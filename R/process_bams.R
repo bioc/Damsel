@@ -45,7 +45,7 @@ process_bams <- function(path_to_bams, regions) {
 
 }
 
-correlation_heatmap_fn <- function(df, method = "spearman") {
+corr_heatmap <- function(df, method = "spearman") {
   corr_res <- cor(df[,7:ncol(df)], method = method)
   median_corr <- round(median(corr_res), 1)
   min_corr <- floor(min(corr_res)*10)/10
@@ -69,7 +69,7 @@ correlation_heatmap_fn <- function(df, method = "spearman") {
     coord_fixed()
 }
 
-correlation_scatter_fn <- function(df, sample_1, sample_2, method = "spearman") {
+corr_scatter <- function(df, sample_1, sample_2, method = "spearman") {
   ggpubr::ggscatter(df, x = sample_1, y = sample_2,
             add = "reg.line", conf.int = TRUE,
             cor.coef = TRUE, cor.method = method)
