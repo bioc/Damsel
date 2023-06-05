@@ -44,3 +44,29 @@ process_bams <- function(path_to_bams, regions) {
   df
 
 }
+
+correlation_heatmap_fn <- function(df, method = "spearman") {
+  corr_res <- cor(df[,7:ncol(df)], method = method)
+  median_corr <- round(median(corr_res), 1)
+  min_corr <- floor(min(corr_res)*10)/10
+  corr_res <- round(corr_res, 2)
+  # Use correlation between variables as distance and reorder
+  dd <- as.dist((1-corr_res)/2)
+  hc <- hclust(dd)
+  corr_res <- corr_res[hc$order, hc$order]
+  # upper triangle
+  corr_res[lower.tri(corr_res)]<- NA
+  # Melt the correlation matrix
+  corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
+  #plot heatmap
+  ggplot(corr_res, aes(Var2, Var1, fill = value)) +
+    geom_tile(color = "white")+
+    scale_fill_gradient2(low = "blue", high = "red",
+                         midpoint = median_corr, limit = c(min_corr,1), space = "Lab",
+                         name = paste(stringr::str_to_title(method), "\nCorrelation", sep = " ")) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
+    coord_fixed()
+}
+
+
