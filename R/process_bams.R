@@ -69,4 +69,8 @@ correlation_heatmap_fn <- function(df, method = "spearman") {
     coord_fixed()
 }
 
-
+correlation_scatter_fn <- function(df, sample_1, sample_2, method = "spearman") {
+  ggpubr::ggscatter(df, x = sample_1, y = sample_2,
+            add = "reg.line", conf.int = TRUE,
+            cor.coef = TRUE, cor.method = method)
+}
