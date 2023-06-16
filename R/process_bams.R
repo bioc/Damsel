@@ -41,6 +41,7 @@ process_bams <- function(path_to_bams, regions) {
     }
   }
 
+  colnames(df) <- sub(paste0(path_to_bams, "/"), "", colnames(df))
   df
 
 }
