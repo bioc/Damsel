@@ -49,7 +49,7 @@ peaks_jan_fn <- function() {
   peaks %>% mutate(seqnames = case_when(number < seqnames_pos[1] ~ "chr2L", number < seqnames_pos[2] ~ "chr2R", number < seqnames_pos[3] ~ "chr3L", number < seqnames_pos[4] ~  "chr3R", number < seqnames_pos[5] ~ "chr4", TRUE ~ "chrX"))
 }
 
-peaks_jan_fn <- function(peaks?, regions = regions_between_gatc_dm6) {
+peaks_jan_fn <- function(regions = regions_between_gatc_dm6) {
   system('python3 call_peaks.py keep lrt_sd.txt > peaks.txt')
   peaks <- read.table("peaks.txt")
 
