@@ -7,7 +7,7 @@ process_bams <- function(path_to_bams, regions) {
     mutate(bai = stringr::str_detect(.$file, "bai")) %>%
     filter(bai == FALSE)
   #add / to get path for each file
-  files <- paste0(path_to_bams, "/", files$file)
+  files <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", paste0(path_to_bams, files$file), paste0(path_to_bams, "/", files$file))
   df <- regions
   #test format of seqnames and separate them
   seqnames_vec <- character()
@@ -15,7 +15,7 @@ process_bams <- function(path_to_bams, regions) {
     is_error <- ifelse(sum(exomeCopy::countBamInGRanges(files[[i]], plyranges::as_granges(df))) == 0, "error", "fine")
     seqnames_vec <- c(seqnames_vec, is_error)
   }
-  files <- as.data.frame(files) %>% setNames(., "file")
+  files <- as.data.frame(files) %>% stats::setNames(., "file")
   files <- cbind(files, seqnames_vec)
   files_fine <- filter(files, seqnames_vec == "fine")$file
   files_error <- filter(files, seqnames_vec == "error")$file
@@ -26,7 +26,7 @@ process_bams <- function(path_to_bams, regions) {
     } else {
       raw_counts <- exomeCopy::countBamInGRanges(files_fine[[i]], plyranges::as_granges(df))
       df[, ncol(df) + 1] <- raw_counts
-      colnames(df)[ncol(df)] <- paste0("raw_counts", files_fine[[i]])
+      colnames(df)[ncol(df)] <- files_fine[[i]]
     }
   }
   #seqnames format chr2L etc
@@ -37,7 +37,7 @@ process_bams <- function(path_to_bams, regions) {
     } else {
       raw_counts <- exomeCopy::countBamInGRanges(files_error[[i]], plyranges::as_granges(df))
       df[, ncol(df) + 1] <- raw_counts
-      colnames(df)[ncol(df)] <- paste0("raw_counts", files_error[[i]])
+      colnames(df)[ncol(df)] <- files_error[[i]] #possibly obselete?
     }
   }
 
