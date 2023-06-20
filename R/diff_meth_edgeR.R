@@ -14,7 +14,6 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 
   dge <- edgeR::calcNormFactors(dge)
 
-  design <- model.matrix(~group + c(1,1,0,0,0,0) + c(0,0,1,1,0,0)) #depends on N of samples
   design_df <- seq(1:10) %>% as.data.frame() %>% setNames("group")
   zero_vec <- rep(0, times = length(n_samples))
   for(i in 1:length(n_samples)) {
@@ -48,8 +47,8 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   lrt_table
 }
 
-edgeR_results_plot <- function(dge, de) {
-  detags <- rownames(dge)[as.logical(de)]
+edgeR_results_plot <- function(dge, results) {
+  detags <- rownames(dge)[as.logical(results$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
 }
 
