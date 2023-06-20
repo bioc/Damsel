@@ -47,7 +47,7 @@ process_bams <- function(path_to_bams, regions) {
 }
 
 corr_heatmap <- function(df, method = "spearman") {
-  corr_res <- cor(df[,7:ncol(df)], method = method)
+  corr_res <- cor(df[,grepl("bam", colnames(df))], method = method)
   median_corr <- round(median(corr_res), 1)
   min_corr <- floor(min(corr_res)*10)/10
   corr_res <- round(corr_res, 2)
