@@ -37,17 +37,6 @@ add_de <- function(regions, de_results) {
 
 
 #jan's peak caller
-peaks_jan_fn <- function() {
-  system('python3 call_peaks.py keep lrt_sd.txt > peaks.txt')
-  peaks <- read.table("peaks.txt")
-  names(peaks) <- c('chr', 'start', 'end', "tags", 'pen', 'aveLogFC', 'sig')
-  peaks$big <- peaks$tags> 2 | peaks$pen==1
-  peaks$number <- 1:nrow(peaks)
-  seqnames_pos <- peaks %>%
-    mutate(prev_ = lag(start), start_diff = start-prev_) %>%
-    filter(start_diff < 0) %>% .[, "number"]
-  peaks %>% mutate(seqnames = case_when(number < seqnames_pos[1] ~ "chr2L", number < seqnames_pos[2] ~ "chr2R", number < seqnames_pos[3] ~ "chr3L", number < seqnames_pos[4] ~  "chr3R", number < seqnames_pos[5] ~ "chr4", TRUE ~ "chrX"))
-}
 
 peaks_jan_fn <- function(regions = regions_between_gatc_dm6) {
   system('python3 call_peaks.py keep lrt_sd.txt > peaks.txt')
