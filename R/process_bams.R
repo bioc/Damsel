@@ -1,3 +1,54 @@
+process_bams <- function(path_to_bams, regions, cores=detectCores()) {
+  #list of all bam files
+  files <- list.files(path_to_bams, pattern = ".bam")
+  #remove any bai files
+  files <- files %>% as.data.frame() %>%
+    stats::setNames(., "file") %>%
+    mutate(bai = stringr::str_detect(.$file, "bai")) %>%
+    filter(bai == FALSE)
+  #add / to get path for each file
+  path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", path_to_bams, paste0(path_to_bams, "/"))
+  files <- paste0(path_to_bams, files$file)
+  df <- regions
+
+  #test format of seqnames and separate them
+  seqnames_vec <- mclapply(files, function(x) {ifelse(sum(exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))) == 0, "error", "fine")}, mc.cores = cores) %>% unlist()
+  files <- as.data.frame(files) %>% setNames(., "file")
+  files <- cbind(files, seqnames_vec)
+  files_fine <- filter(files, seqnames_vec == "fine")$file
+  files_error <- filter(files, seqnames_vec == "error")$file
+
+  #seqnames format 2L etc
+  df_fine <- mclapply(files_fine, function(x) {if(length(x) == 0) {
+    break
+  } else {
+    exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))
+  }}, mc.cores = cores) %>% as.data.frame()
+  colnames(df_fine) <- files_fine
+
+  #seqnames format chr2L etc
+  df <- df %>% mutate(seqnames = paste0("chr", seqnames))
+  df_error <- mclapply(files_error, function(x) {if(length(x) == 0) {
+    break
+  } else {
+    exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))
+  }}, mc.cores = cores) %>% as.data.frame()
+  colnames(df_error) <- files_error
+
+  list_df <- list(df, df_fine, df_error)
+  df2 <- df$Position %>% as.data.frame() #maybe just replace with 1st column and use the index: df[,1] - less risky
+  for(i in 1:length(list_df)) {
+    if(nrow(list_df[[i]]) == 0) {
+      next
+    }
+    df2 <- cbind(df2, list_df[[i]])
+  }
+  colnames(df2) <- sub(path_to_bams, "", colnames(df2))
+  df2 <- df2[,2:ncol(df2)]
+  df2
+
+}
+
 process_bams <- function(path_to_bams, regions) {
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
