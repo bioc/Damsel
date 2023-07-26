@@ -2,100 +2,31 @@ process_bams <- function(path_to_bams, regions, cores=detectCores()) {
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
   #remove any bai files
-  files <- files %>% as.data.frame() %>%
+  files <- files %>% data.frame() %>%
     stats::setNames(., "file") %>%
-    mutate(bai = stringr::str_detect(.$file, "bai")) %>%
-    filter(bai == FALSE)
+    dplyr::mutate(bai = stringr::str_detect(.$file, "bai")) %>%
+    dplyr::filter(bai == FALSE)
   #add / to get path for each file
   path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", path_to_bams, paste0(path_to_bams, "/"))
   files <- paste0(path_to_bams, files$file)
   df <- regions
-
   #test format of seqnames and separate them
-  seqnames_vec <- mclapply(files, function(x) {ifelse(sum(exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))) == 0, "error", "fine")}, mc.cores = cores) %>% unlist()
-  files <- as.data.frame(files) %>% setNames(., "file")
-  files <- cbind(files, seqnames_vec)
-  files_fine <- filter(files, seqnames_vec == "fine")$file
-  files_error <- filter(files, seqnames_vec == "error")$file
+  one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>% data.frame()
+  colnames(one_count) <- files
 
-  #seqnames format 2L etc
-  df_fine <- mclapply(files_fine, function(x) {if(length(x) == 0) {
-    break
-  } else {
-    exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))
-  }}, mc.cores = cores) %>% as.data.frame()
-  colnames(df_fine) <- files_fine
-
-  #seqnames format chr2L etc
-  df <- df %>% mutate(seqnames = paste0("chr", seqnames))
-  df_error <- mclapply(files_error, function(x) {if(length(x) == 0) {
-    break
-  } else {
-    exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))
-  }}, mc.cores = cores) %>% as.data.frame()
-  colnames(df_error) <- files_error
-
-  list_df <- list(df, df_fine, df_error)
-  df2 <- df$Position %>% as.data.frame() #maybe just replace with 1st column and use the index: df[,1] - less risky
-  for(i in 1:length(list_df)) {
-    if(nrow(list_df[[i]]) == 0) {
-      next
+  for(i in 1:ncol(one_count)) {
+    if(sum(one_count[,i]) == 0) {
+      one_count[,i] <- exomeCopy::countBamInGRanges(files[i], plyranges::as_granges(dplyr::mutate(df, seqnames = paste0("chr", seqnames))))
     }
-    df2 <- cbind(df2, list_df[[i]])
   }
+
+  df2 <- cbind(df, one_count)
+  df2$seqnames <- paste0("chr", df2$seqnames)
   colnames(df2) <- sub(path_to_bams, "", colnames(df2))
-  df2 <- df2[,2:ncol(df2)]
   df2
 
 }
 
-process_bams <- function(path_to_bams, regions) {
-  #list of all bam files
-  files <- list.files(path_to_bams, pattern = ".bam")
-  #remove any bai files
-  files <- files %>% as.data.frame() %>%
-    stats::setNames(., "file") %>%
-    mutate(bai = stringr::str_detect(.$file, "bai")) %>%
-    filter(bai == FALSE)
-  #add / to get path for each file
-  files <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", paste0(path_to_bams, files$file), paste0(path_to_bams, "/", files$file))
-  df <- regions
-  #test format of seqnames and separate them
-  seqnames_vec <- character()
-  for(i in 1:length(files)) {
-    is_error <- ifelse(sum(exomeCopy::countBamInGRanges(files[[i]], plyranges::as_granges(df))) == 0, "error", "fine")
-    seqnames_vec <- c(seqnames_vec, is_error)
-  }
-  files <- as.data.frame(files) %>% stats::setNames(., "file")
-  files <- cbind(files, seqnames_vec)
-  files_fine <- filter(files, seqnames_vec == "fine")$file
-  files_error <- filter(files, seqnames_vec == "error")$file
-  #seqnames format 2L etc
-  for(i in 1:length(files_fine)) {
-    if(length(files_fine) == 0) {
-      break
-    } else {
-      raw_counts <- exomeCopy::countBamInGRanges(files_fine[[i]], plyranges::as_granges(df))
-      df[, ncol(df) + 1] <- raw_counts
-      colnames(df)[ncol(df)] <- files_fine[[i]]
-    }
-  }
-  #seqnames format chr2L etc
-  df <- df %>% mutate(seqnames = paste0("chr", seqnames))
-  for(i in 1:length(files_error)) {
-    if(length(files_error) == 0) {
-      break
-    } else {
-      raw_counts <- exomeCopy::countBamInGRanges(files_error[[i]], plyranges::as_granges(df))
-      df[, ncol(df) + 1] <- raw_counts
-      colnames(df)[ncol(df)] <- files_error[[i]] #possibly obselete?
-    }
-  }
-
-  colnames(df) <- sub(paste0(path_to_bams, "/"), "", colnames(df))
-  df
-
-}
 
 corr_heatmap <- function(df, method = "spearman") {
   corr_res <- cor(df[,grepl("bam", colnames(df))], method = method)
@@ -111,14 +42,14 @@ corr_heatmap <- function(df, method = "spearman") {
   # Melt the correlation matrix
   corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
   #plot heatmap
-  ggplot(corr_res, aes(Var2, Var1, fill = value)) +
-    geom_tile(color = "white")+
-    scale_fill_gradient2(low = "blue", high = "red",
+  ggplot::ggplot(corr_res, aes(Var2, Var1, fill = value)) +
+    ggplot::geom_tile(color = "white")+
+    ggplot::scale_fill_gradient2(low = "blue", high = "red",
                          midpoint = median_corr, limit = c(min_corr,1), space = "Lab",
                          name = paste(stringr::str_to_title(method), "\nCorrelation", sep = " ")) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
-    coord_fixed()
+    ggplot::theme_minimal() +
+    ggplot::theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
+    ggplot::coord_fixed()
 }
 
 corr_scatter <- function(df, sample_1, sample_2, method = "spearman") {
