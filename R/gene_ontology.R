@@ -1,15 +1,31 @@
-goseq_fn <- function(regions, genes, peaks, bias=n) {
+#' Gene ontology analysis
+#'
+#'  `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+#'
+#' @param regions data frame of regions between GATC sites - load data
+#' @param genes data frame of gene data
+#' @param peaks data frame of annotated peak data
+#'
+#' @return 4 objects
+#'  * List of top 10 over-represented GO terms across the 3 GO categories
+#'  * Plot of goodness of fit of model
+#'  * Plot of sample data
+#'  * Plot of sample data without bias correction (should be messy)
+#' @export
+#'
+#' @examples
+goseq_fn <- function(regions, genes, peaks) {
   goseq_genes_peaks <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
-    as.data.frame() %>%
-    group_by(ensembl_gene_id) %>%
-    mutate(n = n()) %>%
-    ungroup() %>%
-    mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1,0)) %>%
-    distinct(ensembl_gene_id, gene_width, n, de)
+    data.frame() %>%
+    dplyr::group_by(ensembl_gene_id) %>%
+    dplyr::mutate(n = n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1,0)) %>%
+    dplyr::distinct(ensembl_gene_id, gene_width, n, de)
   gene.vector <- goseq_genes_peaks$de
   names(gene.vector) <- goseq_genes_peaks$ensembl_gene_id
 
-  pwf = goseq::nullp(gene.vector, "dm6", "ensGene", bias.data = goseq_genes_peaks$bias)
+  pwf = goseq::nullp(gene.vector, "dm6", "ensGene", bias.data = goseq_genes_peaks$n)
 
   GO.wall = goseq::goseq(pwf, "dm6", "ensGene")
 
@@ -39,32 +55,3 @@ goseq_fn <- function(regions, genes, peaks, bias=n) {
 }
 
 
-#bootstrap
-goseq_fn_bootstrap <- function(regions=regions_between_gatc_dm6, genes=mutate(as.data.frame(extend_upstream(ensembl_granges, 2500)), gene_width = width), peaks) {
-  goseq_genes_peaks <- find_overlaps_within(as_granges(regions), as_granges(genes)) %>% as.data.frame() %>%
-    group_by(ensembl_gene_id, external_gene_name) %>%
-    summarise(n_regions = n()) %>%
-    mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1,0))
-  gene.vector <- goseq_genes_peaks$de
-  names(gene.vector) <- goseq_genes_peaks$ensembl_gene_id
-
-  pwf = nullp(gene.vector, "dm6", "ensGene", bias.data = goseq_genes_peaks$n_regions)
-
-  GO.wall = goseq(pwf = nullp(gene.vector, "dm6", "ensGene", bias.data = goseq_genes_peaks$n_regions), "dm6", "ensGene")
-
-  enriched.GO=GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
-
-  ifelse(enriched.GO == as.character(0), "No_GO", enriched.GO)
-  #need a test to see if enriched.Go is empty/doesn't have 10
-  #escape clause - for nothing found in the subset
-  #bootstrap 1000 times, blank df this many time
-
-}
-
-goseq_fn_bootstrap2 <- function(x) {
-  go <- x[1:10]
-  ifelse(go == as.character(0), "No_GO", go[1:10])
-}
-
-
-bootstrap_500_test1 <- replicate(500, goseq_fn_bootstrap2(goseq_fn_bootstrap(peaks=sample_n(peaks_harvey_wing_jan_distinct_genes, 350))))
