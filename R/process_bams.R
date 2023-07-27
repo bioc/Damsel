@@ -1,3 +1,18 @@
+#' Initial processing of BAM files
+#'
+#' `process_bams()` obtains the counts for the regions between GATC sites, from BAM files specified in the path.
+#'
+#' @param path_to_bams Character string input vector. Should identify directory containing the BAM files.
+#' @param regions Data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
+#' @param cores Specify computer cores to be used to parallelise function and speed output. Default is to use all available cores. If computer is being used for multiple tasks at once, reccommend reducing the number of cores. Number of available cores can be checked using [parallel::detectCores()]
+#'
+#' @return A data frame containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
+#' * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
+#' * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
+#'
+#' @examples
+#'
+#' @export
 process_bams <- function(path_to_bams, regions, cores=detectCores()) {
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
@@ -28,32 +43,4 @@ process_bams <- function(path_to_bams, regions, cores=detectCores()) {
 }
 
 
-corr_heatmap <- function(df, method = "spearman") {
-  corr_res <- cor(df[,grepl("bam", colnames(df))], method = method)
-  median_corr <- round(median(corr_res), 1)
-  min_corr <- floor(min(corr_res)*10)/10
-  corr_res <- round(corr_res, 2)
-  # Use correlation between variables as distance and reorder
-  dd <- as.dist((1-corr_res)/2)
-  hc <- hclust(dd)
-  corr_res <- corr_res[hc$order, hc$order]
-  # upper triangle
-  corr_res[lower.tri(corr_res)]<- NA
-  # Melt the correlation matrix
-  corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
-  #plot heatmap
-  ggplot::ggplot(corr_res, aes(Var2, Var1, fill = value)) +
-    ggplot::geom_tile(color = "white")+
-    ggplot::scale_fill_gradient2(low = "blue", high = "red",
-                         midpoint = median_corr, limit = c(min_corr,1), space = "Lab",
-                         name = paste(stringr::str_to_title(method), "\nCorrelation", sep = " ")) +
-    ggplot::theme_minimal() +
-    ggplot::theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
-    ggplot::coord_fixed()
-}
 
-corr_scatter <- function(df, sample_1, sample_2, method = "spearman") {
-  ggpubr::ggscatter(df, x = sample_1, y = sample_2,
-            add = "reg.line", conf.int = TRUE,
-            cor.coef = TRUE, cor.method = method)
-}
