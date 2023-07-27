@@ -14,8 +14,8 @@ gene_annotate_fn <- function(granges, upstream, peaks) {
   start(granges) <- new_start
   end(granges) <- new_end
 
-  plyranges::find_overlaps_within(plyranges::as_granges(mutate(peaks, start = peak_start, end = peak_end)),
-                       plyranges::as_granges(mutate(as.data.frame(granges), gene_width = width))) %>%
-    as.data.frame()
+  plyranges::find_overlaps_within(plyranges::as_granges(dplyr::mutate(peaks, start = peak_start, end = peak_end)),
+                       plyranges::as_granges(dplyr::mutate(data.frame(granges), gene_width = width))) %>%
+    data.frame()
 
 }
