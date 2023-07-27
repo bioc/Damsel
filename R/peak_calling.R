@@ -1,107 +1,80 @@
-##function
-find_peaks <- function(de_results, regions = regions) {
-  df <- regions %>% dplyr::mutate(sig = de_results[match(.$Position, row.names(de_results)), "de"],
-                           logFC = de_results[match(.$Position, row.names(de_results)), "logFC"],
-                           pVal = de_results[match(.$Position, row.names(de_results)), "PValue"])
-  df <- df %>% dplyr::mutate(sig = dplyr::coalesce(sig, 0), logFC = dplyr::coalesce(logFC, 0), pVal = dplyr::coalesce(pVal, 1))
-  df$tag <- df$start
 
-  start <- -1
-  end <- -1
-  logFC <- 0
-  size <- 0
-  sig <- 0
+#' Identify peaks by aggregating differentially methylated regions
+#'
+#' `aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
+#'
+#' @param dm_results data frame of differential methylation results obtained from [edgeR_results]
+#'
+#' @return data frame of peaks. columns are chromosome name, start, end, and width of peak, peak identifier, n of dm regions within the peak, gap in bp to the next peak, and peak rank (based on p value).
+#' @export
+#'
+#' @examples
+aggregate_peaks <- function(dm_results) {
+  df_a <- dm_results %>% dplyr::mutate(number = 1:n(),
+                        trial = unsplit(lapply(split(.[,"de"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
+                        trial = ifelse(lead(trial) == trial, 0, trial),
+                        multiple = ifelse(trial == 0, F, T))
+  df_1 <- df_a %>% dplyr::filter(multiple == TRUE) %>%
+    dplyr::group_by(seqnames, de) %>%
+    dplyr::mutate(swap = ifelse(lag(number) != (number - 1), 1, 0),
+           swap = dplyr::coalesce(swap, 1)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(swap) %>%
+    dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
+           seq = ifelse(seq == 0, NA, seq)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(sig) %>%
+    tidyr::fill(seq) %>%
+    dplyr::ungroup() %>%
+    data.frame()
+  df_2 <- df_a %>% dplyr::filter(multiple == FALSE)  %>%
+    dplyr::group_by(seqnames) %>%
+    dplyr::mutate(swap = ifelse(lag(number) != (number - 1), 1, 0),
+           swap = dplyr::coalesce(swap, 1)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(swap) %>%
+    dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
+           seq = ifelse(seq == 0, NA, seq)) %>%
+    dplyr::ungroup() %>%
+    tidyr::fill(seq) %>%
+    dplyr::ungroup() %>%
+    data.frame()
+  df_3 <- dm_results %>%
+    dplyr::mutate(consec_dm = df_1[match(df$Position, df_1$Position), "seq"],
+           not_consec_dm = df_2[match(df$Position, df_2$Position), "seq"]) %>%
+    dplyr::group_by(consec_dm, not_consec_dm) %>%
+    dplyr::mutate(n_regions_dm = n(),
+           distance_dm = sum(width),
+           dm_start = ifelse(row_number() == 1, start, NA),
+           dm_end = ifelse(row_number() == n(), end, NA)) %>%
+    tidyr::fill(dm_start) %>% dplyr::ungroup() %>% tidyr::fill(dm_end, .direction = "up")
 
-  lapseOneTag <- FALSE
-  peaks <- rbind(1:7) %>% data.frame()
-  for (i in seq(1, nrow(df), by = 2)) {
-    if (i + 3 < nrow(df) && df[i + 3,]$pVal < 0.05 && df[i,]$pVal < 0.05 &&
-        df[i + 3,]$logFC > 0 && df[i,]$logFC > 0) {
-      if (df[i,]$sig > 0) {
-        sig <- sig + 1
-      }
-      if (df[i + 3,]$sig > 0) {
-        sig <- sig + 1
-      }
-      size <- size + 2
-      logFC <- logFC + df[i,]$logFC + df[i + 3,]$logFC
-      if (start < 0) {
-        start <- i
-      }
-      end <- i + 3
-      lapseOneTag <- TRUE
-    } else if (lapseOneTag) {
-      lapseOneTag <- FALSE
-    } else if (start >= 0) {
-      s <-  df[start,]$tag
-      e <- df[end,]$tag
-      m <- (s + e) / 2
-      unmeth <- 0
-      for (j in seq(end + 3, nrow(df), by = 1)) {
-        x <- df[j,]$tag
-        if (x - m > 500) {
-          break
-        }
-        if (!df[j,]$sig && !df[j - 1,]$sig) {
-          unmeth <- unmeth + 1
-        }
-      }
-      if(start == 1) {
-        for (j in seq(1, start - 1, by= -1)) {
-          x <- df[j,]$tag
-          if (m - x > 500) {
-            break
-          }
-          if (!df[j,]$sig && !df[j + 1,]$sig) {
-            unmeth <- unmeth + 1
-          }
-        } } else {
-          for (j in seq(start - 1, 1, by= -1)) {
-            x <- df[j,]$tag
-            if (m - x > 500) {
-              break
-            }
-            if (!df[j,]$sig && !df[j + 1,]$sig) {
-              unmeth <- unmeth + 1
-            }
-          }
-        }
+  peaks <- df_3 %>%
+    dplyr::group_by(consec_dm) %>%
+    dplyr::mutate(ave_logFC = mean(logFC),
+                  ave_pVal = mean(pVal)) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct(seqnames, dm_start, dm_end, sig, consec_dm, n_regions_dm, ave_logFC, ave_pVal) %>%
+    dplyr::filter(!is.na(consec_dm), n_regions_dm != 2, sig == 1) %>%
+    .[order(.$ave_pVal),] %>%
+    dplyr::mutate(rank_p = 1:nrow(.)) %>%
+    .[order(.$consec_dm),] %>%
+    stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:6]))) %>%
+    plyranges::as_granges() %>%
+    data.frame() %>%
+    dplyr::group_by(seqnames) %>%
+    dplyr::mutate(gap = start - lag(end)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(number = 1:nrow(.))
+  peaks <- peaks %>% dplyr::mutate(info = case_when(width <= 2000 ~ "significant binding", width > 2000 && width <= 10000 ~ "less significant", width > 10000 ~ "unexpected width")) #some kind of message about peaks that are too big or something
 
-      ll <- logFC / size
-      output <- c(df[start,]$tag, s, e, size, (size / (unmeth + size)), ll, sig)
-      peaks[nrow(peaks) + 1, ] <- output
-
-      last <- 0
-      skip <- 0
-      logFC <- 0
-      start <- -1
-      end <- -1
-      size <- 0
-      sig <- 0
-
+  for(i in 1:nrow(peaks)) {
+    if(peaks[i,]$gap == 5) {
+      peaks[i-1,] <- peaks[i-1,] %>% dplyr::mutate(end = peaks[i,]$end,
+                                            n_regions_dm = n_regions_dm + peaks[i,]$n_regions_dm,
+                                            width = width + peaks[i,]$width + 4)
+      peaks <- peaks[-i,]
     }
   }
-
-  peaks <- peaks[2:nrow(peaks), 2:ncol(peaks)]
-  colnames(peaks) <- c("start", "end", "n_regions", "any_unmeth", "aveLogFC", "n_de_regions")
-  peaks$big = peaks$n_regions> 2 | peaks$any_unmeth==1
-
-  peaks$number <- 1:nrow(peaks)
-
-  seqnames_pos <- peaks %>%
-    dplyr::mutate(prev_ = lag(start), start_diff = start-prev_) %>%
-    dplyr::filter(start_diff < 0) %>% .[, "number"]
-  seqnames_pos <- c(1, seqnames_pos)
-  seqnames_pos <- c(seqnames_pos, (nrow(peaks) + 1))
-  seqnames_distinct <- df$seqnames %>% unique()
-
-  seqnames_vec <- character()
-  for(i in 1:length(seqnames_distinct)) {
-    out <- replicate(n = (seqnames_pos[i + 1] - seqnames_pos[i]), seqnames_distinct[i])
-    seqnames_vec <- c(seqnames_vec, out)
-  }
-
-  peaks$seqnames <- seqnames_vec
   peaks
 }
-
