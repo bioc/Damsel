@@ -10,6 +10,8 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
@@ -29,3 +31,4 @@ Imports:
     reshape2,
     stringr,
     tidyr
+VignetteBuilder: knitr
