@@ -56,7 +56,7 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @examples
 edgeR_plot_mds <- function(dge) {
   group <- dge$samples$group %>% as.character()
-  edgeR::plotMDS(dge, col=as.numeric(factor(group)))
+  limma::plotMDS(dge, col=as.numeric(factor(group)))
 }
 
 
