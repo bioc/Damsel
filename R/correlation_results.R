@@ -1,4 +1,4 @@
-#' Plotting correlation of samples
+#' Plotting correlation of all samples
 #'
 #' `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 #' * uses the non-parametric "spearman's" correlation.
@@ -6,7 +6,7 @@
 #' The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
 #'
 #' @param df data frame as outputted from [process_bams()]
-#' @param method correlation method. Default is the non-parametric spearman's. Non-parametric methods are required as data does not reliably meet the requirements for parametric analysis.
+#' @param method correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.
 #'
 #' @return A heatmap style plot of the samples, coloured by correlation value. Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 #' @examples
@@ -36,6 +36,24 @@ corr_heatmap <- function(df, method = "spearman") {
     ggplot::coord_fixed()
 }
 
+#' Plotting correlation of specific samples
+#'
+#' `corr_scatter` plots a scatterplot with correlation results from two selected samples, in order to visualise their similarity/difference.
+#' * uses the non-parametric "spearman's" correlation.
+#' * for more information, see: [ggpubr::ggscatter()]
+#'
+#'The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
+#'
+#' @param df data frame as outputted from [process_bams()]
+#' @param sample_1 name of the BAM file within df
+#' @param sample_2 name of the BAM file within df
+#' @param method correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.
+#'
+#'
+#' @return A scatterplot of the two selected samples, showing their counts at each region, overlaid with the correlation results.
+#' @export
+#'
+#' @examples
 corr_scatter <- function(df, sample_1, sample_2, method = "spearman") {
   ggpubr::ggscatter(df, x = sample_1, y = sample_2,
                     add = "reg.line", conf.int = TRUE,
