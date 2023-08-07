@@ -45,10 +45,12 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 
 #' Multidimensional scaling plot for samples
 #'
-#' this is a test for having 2 in 1 doc
+#' `edgeR_plot_mds` visualises the difference between samples.
+#' * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
+#'
 #' @param dge as outputted from [edgeR_set_up()]
 #'
-#' @return mds plot of samples -
+#' @return refer to [edgeR::plotMDS()] for details
 #' @export
 #'
 #' @examples
@@ -57,6 +59,23 @@ edgeR_plot_mds <- function(dge) {
   edgeR::plotMDS(dge, col=as.numeric(factor(group)))
 }
 
+
+#' Differential methylation analysis
+#'
+#' `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.
+#' Refer to the following pages for further details:
+#' * [edgeR::glmQLFit()]
+#' * [edgeR::glmGQLFTest()]
+#' * [edgeR::decideTestsDGE()]
+#'
+#' @param dge as outputted from [edgeR_set_up()]
+#' @param p.value p value threshold for minimum significance. Default is 0.05
+#' @param lfc minimum log fold change for significant results. Default is 1
+#'
+#' @return data frame of differential methylation results. Columns are as follows; rownames(Region position), logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
+#' @export
+#'
+#' @examples
 edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   group <- dge$samples$group %>% as.character()
   design <- dge$design
@@ -70,6 +89,18 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   lrt_table
 }
 
+#' Differential methylation results plot
+#'
+#' `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
+#' * for further details, see [edgeR::plotSmear()]
+#'
+#' @param dge as outputted from [edgeR_set_up()]
+#' @param results as outputted from [edgeR_results()]
+#'
+#' @return MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
+#' @export
+#'
+#' @examples
 edgeR_results_plot <- function(dge, results) {
   detags <- rownames(dge)[as.logical(results$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
