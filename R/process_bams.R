@@ -13,7 +13,7 @@
 #' @examples
 #'
 #' @export
-process_bams <- function(path_to_bams, regions, cores=detectCores()) {
+process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=parallel::detectCores()) {
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
   #remove any bai files
