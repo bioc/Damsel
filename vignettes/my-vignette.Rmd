@@ -158,10 +158,35 @@ Given that we know that Dam can methylate up to 5kb away, and most significantly
 
 
 ##5. Identifying genes associated with peaks
+The peak information itself - while interesting, has no biological meaning. As the peaks represent a region that the Fusion protein interacted with on the DNA, likely as a transcription factor, we wish to identify the gene that is being affected. To do so, we need to associate the peaks with a potential "target" gene.
+
+Note: any gene identified here is only a potential target that must be validated in laboratory procedures. There is no method available that is able to accurately predict the location and target genes of enhancers, so a key and potentially incorrect assumption in this part of the analysis is that all peaks represent binding to a local enhancer or promoter - that it is close or overlapping to the target gene.
+
+It must also be noted that the Drosophila melanogaster genome and transcription factor interactions are different to that of mammals and using the same assumptions is problematic but it's the best we have. While mammalian genes are generally spread out with little overlap, there is a large amount of overlap between Drosophila genes, requiring some intuitive interpretation of which gene the peak is potentially targeting.
+
+In the Damsel methodology, peaks are considered to associate with genes if they overlap the gene body or are within 2.5kb upstream of the genes transcription start site. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
+
 #5.1 Extract genes from Ensembl using biomaRt
+Obtaining information about the genes is done through accessing Ensembl via biomaRt. As this can be a slow process, it has been provided for Drosophila melanogaster dm6 and can be loaded via `data`.
+
+Functions to undertake this are also available (`get_biomart_genes`), and follow these general steps:
+-i. accesses biomaRt using the seqnames of the appropriate GATC region file as a guide
+-ii. accesses biomaRt a second time to obtain only the Ensembl canonical sequence information for each gene
+-iii. identifies the number of GATC regions that overlap with each gene
+
+```{r}
+#data(gene_file)
+#get_biomart_genes(species, version, regions)
+```
+
+
 #5.2 Examine distribution of genes and GATC regions
+This can be visualised with ...
+
 #5.3 Annotating genes to peaks
+yeah I don't actually have a good fn for that yet
 #5.4 Interpreting results/Plotting?
+also don't have a good fn for that yet
 
 ##6. Gene ontology
 #6.1 Setting up goseq
