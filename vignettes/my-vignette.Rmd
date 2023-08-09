@@ -140,9 +140,22 @@ MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, wi
 
 
 ##4. Identifying peaks (bridges)
+As you could see from the plot of the differential methylation results, there are 10s of 1000s of enriched regions. To reduce the scale of this data to something that can be more biologically meaningul, enriched regions can be compiled into peaks.
+
 # ?Plotting
+idk
 # Aggregating the regions
+Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were exlcuded from edgeR analysis for being too small given a p value of 1.
+
+Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
+
+```{r}
+#aggregate_peaks(dm_results)
+```
+
 # ?Plotting
+-idk
+
 
 ##5. Identifying genes associated with peaks
 #5.1 Extract genes from Ensembl using biomaRt
