@@ -1,0 +1,65 @@
+---
+title: "my-vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(Damsel)
+```
+
+##thoughts
+sketch out a format
+-introduce data
+-process data
+-optional correlation plots
+-then methylation analysis
+-plots
+-then finding peaks, any plots
+-add the genes
+-do the goseq
+a
+
+##1. Introduction
+This document gives an introduction to the R package Damsel, for use in DamID analysis; from BAM file input to gene ontology analysis.
+Designed for use with DamID data, the Damsel methodology could be modified for use on any similar technology that seeks to identify enriched regions relative to a control sample. Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
+
+##2. Processing the BAM files
+#2.1 Introducing the GATC region file
+#2.2 Extracting the counts within the GATC regions
+#2.3 Correlation analysis of samples
+
+##3. Differential methylation analysis
+#3.1 Setting up edgeR analysis
+#3.2 Examining the data - multidimensional scaling plot
+#3.3 Identifying differentially methylated regions
+#3.4 Plotting the results
+
+##4. Identifying peaks (bridges)
+# ?Plotting
+# Aggregating the regions
+# ?Plotting
+
+##5. Identifying genes associated with peaks
+#5.1 Extract genes from Ensembl using biomaRt
+#5.2 Examine distribution of genes and GATC regions
+#5.3 Annotating genes to peaks
+#5.4 Interpreting results/Plotting?
+
+##6. Gene ontology
+#6.1 Setting up goseq
+#6.2 Interpreting results
+
+
+
+
