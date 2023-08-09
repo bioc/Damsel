@@ -28,16 +28,67 @@ sketch out a format
 -then finding peaks, any plots
 -add the genes
 -do the goseq
-a
+
 
 ##1. Introduction
 This document gives an introduction to the R package Damsel, for use in DamID analysis; from BAM file input to gene ontology analysis.
 Designed for use with DamID data, the Damsel methodology could be modified for use on any similar technology that seeks to identify enriched regions relative to a control sample. Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
 
 ##2. Processing the BAM files
+As a DamID analysis tool, Damsel requires a GATC region file for analysis. These regions serve as a guide to extract counts from the BAM files.
+
 #2.1 Introducing the GATC region file
+The GATC region file for Drosophila melanogaster v6 is available to you via data.
+```{r}
+#data("regions_gatc_drosophila_dm6")
+#not sure how to write it actually
+```
+It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
+
+If you have another species of DamID data or would prefer to make your own region file, you can use the following fn:
+
+If you already have your own GATC region file, ensure that it has the same format as `regions_gatc_drosophila_dm6` with 6 columns: 
+-Position: chromosome-start
+-seqnames: chromosome name
+-start: start of region
+-end: end of region
+-width: length of region (ensure that is is correct according to [plyranges::as_granges()])
+
+The GATC regions are not evenly distributed across the genome, and vary greatly in size. 
+This can be explored in more detail via boxplots and #that one function I was making looking for patterns in the distribution
+
+
 #2.2 Extracting the counts within the GATC regions
+Note: Damsel requires BAM files that have been mapped to the reference genome.
+Provided the path to a folder of BAM files (and their .bai files) and the appropriate GATC region file, the function `process_bams()` will extract the counts for each region for each available BAM and add them as columns to a data frame. The columns will be named by the BAM file name - please rename them before running `process_bams` if they do not make sense.
+-the function makes use of [exomeCopy::countBaminGranges()]
+```{r}
+#process_bams(path, region = regions_gatc_drosophila_dm6)
+```
+-If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
+-Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the dataframe.
+```{r}
+#example on rearranging columns
+#df[,c(1:6,8,7,blah,blah)]
+```
+
+-The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
+
+
 #2.3 Correlation analysis of samples
+At this stage, the similarities and differences between the samples can be analysed via correlation.
+ `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
+The default for all Damsel correlation analysis is the non-parametric "spearman's" correlation.
+The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
+```{r}
+#corr_heatmap(df)
+```
+
+Two specific samples can also be compared using `corr_scatter` which plots a scatterplot of the two samples, overlaid with the correlation results. `corr_scatter` utilises [ggpubr::ggscatter()]
+```{r}
+#corr_scatter(df, sample_1 = col_1, sample_2 = col_2)
+```
+
 
 ##3. Differential methylation analysis
 #3.1 Setting up edgeR analysis
