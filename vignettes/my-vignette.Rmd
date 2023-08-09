@@ -189,8 +189,21 @@ yeah I don't actually have a good fn for that yet
 also don't have a good fn for that yet
 
 ##6. Gene ontology
-#6.1 Setting up goseq
-#6.2 Interpreting results
+One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
+#6.1 GO analysis with goseq
+`goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+ 
+Outputs list of 4 graphs
+List of top 10 over-represented GO terms across the 3 GO categories
+Plot of goodness of fit of model
+Plot of sample data
+Plot of sample data without bias correction (should be messy)
+
+```{r}
+#goseq_fn(regions, genes, peaks)
+```
+
+#6.2 KEGG???
 
 
 
