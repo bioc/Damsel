@@ -13,22 +13,25 @@
 #' @examples
 #'
 #' @export
+#rename to processBams
 process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=parallel::detectCores()) {
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
   #remove any bai files
-  files <- files %>% data.frame() %>%
-    stats::setNames(., "file") %>%
-    dplyr::mutate(bai = stringr::str_detect(.$file, "bai")) %>%
-    dplyr::filter(bai == FALSE)
+  files <- files %>%
+             data.frame() %>%
+             stats::setNames(., "file") %>%
+             dplyr::mutate(bai = stringr::str_detect(.$file, "bai")) %>%
+             dplyr::filter(bai == FALSE)
   #add / to get path for each file
   path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", path_to_bams, paste0(path_to_bams, "/"))
   files <- paste0(path_to_bams, files$file)
   df <- regions
   #test format of seqnames and separate them
-  one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>% data.frame()
+  one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>%
+                 data.frame()
   colnames(one_count) <- files
-
+#want i in seq_len or something
   for(i in 1:ncol(one_count)) {
     if(sum(one_count[,i]) == 0) {
       one_count[,i] <- exomeCopy::countBamInGRanges(files[i], plyranges::as_granges(dplyr::mutate(df, seqnames = paste0("chr", seqnames))))
