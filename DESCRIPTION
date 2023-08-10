@@ -27,6 +27,7 @@ Imports:
     goseq,
     limma,
     magrittr,
+    parallel,
     plyranges,
     reshape2,
     stringr,
