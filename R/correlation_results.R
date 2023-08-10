@@ -12,17 +12,18 @@
 #' @examples
 #'
 #' @export
-corr_heatmap <- function(df, method = "spearman") {
-  corr_res <- cor(df[,grepl("bam", colnames(df))], method = method)
+#corrHeatmap
+corr_heatmap <- function(df, method="spearman") {
+  corr_res <- cor(df[, grepl("bam", colnames(df))], method = method)
   median_corr <- round(median(corr_res), 1)
-  min_corr <- floor(min(corr_res)*10)/10
+  min_corr <- floor(min(corr_res) * 10) / 10
   corr_res <- round(corr_res, 2)
   # Use correlation between variables as distance and reorder
-  dd <- as.dist((1-corr_res)/2)
+  dd <- as.dist((1 - corr_res) / 2)
   hc <- hclust(dd)
   corr_res <- corr_res[hc$order, hc$order]
   # upper triangle
-  corr_res[lower.tri(corr_res)]<- NA
+  corr_res[lower.tri(corr_res)] <- NA
   # Melt the correlation matrix
   corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
   #plot heatmap
@@ -54,7 +55,8 @@ corr_heatmap <- function(df, method = "spearman") {
 #' @export
 #'
 #' @examples
-corr_scatter <- function(df, sample_1, sample_2, method = "spearman") {
+#corrScatter
+corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
   ggpubr::ggscatter(df, x = sample_1, y = sample_2,
                     add = "reg.line", conf.int = TRUE,
                     cor.coef = TRUE, cor.method = method)
