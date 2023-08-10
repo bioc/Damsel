@@ -13,6 +13,7 @@
 #' @export
 #'
 #' @examples
+#dmSetUp
 edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
   matrix <- as.matrix(df[,grepl("bam", colnames(df))]) # can I be sure they would have "bam" in it?
   rownames(matrix) <- df$Position
@@ -24,19 +25,22 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
   dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = df[,2:5])
 
   keep <- rowSums(cpm(dge) >= keep_a) >= keep_b #potentially will mess with
-  dge <- dge[keep, , keep.lib.sizes=FALSE]
+  dge <- dge[keep, , keep.lib.sizes = FALSE]
 
   dge <- edgeR::calcNormFactors(dge)
 
-  design_df <- seq(1:10) %>% as.data.frame() %>% setNames("group")
+  design_df <- seq(1:10) %>%
+                 data.frame() %>%
+                 setNames("group")
   zero_vec <- rep(0, times = length(n_samples))
+  #need to replace the 1:length with seq along or something
   for(i in 1:length(n_samples)) {
     design <- replace(zero_vec, i, 1)
     design <- rep(design, each = 2)
     design_df[,ncol(design_df) + 1] <- design
 
   }
-  design <- model.matrix(~., data = design_df[,1:ncol(design_df)-1])
+  design <- model.matrix(~., data = design_df[, 1:ncol(design_df) - 1])
 
   dge <- edgeR::estimateDisp(dge, robust = T, design = design)
 
@@ -54,9 +58,10 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @export
 #'
 #' @examples
+#dmPlotMDS
 edgeR_plot_mds <- function(dge) {
   group <- dge$samples$group %>% as.character()
-  limma::plotMDS(dge, col=as.numeric(factor(group)))
+  limma::plotMDS(dge, col = as.numeric(factor(group)))
 }
 
 
@@ -76,11 +81,13 @@ edgeR_plot_mds <- function(dge) {
 #' @export
 #'
 #' @examples
+#dmResults
+#also need to update this fn - adjusted p val
 edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   group <- dge$samples$group %>% as.character()
   design <- dge$design
-  fit = edgeR::glmQLFit(dge, design = design)
-  qlf = edgeR::glmQLFTest(fit, coef = 2)
+  fit <- edgeR::glmQLFit(dge, design = design)
+  qlf <- edgeR::glmQLFTest(fit, coef = 2)
   summary(de <- edgeR::decideTestsDGE(qlf, p.value = p.value, lfc = lfc))
   lrt_table <- qlf$table
   lrt_table$de <- data.frame(de)$groupFusion
@@ -101,6 +108,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #' @export
 #'
 #' @examples
+#dmPlotResults
 edgeR_results_plot <- function(dge, results) {
   detags <- rownames(dge)[as.logical(results$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
