@@ -14,19 +14,92 @@ get_biomart_genes <- function(species, version=109, regions) {
   gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position),]
   colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
   gene_features <- gene_features %>%
-                     plyranges::as_granges() %>%
-                     data.frame()
+      plyranges::as_granges() %>%
+      data.frame()
 
   overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(gene_features)) %>%
-               data.frame() %>%
-               dplyr::group_by(ensembl_gene_id) %>%
-               dplyr::summarise(n_regions = n()) %>%
-               data.frame()
+      data.frame() %>%
+      dplyr::group_by(ensembl_gene_id) %>%
+      dplyr::summarise(n_regions = n()) %>%
+      data.frame()
   gene_features$n_regions <- overlap[match(gene_features$ensembl_gene_id, overlap$ensembl_gene_id), "n_regions"]
   gene_features <- gene_features %>% dplyr::mutate(n_regions = dplyr::coalesce(n_regions, 0), seqnames = paste0("chr", seqnames))
 
   gene_features
 }
+
+
+gene_annotate_fn2 <- function(peaks, genes) {
+  annotated <- plyranges::pair_nearest(as_granges(genes), as_granges(peaks)) %>%
+      data.frame() %>%
+      dplyr::mutate(peak_midpoint = (granges.y.start + granges.y.end)/2,
+                    distance_to_start = granges.x.start - peak_midpoint,
+                    words = ifelse(distance_to_start >= 0, "Upstream", "Downstream"),
+                    combo = paste0(ensembl_gene_id, "-", number))
+  overlaps_only <- plyranges::pair_overlaps(as_granges(genes), as_granges(peaks)) %>%
+      data.frame() %>%
+      dplyr::mutate(combo = paste0(ensembl_gene_id, "-", number))
+  annotated <- annotated %>%
+      dplyr::mutate(location = ifelse(combo %in% overlaps_only$combo, "Overlap", "NA"),
+                    distance = case_when(location == "NA" & words == "Upstream" ~ granges.x.start - granges.y.end,
+                                         location == "NA" & words == "Downstream" ~ granges.y.start - granges.x.end,
+                                         TRUE ~ 0))
+  annotated <- annotated %>%
+      dplyr::filter(distance <= 5000) %>%
+      dplyr::group_by(number) %>%
+      dplyr::mutate(peaks = n(),
+                    min_distance = ifelse(peaks == 1, distance_to_start, min(abs(distance_to_start))))
+  annotated
+}
+
+
+gene_annotate_fn_organised <- function(annotated_peaks) {
+  gene_peak <- annotated_peaks
+  gene_peak <- gene_peak %>%
+      dplyr::group_by(consec_dm) %>%
+      dplyr::mutate(is_fbgn = str_detect(ensembl_gene_id, "FBgn"),
+             n_genes = n(),
+             is_0 = ifelse(distance == 0, TRUE, FALSE),
+             min_distance = ifelse(abs(min_distance) == abs(distance_to_start), abs(min_distance), 0)) %>%
+      dplyr::mutate(has_min = ifelse(min_distance > 0, TRUE, FALSE)) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(consec_dm, is_fbgn) %>%
+      dplyr::mutate(n_coding = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(ratio = n_coding/n_genes) %>%
+      dplyr::group_by(consec_dm, is_0) %>%
+      dplyr::mutate(n_0 = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::filter(is_fbgn == TRUE | ratio == 1 | has_min == 1) %>%
+      dplyr::mutate(closest = ifelse(has_min == TRUE, gene_name, NA))
+  closest <- gene_peak %>%
+      dplyr::filter(!is.na(closest)) %>%
+      dplyr::distinct(consec_dm, closest) %>%
+      dplyr::group_by(consec_dm) %>%
+      dplyr::mutate(number = 1:n()) %>%
+      dplyr::filter(number == 1) %>%
+      dplyr::ungroup() %>%
+      dplyr::data.frame()
+  others <- gene_peak %>%
+      dplyr::group_by(consec_dm, closest) %>%
+      dplyrLLmutate(num = 1:n(), check = ifelse(closest == "Yes" & num == 1, 1, 0)) %>%
+      dplyr::filter(check != 1) %>%
+      dplyr::ungroup() %>%
+      dplyr::group_by(consec_dm) %>%
+      dplyr::summarise(list_gene = toString(gene_name),
+                       list_gene_id = toString(ensembl_gene_id),
+                       distance = toString(distance)) %>%
+      dplyr::ungroup() %>%
+      data.frame()
+
+  closest$list_gene <-  others[match(closest$consec_dm, others$consec_dm), "list_gene"]
+  closest$list_gene_id <- others[match(closest$consec_dm, others$consec_dm), "list_gene_id"]
+  closest$distance <- others[match(closest$consec_dm, others$consec_dm), "distance"]
+  closest
+}
+
+
+
 
 
 
