@@ -17,12 +17,12 @@
 #geneOntology?
 goseq_fn <- function(regions, genes, peaks) {
   goseq_genes_peaks <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
-                         data.frame() %>%
-                         dplyr::group_by(ensembl_gene_id) %>%
-                         dplyr::mutate(n = n()) %>%
-                         dplyr::ungroup() %>%
-                         dplyr::mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1, 0)) %>%
-                         dplyr::distinct(ensembl_gene_id, gene_width, n, de)
+      data.frame() %>%
+      dplyr::group_by(ensembl_gene_id) %>%
+      dplyr::mutate(n = n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1, 0)) %>%
+      dplyr::distinct(ensembl_gene_id, gene_width, n, de)
   gene.vector <- goseq_genes_peaks$de
   names(gene.vector) <- goseq_genes_peaks$ensembl_gene_id
 
