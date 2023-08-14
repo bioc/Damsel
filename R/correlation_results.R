@@ -27,13 +27,13 @@ corr_heatmap <- function(df, method="spearman") {
   # Melt the correlation matrix
   corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
   #plot heatmap
-  ggplot2::ggplot(corr_res, aes(Var2, Var1, fill = value)) +
+  ggplot2::ggplot(corr_res, ggplot2::aes(Var2, Var1, fill = value)) +
     ggplot2::geom_tile(color = "white")+
     ggplot2::scale_fill_gradient2(low = "blue", high = "red",
                                  midpoint = median_corr, limit = c(min_corr,1), space = "Lab",
                                  name = paste(stringr::str_to_title(method), "\nCorrelation", sep = " ")) +
     ggplot2::theme_minimal() +
-    ggplot2::theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
     ggplot2::coord_fixed()
 }
 
