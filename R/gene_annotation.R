@@ -82,7 +82,7 @@ gene_annotate_fn_organised <- function(annotated_peaks) {
       dplyr::data.frame()
   others <- gene_peak %>%
       dplyr::group_by(consec_dm, closest) %>%
-      dplyrLLmutate(num = 1:n(), check = ifelse(closest == "Yes" & num == 1, 1, 0)) %>%
+      dplyr::mutate(num = 1:n(), check = ifelse(closest == "Yes" & num == 1, 1, 0)) %>%
       dplyr::filter(check != 1) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(consec_dm) %>%
