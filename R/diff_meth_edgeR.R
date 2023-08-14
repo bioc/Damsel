@@ -90,11 +90,13 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
   summary(de <- edgeR::decideTestsDGE(qlf, p.value = p.value, lfc = lfc))
   lrt_table <- qlf$table
-  lrt_table$de <- data.frame(de)$groupFusion
-  write.table(lrt_table, file='../output/lrt_sd.txt', quote=F)
-  write.table(keep, file='../output/keep', quote=F, col.names = FALSE)
+  lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(PValue, method = "BH"),
+                                    de = dplyr::case_when(logFC < -lfc & adjust.p < p.value ~ -1,
+                                                   abs(logFC) < lfc ~ 0,
+                                                   logFC > lfc & adjust.p < p.value ~ 1, TRUE ~ 0))
   lrt_table
 }
+
 
 #' Differential methylation results plot
 #'
