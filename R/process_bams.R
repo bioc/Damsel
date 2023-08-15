@@ -15,13 +15,35 @@
 #' @export
 #rename to processBams
 process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=parallel::detectCores()) {
+  if(missing(path_to_bams)) {
+    stop("Path to bam files required")
+  }
+  if(missing(regions)) {
+    message("regions missing, regions_gatc_drosophila_dm6 used instead")
+    #regions <- "default" - don't think I need this??
+  }
+  if(missing(cores)) {
+    message("cores missing, [parallel::detectCores()] used instead")
+  }
+
   #list of all bam files
   files <- list.files(path_to_bams, pattern = ".bam")
-  #remove any bai files
+  #check
+  if(length(files) == 0) {
+    stop("No bam files present in path")
+  }
+
   files <- files %>%
       data.frame() %>%
       stats::setNames(., "file") %>%
-      dplyr::mutate(bai = stringr::str_detect(.$file, "bai")) %>%
+      dplyr::mutate(bai = stringr::str_detect(.$file, "bai"))
+  if(S4Vectors::isEmpty(dplyr::filter(files, bai == TRUE))) {
+    stop("No .bai files present in path")
+  }
+  #want to add a check for unequal n of bams and bai
+
+    #remove any bai files
+  files <- files %>%
       dplyr::filter(bai == FALSE)
   #add / to get path for each file
   path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams)) == "/", path_to_bams, paste0(path_to_bams, "/"))
