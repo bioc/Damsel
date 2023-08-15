@@ -18,20 +18,20 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
   matrix <- as.matrix(df[,grepl("bam", colnames(df))]) # can I be sure they would have "bam" in it?
   rownames(matrix) <- df$Position
 
-  n_samples <- seq(1:(ncol(test_peaks_bams)/2))
+  n_samples <- seq(1:(ncol(matrix)/2))
 
   group <- rep(c("Dam", "Fusion"), times = length(n_samples)) #specify that this order is required
 
   dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = df[,2:5])
 
-  keep <- rowSums(cpm(dge) >= keep_a) >= keep_b #potentially will mess with
+  keep <- rowSums(edgeR::cpm(dge) >= keep_a) >= keep_b #potentially will mess with
   dge <- dge[keep, , keep.lib.sizes = FALSE]
 
   dge <- edgeR::calcNormFactors(dge)
 
-  design_df <- seq(1:10) %>%
+  design_df <- seq(1:ncol(matrix)) %>%
                  data.frame() %>%
-                 setNames("group")
+                 stats::setNames("group")
   zero_vec <- rep(0, times = length(n_samples))
   #need to replace the 1:length with seq along or something
   for(i in 1:length(n_samples)) {
@@ -40,7 +40,7 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
     design_df[,ncol(design_df) + 1] <- design
 
   }
-  design <- model.matrix(~., data = design_df[, 1:ncol(design_df) - 1])
+  design <- stats::model.matrix(~., data = design_df[, 1:ncol(design_df) - 1])
 
   dge <- edgeR::estimateDisp(dge, robust = T, design = design)
 
