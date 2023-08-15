@@ -10,30 +10,31 @@
 #'
 #' @examples
 #need to rename fn - aggregatePeaks
-aggregate_peaks <- function(dm_results) {
-  df_a <- dm_results %>%
-      dplyr::mutate(number = 1:n(),
-                    trial = unsplit(lapply(split(.[,"de"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
-                    trial = ifelse(lead(trial) == trial, 0, trial),
+aggregate_peaks <- function(dm_results, regions) {
+  results <- add_de(de_results=dm_results, regions=regions_gatc_drosophila_dm6)
+  df_a <- results %>%
+      dplyr::mutate(number = 1:nrow(.),
+                    trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
+                    trial = ifelse(dplyr::lead(trial) == trial, 0, trial),
                     multiple = ifelse(trial == 0, FALSE, TRUE))
   df_1 <- df_a %>%
       dplyr::filter(multiple == TRUE) %>%
-      dplyr::group_by(seqnames, de) %>%
-      dplyr::mutate(swap = ifelse(lag(number) != (number - 1), 1, 0),
+      dplyr::group_by(seqnames, meth_status) %>%
+      dplyr::mutate(swap = ifelse(dplyr::lag(number) != (number - 1), 1, 0),
                     swap = dplyr::coalesce(swap, 1)) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(swap) %>%
       dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
                     seq = ifelse(seq == 0, NA, seq)) %>%
       dplyr::ungroup() %>%
-      dplyr::group_by(sig) %>%
+      dplyr::group_by(meth_status) %>%
       tidyr::fill(seq) %>%
       dplyr::ungroup() %>%
       data.frame()
   df_2 <- df_a %>%
       dplyr::filter(multiple == FALSE) %>%
       dplyr::group_by(seqnames) %>%
-      dplyr::mutate(swap = ifelse(lag(number) != (number - 1), 1, 0),
+      dplyr::mutate(swap = ifelse(dplyr::lag(number) != (number - 1), 1, 0),
                     swap = dplyr::coalesce(swap, 1)) %>%
       dplyr::ungroup() %>%
       dplyr::group_by(swap) %>%
@@ -43,14 +44,14 @@ aggregate_peaks <- function(dm_results) {
       tidyr::fill(seq) %>%
       dplyr::ungroup() %>%
       data.frame()
-  df_3 <- dm_results %>%
-      dplyr::mutate(consec_dm = df_1[match(df$Position, df_1$Position), "seq"],
-                    not_consec_dm = df_2[match(df$Position, df_2$Position), "seq"]) %>%
+  df_3 <- results %>%
+      dplyr::mutate(consec_dm = df_1[match(.$Position, df_1$Position), "seq"],
+                    not_consec_dm = df_2[match(.$Position, df_2$Position), "seq"]) %>%
       dplyr::group_by(consec_dm, not_consec_dm) %>%
-      dplyr::mutate(n_regions_dm = n(),
+      dplyr::mutate(n_regions_dm = dplyr::n(),
                     distance_dm = sum(width),
-                    dm_start = ifelse(row_number() == 1, start, NA),
-                    dm_end = ifelse(row_number() == n(), end, NA)) %>%
+                    dm_start = ifelse(dplyr::row_number() == 1, start, NA),
+                    dm_end = ifelse(dplyr::row_number() == dplyr::n(), end, NA)) %>%
       tidyr::fill(dm_start) %>%
       dplyr::ungroup() %>%
       tidyr::fill(dm_end, .direction = "up")
@@ -58,10 +59,10 @@ aggregate_peaks <- function(dm_results) {
   peaks <- df_3 %>%
       dplyr::group_by(consec_dm) %>%
       dplyr::mutate(ave_logFC = mean(logFC),
-                    ave_pVal = mean(pVal)) %>%
+                    ave_pVal = mean(adjust.p)) %>%
       dplyr::ungroup() %>%
-      dplyr::distinct(seqnames, dm_start, dm_end, sig, consec_dm, n_regions_dm, ave_logFC, ave_pVal) %>%
-      dplyr::filter(!is.na(consec_dm), n_regions_dm != 2, sig == 1) %>%
+      dplyr::distinct(seqnames, dm_start, dm_end, meth_status, de, consec_dm, n_regions_dm, ave_logFC, ave_pVal) %>%
+      dplyr::filter(!is.na(consec_dm), n_regions_dm != 2, de == 1) %>%
       .[order(.$ave_pVal),] %>%
       dplyr::mutate(rank_p = 1:nrow(.)) %>%
       .[order(.$consec_dm),] %>%
@@ -73,7 +74,7 @@ aggregate_peaks <- function(dm_results) {
       dplyr::ungroup() %>%
       dplyr::mutate(number = 1:nrow(.))
   peaks <- peaks %>%
-      dplyr::mutate(info = case_when(width <= 2000 ~ "significant binding",
+      dplyr::mutate(info = dplyr::case_when(width <= 2000 ~ "significant binding",
                                      width > 2000 && width <= 10000 ~ "less significant",
                                      width > 10000 ~ "unexpected width")) #some kind of message about peaks that are too big or something
 #change 1:nrow(peaks) to i in seq_len or something
@@ -86,4 +87,21 @@ aggregate_peaks <- function(dm_results) {
     }
   }
   peaks
+}
+
+add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
+  results <- de_results
+  df <- regions %>%
+      dplyr::mutate(seqnames = paste0("chr", seqnames), number = 1:nrow(.))
+  df$de <- results[match(df$Position, row.names(results)), "de"]
+  df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
+  df$adjust.p <- results[match(df$Position, row.names(results)), "adjust.p"]
+  df <- df %>%
+      dplyr::mutate(meth_status = dplyr::case_when(is.na(de) ~ "Not_included",
+                                                   de == 1 ~ "Upreg",
+                                                   de == -1 ~ "Downreg",
+                                                   TRUE ~ "No_sig"))
+  df <- df %>%
+      dplyr::mutate(logFC = dplyr::coalesce(logFC, 0), adjust.p = dplyr::coalesce(adjust.p, 1))
+  df
 }
