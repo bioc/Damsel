@@ -19,7 +19,7 @@ goseq_fn <- function(regions, genes, peaks) {
   goseq_genes_peaks <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
       data.frame() %>%
       dplyr::group_by(ensembl_gene_id) %>%
-      dplyr::mutate(n = n()) %>%
+      dplyr::mutate(n = dplyr::n()) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(de = ifelse(ensembl_gene_id %in% peaks$ensembl_gene_id, 1, 0)) %>%
       dplyr::distinct(ensembl_gene_id, gene_width, n, de)
@@ -44,7 +44,7 @@ goseq_fn <- function(regions, genes, peaks) {
                xlim=c(-3,0), ylim=c(-3,0))
   abline(0,1,col=3,lty=2)
 
-  enriched.GO <- GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
+  enriched.GO <- GO.wall$category[stats::p.adjust(GO.wall$over_represented_pvalue, method="BH")<.05]
   head(enriched.GO)
 
   list <- list(for(go in enriched.GO[1:10]){
