@@ -18,9 +18,15 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, core
   if(missing(path_to_bams)) {
     stop("Path to bam files required")
   }
+  if(!is.character(path_to_bams)) {
+    stop("Path to bams must be a character vector")
+  }
   if(missing(regions)) {
     message("regions missing, regions_gatc_drosophila_dm6 used instead")
     #regions <- "default" - don't think I need this??
+  }
+  if(!is.data.frame(regions)) {
+    stop("GATC region file must be a data.frame")
   }
   if(missing(cores)) {
     message("cores missing, [parallel::detectCores()] used instead")
