@@ -15,6 +15,16 @@
 #' @examples
 #dmSetUp
 edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
+  if(missing(df) | !is.data.frame(df)) {
+    stop("Must have data.frame of counts")
+  }
+  if(!is.numeric(keep_a) | length(keep_a) > 1) {
+    stop("keep_a must be 1 value, recommend using default value")
+  }
+  if(!is.numeric(keep_b) | length(keep_b) > 1) {
+    stop("keep_b must be 1 value, recommend using default value")
+  }
+
   matrix <- as.matrix(df[,grepl("bam", colnames(df))]) # can I be sure they would have "bam" in it?
   rownames(matrix) <- df$Position
 
@@ -60,6 +70,9 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @examples
 #dmPlotMDS
 edgeR_plot_mds <- function(dge) {
+  if(missing(dge)) {
+    stop("requires DGE as outputted from `edgeR_set_up")
+  }
   group <- dge$samples$group %>% as.character()
   limma::plotMDS(dge, col = as.numeric(factor(group)))
 }
@@ -84,6 +97,15 @@ edgeR_plot_mds <- function(dge) {
 #dmResults
 #also need to update this fn - adjusted p val
 edgeR_results <- function(dge, p.value=0.05, lfc=1) {
+  if(missing(dge)) {
+    stop("requires DGE as outputted from `edgeR_set_up")
+  }
+  if(!is.numeric(p.value) | length(p.value) > 1) {
+    stop("p.value must be 1 number, recommend using default value")
+  }
+  if(!is.numeric(lfc) | length(lfc) > 1) {
+    stop("lfc must be 1 number, recommend using default value")
+  }
   group <- dge$samples$group %>% as.character()
   design <- dge$design
   fit <- edgeR::glmQLFit(dge, design = design)
@@ -112,6 +134,12 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #' @examples
 #dmPlotResults
 edgeR_results_plot <- function(dge, results) {
+  if(missing(dge)) {
+    stop("requires DGE as outputted from `edgeR_set_up")
+  }
+  if(missing(results) | !is.data.frame(results)) {
+    stop("results ")
+  }
   detags <- rownames(dge)[as.logical(results$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
 }
