@@ -14,6 +14,13 @@
 #' @export
 #corrHeatmap
 corr_heatmap <- function(df, method="spearman") {
+  if(missing(df) | !is.data.frame(df)) {
+    stop("data.frame of counts is required")
+  }
+  if(missing(method)) {
+    message("default spearman's method is used")
+  }
+
   corr_res <- cor(df[, grepl("bam", colnames(df))], method = method)
   median_corr <- round(median(corr_res), 1)
   min_corr <- floor(min(corr_res) * 10) / 10
@@ -57,6 +64,19 @@ corr_heatmap <- function(df, method="spearman") {
 #' @examples
 #corrScatter
 corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
+  if(missing(df) | !is.data.frame(df)) {
+    stop("data.frame of counts is required")
+  }
+  if(missing(sample_1) | !is.character(sample_1)) {
+    stop("sample_1 must be a character vector")
+  }
+  if(missing(sample_2) | !is.character(sample_2)) {
+    stop("sample_2 must be a character vector")
+  }
+  if(missing(method)) {
+    message("default spearman's method is used")
+  }
+
   ggpubr::ggscatter(df, x = sample_1, y = sample_2,
                     add = "reg.line", conf.int = TRUE,
                     cor.coef = TRUE, cor.method = method)
