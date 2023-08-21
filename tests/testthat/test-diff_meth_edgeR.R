@@ -46,7 +46,19 @@ test_that("Output is no error", {
   expect_no_error(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel")))))
 })
 
-##results plot - fn currently doesn't work
-#test_that("Output is an MA plot", {
- # expect_s4_class(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))))), "MA")
-#})
+##results plot - fn currently doesn't work - just added contents of results fn for now
+test_that("Output is an MA plot", {
+  expect_s4_class(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))))), "MA")
+})
+
+test_that("Output is error", {
+  expect_error(edgeR_results_plot(), "requires DGE as outputted from `edgeR_set_up", ignore.case = TRUE)
+  expect_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), p.value = list(c(1,2,3))), "p.value must be 1 number, recommend using default value", ignore.case = TRUE)
+  expect_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), p.value = "A"), "p.value must be 1 number, recommend using default value", ignore.case = TRUE)
+  expect_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), lfc = "&"), "lfc must be 1 number, recommend using default value", ignore.case = TRUE)
+  expect_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), lfc = data.frame(a = c("$", 2, "A"))), "lfc must be 1 number, recommend using default value", ignore.case = TRUE)
+})
+
+test_that("Output is no error", {
+  expect_no_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel")))))
+})
