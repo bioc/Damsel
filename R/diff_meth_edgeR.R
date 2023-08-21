@@ -110,7 +110,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
   design <- dge$design
   fit <- edgeR::glmQLFit(dge, design = design)
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
-  summary(de <- edgeR::decideTestsDGE(qlf, p.value = p.value, lfc = lfc))
+  #summary(de <- edgeR::decideTestsDGE(qlf, p.value = p.value, lfc = lfc))
   lrt_table <- qlf$table
   lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(PValue, method = "BH"),
                                     de = dplyr::case_when(logFC < -lfc & adjust.p < p.value ~ -1,
@@ -137,10 +137,23 @@ edgeR_results_plot <- function(dge, results) {
   if(missing(dge)) {
     stop("requires DGE as outputted from `edgeR_set_up")
   }
-  if(missing(results) | !is.data.frame(results)) {
-    stop("results ")
+  if(!is.numeric(p.value) | length(p.value) > 1) {
+    stop("p.value must be 1 number, recommend using default value")
   }
-  detags <- rownames(dge)[as.logical(results$de)]
+  if(!is.numeric(lfc) | length(lfc) > 1) {
+    stop("lfc must be 1 number, recommend using default value")
+  }
+  group <- dge$samples$group %>% as.character()
+  design <- dge$design
+  fit <- edgeR::glmQLFit(dge, design = design)
+  qlf <- edgeR::glmQLFTest(fit, coef = 2)
+  #summary(de <- edgeR::decideTestsDGE(qlf, p.value = p.value, lfc = lfc))
+  lrt_table <- qlf$table
+  lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(PValue, method = "BH"),
+                                           de = dplyr::case_when(logFC < -lfc & adjust.p < p.value ~ -1,
+                                                                 abs(logFC) < lfc ~ 0,
+                                                                 logFC > lfc & adjust.p < p.value ~ 1, TRUE ~ 0))
+  detags <- rownames(dge)[as.logical(lrt_table$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
 }
 
