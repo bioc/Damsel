@@ -14,7 +14,7 @@
 #' @export
 #corrHeatmap
 corr_heatmap <- function(df, method="spearman") {
-  if(missing(df) | !is.data.frame(df)) {
+  if(!is.data.frame(df)) {
     stop("data.frame of counts is required")
   }
   if(missing(method)) {
@@ -64,7 +64,7 @@ corr_heatmap <- function(df, method="spearman") {
 #' @examples
 #corrScatter
 corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
-  if(missing(df) | !is.data.frame(df)) {
+  if(!is.data.frame(df)) {
     stop("data.frame of counts is required")
   }
   if(missing(sample_1) | !is.character(sample_1)) {

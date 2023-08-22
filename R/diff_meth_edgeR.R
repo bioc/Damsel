@@ -15,7 +15,7 @@
 #' @examples
 #dmSetUp
 edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
-  if(missing(df) | !is.data.frame(df)) {
+  if(!is.data.frame(df)) {
     stop("Must have data.frame of counts")
   }
   if(!is.numeric(keep_a) | length(keep_a) > 1) {
@@ -70,9 +70,6 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @examples
 #dmPlotMDS
 edgeR_plot_mds <- function(dge) {
-  if(missing(dge)) {
-    stop("requires DGE as outputted from `edgeR_set_up")
-  }
   group <- dge$samples$group %>% as.character()
   limma::plotMDS(dge, col = as.numeric(factor(group)))
 }
@@ -97,9 +94,6 @@ edgeR_plot_mds <- function(dge) {
 #dmResults
 #also need to update this fn - adjusted p val
 edgeR_results <- function(dge, p.value=0.05, lfc=1) {
-  if(missing(dge)) {
-    stop("requires DGE as outputted from `edgeR_set_up")
-  }
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }
@@ -133,10 +127,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #'
 #' @examples
 #dmPlotResults
-edgeR_results_plot <- function(dge, results) {
-  if(missing(dge)) {
-    stop("requires DGE as outputted from `edgeR_set_up")
-  }
+edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }

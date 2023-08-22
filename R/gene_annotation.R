@@ -1,10 +1,16 @@
 #getGenes
 get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosophila_dm6) {
-  if(missing(species) | !is.character(species)) {
+  if(!is.character(species)) {
     stop("Species must be a character vector")
   }
   if(!is.data.frame(regions)) {
     stop("Regions must be a data frame")
+  }
+  if(missing(version)) {
+    message("Default version 109 used")
+  }
+  if(missing(regions)) {
+    message("Default of drosophila dm6 regions used")
   }
   ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
   BM.info <- biomaRt::getBM(attributes = c("ensembl_gene_id", "ensembl_transcript_id", "transcript_is_canonical"),
@@ -38,10 +44,10 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 
 
 gene_annotate <- function(peaks, genes) {
-  if(missing(peaks) | !is.data.frame(peaks)) {
+  if(!is.data.frame(peaks)) {
     "Require data.frame of peaks as outputted from `aggregate_peaks"
   }
-  if(missing(genes) | !is.data.frame(genes)) {
+  if(!is.data.frame(genes)) {
     "Requires data.frame of genes as outputted from `get_biomart_genes"
   }
   annotated <- plyranges::pair_nearest(plyranges::as_granges(genes), plyranges::as_granges(peaks)) %>%
@@ -68,7 +74,7 @@ gene_annotate <- function(peaks, genes) {
 
 
 gene_annotate_organised <- function(annotated_peaks) {
-  if(missing(annotated_peaks) | !is.data.frame(annotated_peaks)) {
+  if(!is.data.frame(annotated_peaks)) {
     "Requires data.frame of annotated peaks as outputted from `gene_annotate"
   }
   gene_peak <- annotated_peaks

@@ -11,11 +11,14 @@
 #' @examples
 #need to rename fn - aggregatePeaks
 aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
-  if(missing(dm_results) | !is.data.frame(dm_results)) {
+  if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
   if(!is.data.frame(regions)) {
     stop("Regions must be a data.frame")
+  }
+  if(missing(regions)) {
+    message("Default of drosophila dm6 regions used")
   }
   results <- add_de(de_results=dm_results, regions=regions_gatc_drosophila_dm6)
   df_a <- results %>%
@@ -96,7 +99,7 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
 }
 
 add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
-  if(missing(de_results) | !is.data.frame(de_results)) {
+  if(!is.data.frame(de_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
   if(!is.data.frame(regions)) {
