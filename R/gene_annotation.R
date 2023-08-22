@@ -1,3 +1,17 @@
+
+#' Get gene information from Ensembl using biomaRt
+#'
+#'`get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
+#' Also identifies the number of GATC regions matching to each gene.
+#'
+#' @param species species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl
+#' @param version Ensembl version of genome. Default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
+#' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
+#'
+#' @return data.frame of information about the genes. Columns include (I don't know what order right now): chromosome, start, end, width, strand, gene name, ensembl_gene_id, ensembl_transcript_id, n_overlapping_gatc_regions
+#' @export
+#'
+#' @examples
 #getGenes
 get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosophila_dm6) {
   if(!is.character(species)) {
@@ -43,6 +57,17 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 }
 
 
+#' Annotating peaks to their closest gene
+#'
+#' `gene_annotate` takes both the peaks and genes as input and returns the paired results.
+#'
+#' @param peaks data.frame of peaks as outputted from [aggregate_peaks]
+#' @param genes data frame of gene information as outputted from [get_biomart_genes]
+#'
+#' @return data.frame of annotated peaks and genes in a horrible messy format I don't like to look at.
+#' @export
+#'
+#' @examples
 gene_annotate <- function(peaks, genes) {
   if(!is.data.frame(peaks)) {
     "Require data.frame of peaks as outputted from `aggregate_peaks"
@@ -73,6 +98,16 @@ gene_annotate <- function(peaks, genes) {
 }
 
 
+#' Tabular display of peak statistical information and their closest genes
+#'
+#' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format. meaning I probably want it all as 1 fn
+#'
+#' @param annotated_peaks
+#'
+#' @return organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
+#' @export
+#'
+#' @examples
 gene_annotate_organised <- function(annotated_peaks) {
   if(!is.data.frame(annotated_peaks)) {
     "Requires data.frame of annotated peaks as outputted from `gene_annotate"
