@@ -120,7 +120,8 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #' * for further details, see [edgeR::plotSmear()]
 #'
 #' @param dge as outputted from [edgeR_set_up()]
-#' @param results as outputted from [edgeR_results()]
+#' @param p.value p value threshold for minimum significance. Default is 0.05
+#' @param lfc minimum log fold change for significant results. Default is 1
 #'
 #' @return MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 #' @export
