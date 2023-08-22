@@ -4,6 +4,7 @@
 #' `aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
 #'
 #' @param dm_results data frame of differential methylation results obtained from [edgeR_results]
+#' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
 #'
 #' @return data frame of peaks. columns are chromosome name, start, end, and width of peak, peak identifier, n of dm regions within the peak, gap in bp to the next peak, and peak rank (based on p value).
 #' @export
