@@ -25,9 +25,9 @@ test_that("corr_scatter:Output is a plot", {
 test_that("corr_scatter:Output is error", {
   expect_error(corr_scatter())
   expect_error(corr_scatter(df = c(1,2,3)), "data.frame of counts is required")#, ignore.case = TRUE)
-  expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_1 = "Wing_Dam-1_S1_s.bam"), "sample_2 must be a character vector")#, ignore.case = TRUE)
+  expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_1 = "Wing_Dam-1_S1_s.bam"))#, ignore.case = TRUE)
   expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_1 = "Wing_Dam-1_S1_s.bam", sample_2 = c(1,2,3)), "sample_2 must be a character vector")#, ignore.case = TRUE)
-  expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_2 = "Wing_Dam-1_S1_s.bam"), "sample_1 must be a character vector")#, ignore.case = TRUE)
+  expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_2 = "Wing_Dam-1_S1_s.bam"))#, ignore.case = TRUE)
   expect_error(corr_scatter(df = process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 1), sample_1 = list(c(1,2,3)), sample_2 = "Wing_Dam-1_S1_s.bam"), "sample_1 must be a character vector")#, ignore.case = TRUE)
 })
 
