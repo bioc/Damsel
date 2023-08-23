@@ -42,6 +42,7 @@ corr_heatmap <- function(df, method="spearman") {
     ggplot2::theme_minimal() +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
     ggplot2::coord_fixed()
+  #heatmap_plot
 }
 
 #' Plotting correlation of specific samples
@@ -67,17 +68,17 @@ corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
   if(!is.data.frame(df)) {
     stop("data.frame of counts is required")
   }
-  if(missing(sample_1) | !is.character(sample_1)) {
+  if(!is.character(sample_1)) {
     stop("sample_1 must be a character vector")
   }
-  if(missing(sample_2) | !is.character(sample_2)) {
+  if(!is.character(sample_2)) {
     stop("sample_2 must be a character vector")
   }
   if(missing(method)) {
     message("default spearman's method is used")
   }
-
-  ggpubr::ggscatter(df, x = sample_1, y = sample_2,
+  print(colnames(df))
+  ggpubr::ggscatter(df, x = !!sample_1, y = !!sample_2,
                     add = "reg.line", conf.int = TRUE,
                     cor.coef = TRUE, cor.method = method)
 }
