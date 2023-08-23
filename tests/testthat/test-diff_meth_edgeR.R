@@ -48,7 +48,7 @@ test_that("edgeR res:Output is no error", {
 
 ##results plot - fn currently doesn't work - just added contents of results fn for now
 test_that("edgeR res plot:Output is an MA plot", {
-  expect_s4_class(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))), edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))))), "MA")
+  expect_s4_class(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel")))), "MA")
 })
 
 test_that("edgeR res plot:Output is error", {
