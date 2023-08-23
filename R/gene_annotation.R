@@ -70,10 +70,10 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #' @examples
 gene_annotate <- function(peaks, genes) {
   if(!is.data.frame(peaks)) {
-    "Require data.frame of peaks as outputted from `aggregate_peaks"
+    stop("Require data.frame of peaks as outputted from `aggregate_peaks")
   }
   if(!is.data.frame(genes)) {
-    "Requires data.frame of genes as outputted from `get_biomart_genes"
+    stop("Requires data.frame of genes as outputted from `get_biomart_genes")
   }
   annotated <- plyranges::pair_nearest(plyranges::as_granges(genes), plyranges::as_granges(peaks)) %>%
       data.frame() %>%
@@ -102,7 +102,7 @@ gene_annotate <- function(peaks, genes) {
 #'
 #' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format. meaning I probably want it all as 1 fn
 #'
-#' @param annotated_peaks
+#' @param annotated_peaks data.frame of annotated messy peaks I don't like from [gene_annotate()]
 #'
 #' @return organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
 #' @export
@@ -110,7 +110,7 @@ gene_annotate <- function(peaks, genes) {
 #' @examples
 gene_annotate_organised <- function(annotated_peaks) {
   if(!is.data.frame(annotated_peaks)) {
-    "Requires data.frame of annotated peaks as outputted from `gene_annotate"
+    stop("Requires data.frame of annotated peaks as outputted from `gene_annotate")
   }
   gene_peak <- annotated_peaks
   gene_peak <- gene_peak %>%
