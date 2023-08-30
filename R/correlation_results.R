@@ -64,21 +64,5 @@ corr_heatmap <- function(df, method="spearman") {
 #'
 #' @examples
 #corrScatter
-corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
-  if(!is.data.frame(df)) {
-    stop("data.frame of counts is required")
-  }
-  if(!is.character(sample_1)) {
-    stop("sample_1 must be a character vector")
-  }
-  if(!is.character(sample_2)) {
-    stop("sample_2 must be a character vector")
-  }
-  if(missing(method)) {
-    message("default spearman's method is used")
-  }
-  print(colnames(df))
-  ggpubr::ggscatter(df, x = !!sample_1, y = !!sample_2,
-                    add = "reg.line", conf.int = TRUE,
-                    cor.coef = TRUE, cor.method = method)
-}
+#corr_scatter <- function(df, sample_1, sample_2, method="spearman") {
+#THIS FN IS BEING REMOVED
