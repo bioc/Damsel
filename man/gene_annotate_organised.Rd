@@ -7,7 +7,7 @@
 gene_annotate_organised(annotated_peaks)
 }
 \arguments{
-\item{annotated_peaks}{}
+\item{annotated_peaks}{data.frame of annotated messy peaks I don't like from [gene_annotate()]}
 }
 \value{
 organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
