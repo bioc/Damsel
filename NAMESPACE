@@ -3,7 +3,6 @@
 export("%>%")
 export(aggregate_peaks)
 export(corr_heatmap)
-export(corr_scatter)
 export(edgeR_plot_mds)
 export(edgeR_results)
 export(edgeR_results_plot)
