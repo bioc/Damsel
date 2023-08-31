@@ -32,7 +32,8 @@ sketch out a format
 
 ##1. Introduction
 This document gives an introduction to the R package Damsel, for use in DamID analysis; from BAM file input to gene ontology analysis.
-Designed for use with DamID data, the Damsel methodology could be modified for use on any similar technology that seeks to identify enriched regions relative to a control sample. Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
+Designed for use with DamID data, the Damsel methodology could be modified for use on any similar technology that seeks to identify enriched regions relative to a control sample. 
+Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
 
 ##2. Processing the BAM files
 As a DamID analysis tool, Damsel requires a GATC region file for analysis. These regions serve as a guide to extract counts from the BAM files.
@@ -84,14 +85,15 @@ The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, where
 #corr_heatmap(df)
 ```
 
-Two specific samples can also be compared using `corr_scatter` which plots a scatterplot of the two samples, overlaid with the correlation results. `corr_scatter` utilises [ggpubr::ggscatter()]
+Two specific samples can also be compared using `ggscatter` which plots a scatterplot of the two samples, overlaid with the correlation results. [ggpubr::ggscatter()]
 ```{r}
-#corr_scatter(df, sample_1 = col_1, sample_2 = col_2)
+#ggpubr::ggscatter(df, sample_1 = col_1, sample_2 = col_2)
 ```
 
 
 ##3. Differential methylation analysis
 The goal with DamID analysis is to identify regions that are enriched in the fusion sample relative to the control. In Damsel, this step is referred to as differential methylation analysis, and makes use of [edgeR].
+
 For ease of use, Damsel has four main edgeR based functions which compile different steps and functions from within edgeR. 
 
 #3.1 Setting up edgeR analysis
@@ -106,10 +108,11 @@ For ease of use, Damsel has four main edgeR based functions which compile differ
 ```{r}
 #edgeR_set_up(df)
 ```
-The output from this step is a grouped dataframe containing all of the information from the steps.
+The output from this step is a DGEList? containing all of the information from the steps.
 
 #3.2 Examining the data - multidimensional scaling plot
 It's important to visualise the differences between the samples. This can be done with `edgeR_plot_mds`
+
 You would expect the Dam samples to cluster together, and for the Fusion samples to cluster together.
 You would expect the majority of the variation to be within the 1st dimension (the x axis), and less variation in the 2nd dimension (y axis)
 ```{r}
@@ -145,7 +148,7 @@ As you could see from the plot of the differential methylation results, there ar
 # ?Plotting
 idk
 # Aggregating the regions
-Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were exlcuded from edgeR analysis for being too small given a p value of 1.
+Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were excluded from edgeR analysis for being too small given a p value of 1.
 
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
 
@@ -206,5 +209,5 @@ Plot of sample data without bias correction (should be messy)
 #6.2 KEGG???
 
 
-
+##7. Motif analysis??
 
