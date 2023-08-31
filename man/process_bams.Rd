@@ -4,7 +4,7 @@
 \alias{process_bams}
 \title{Initial processing of BAM files}
 \usage{
-process_bams(path_to_bams, regions = regions_gatc_drosophila_dm6, cores = 1)
+process_bams(path_to_bams, regions = regions_gatc_drosophila_dm6, cores = 2)
 }
 \arguments{
 \item{path_to_bams}{Character string input vector. Should identify directory containing the BAM files.}
