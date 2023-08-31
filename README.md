@@ -9,7 +9,6 @@ The goal of Damsel is to ...
 ## Installation
 
 You can install the development version of Damsel like so:
-hello
 
 ``` r
 # FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
