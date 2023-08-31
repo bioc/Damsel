@@ -14,7 +14,7 @@
 #'
 #' @export
 #rename to processBams
-process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=1) {
+process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=2) {
   if(!is.character(path_to_bams)) {
     stop("Path to bams must be a character vector")
   }
