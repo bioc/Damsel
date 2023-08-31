@@ -23,7 +23,6 @@ Imports:
     edgeR,
     exomeCopy,
     ggplot2,
-    ggpubr,
     goseq,
     limma,
     magrittr,
