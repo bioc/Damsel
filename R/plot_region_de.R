@@ -12,6 +12,9 @@ ggplot_add.de.res <- function(object, plot, object_name) {
   # get plot data, plot data should contain bins
   if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
     plot.data <- plot[[1]]$layers[[1]]$data
+    if(!("data.frame" %in% class(plot.data))) {
+      plot.data <- plot[[1]]$data
+    }
   } else if ("patchwork" %in% class(plot) && length(plot[[1]]$layers) == 2) {
     plot.data <- plot[[1]]$layers[[2]]$data
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
