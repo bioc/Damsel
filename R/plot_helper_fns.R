@@ -1,4 +1,17 @@
 ##in plot_peak and plot_gatc
+#' Get the regions
+#'
+#' helper fn
+#'
+#' @param df df used by plot fn
+#' @param chr seqnames
+#' @param start start of plotting region
+#' @param end end of plotting region
+#'
+#' @return
+#' @export
+#'
+#' @examples
 GetRegion_hack <- function(df, chr, start, end = NULL) {
   # subset used chromosome
   df <- df[df$seqnames == chr, ] %>% dplyr::arrange(start)
@@ -18,6 +31,17 @@ GetRegion_hack <- function(df, chr, start, end = NULL) {
   return(df.select)
 }
 
+#' theme for narrow plots
+#'
+#' Theme used
+#'
+#' @param margin.len how big a gap
+#' @param x.range the plotting region
+#'
+#' @return
+#' @export
+#'
+#' @examples
 theme_peak_hack <- function(margin.len, x.range) {
   list(
     ggplot2::theme_classic(),
@@ -38,4 +62,5 @@ theme_peak_hack <- function(margin.len, x.range) {
     ),
     ggplot2::scale_x_continuous(expand = c(0, 0)),
     ggplot2::coord_cartesian(xlim = x.range)
-  )
+    )
+}
