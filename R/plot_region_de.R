@@ -1,0 +1,85 @@
+geom_de.res <- function(de_results.df = NULL,
+                        plot.space = 0.1, plot.height = 0.3) {
+  structure(list(
+    de_results.df = de_results.df, plot.space = 0.1, plot.height = plot.height
+  ),
+  class = "de.res"
+  )
+}
+
+ggplot_add.de.res <- function(object, plot, object_name) {
+  # get plot data
+  # get plot data, plot data should contain bins
+  if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
+    plot.data <- plot[[1]]$layers[[1]]$data
+  } else if ("patchwork" %in% class(plot) && length(plot[[1]]$layers) == 2) {
+    plot.data <- plot[[1]]$layers[[2]]$data
+    colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
+  } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 1) {
+    plot.data <- plot$layers[[1]]$data
+  } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 2) {
+    plot.data <- plot$layers[[2]]$data
+    colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
+  }
+  # prepare plot range
+  # the plot region are not normal, so start is minimum value
+  plot.chr <- as.character(plot.data[1, "seqnames"])
+  plot.region.start <- min(plot.data[, "start"])
+  plot.region.end <- max(plot.data[, "end"])
+
+  # get parameters
+  de_results.df <- object$de_results.df
+  plot.space <- object$plot.space
+  plot.height <- object$plot.height
+
+  df_regions <- dplyr::filter(de_results.df, seqnames == plot.chr, start >= plot.region.start,  end <= plot.region.end)
+  df_colour <- df_regions %>%
+      dplyr::mutate(number = 1:dplyr::n()) %>%
+      .[rep(seq_len(nrow(.)), times = 4),] %>%
+      .[order(.$number),] %>%
+      dplyr::group_by(number) %>%
+      dplyr::mutate(num = 1:dplyr::n()) %>%
+      dplyr::mutate(Position = dplyr::case_when(num == 1 ~ start,
+                                         num == 2 ~ start,
+                                         num == 3 ~ end,
+                                         TRUE ~ end),
+                    y_axis_2 = dplyr::case_when(num == 1 ~ 0,
+                                                num == 2 ~ de,
+                                                num == 3 ~ de,
+                                                TRUE ~ 0))
+
+  de_res.plot <- df_regions %>%
+    ggplot2::ggplot(ggplot2::aes(x = start, y = de, colour = as.factor(de))) +
+    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = Position, y = y_axis_2, fill = as.factor(de))) +
+    ggplot2::geom_segment(ggplot2::aes(xend=start, yend=0)) +
+    ggplot2::geom_segment(ggplot2::aes(x=end, xend=end, y=de, yend=0)) +
+    ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=de, yend=de)) +
+    ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=0, yend=0)) +
+    ggplot2::scale_x_continuous(expand = c(0,0),
+                                ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end))) +
+    ggplot2::scale_y_continuous(limits = c(-5, 5),
+                                expand = c(0, 0),
+                                position = "right") +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      axis.line.y = ggplot2::element_blank(),
+      axis.text.y = ggplot2::element_blank(),
+      axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
+      axis.ticks.y = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_blank(),
+      axis.title.x = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
+      panel.border = ggplot2::element_rect(colour = "black", fill = NA, size = 1),
+      plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+    )
+
+
+  # add theme
+  #gatc.plot <- gatc.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+
+  # assemble plot
+  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+                        de_res.plot,
+                        ncol = 1, heights = c(1, plot.height)
+  )
+}
