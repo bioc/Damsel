@@ -50,8 +50,8 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   # get valid bed
   valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
 
-  peak.plot <- ggplot() +
-    geom_segment(
+  peak.plot <- ggplot2::ggplot() +
+    ggplot2::geom_segment(
       data = valid.bed,
       mapping = aes_string(
         x = "start",
@@ -62,7 +62,7 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
       size = peak.size,
       color = peak.color
     ) +
-    labs(y = "Peak")
+    ggplot2::labs(y = "Peak")
 
   # add theme
   peak.plot <- peak.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
@@ -95,8 +95,8 @@ GetRegion_hack <- function(df, chr, start, end = NULL) {
 
 theme_peak_hack <- function(margin.len, x.range) {
   list(
-    theme_classic(),
-    theme(
+    ggplot2::theme_classic(),
+    ggplot2::theme(
       axis.line.y = element_blank(),
       axis.text.y = element_blank(),
       axis.title.y.right = element_text(color = "black", angle = 90, vjust = 0.5),
@@ -107,11 +107,11 @@ theme_peak_hack <- function(margin.len, x.range) {
       panel.border = element_rect(colour = "black", fill = NA, size = 1),
       plot.margin = margin(t = margin.len, b = margin.len)
     ),
-    scale_y_continuous(
+    ggplot2::scale_y_continuous(
       limits = c(1 - 0.1, 1 + 0.1),
       expand = c(0, 0), position = "right"
     ),
-    scale_x_continuous(expand = c(0, 0)),
-    coord_cartesian(xlim = x.range)
+    ggplot2::scale_x_continuous(expand = c(0, 0)),
+    ggplot2::coord_cartesian(xlim = x.range)
   )
 }
