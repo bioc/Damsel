@@ -1,3 +1,14 @@
+#' Plot lfc results across the regions
+#'
+#' @param region.df results df plus add_de: `add_de(edgeR_results())`
+#' @param region.color leave as default
+#' @param plot.space gap to next plot
+#' @param plot.height height of plot
+#'
+#' @return
+#' @export
+#'
+#' @examples
 geom_regions.lfc <- function(region.df = NULL, region.color = "black",
                              plot.space = 0.1, plot.height = 1) {
   structure(list(
@@ -8,6 +19,16 @@ geom_regions.lfc <- function(region.df = NULL, region.color = "black",
   )
 }
 
+#' Constructor for plotting lfc results across regions
+#'
+#' @param object thing to plot
+#' @param plot plot being added to
+#' @param object_name thing to plot
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ggplot_add.regions.lfc <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins

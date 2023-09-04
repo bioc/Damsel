@@ -1,3 +1,13 @@
+#' Plotting de results
+#'
+#' @param de_results.df results df plus add_de: `add_de(edgeR_results())`
+#' @param plot.space gap to next plot
+#' @param plot.height height of plot
+#'
+#' @return
+#' @export
+#'
+#' @examples
 geom_de.res <- function(de_results.df = NULL,
                         plot.space = 0.1, plot.height = 0.3) {
   structure(list(
@@ -7,6 +17,16 @@ geom_de.res <- function(de_results.df = NULL,
   )
 }
 
+#' Constructor for de results plot
+#'
+#' @param object de results
+#' @param plot plot being added to
+#' @param object_name de results
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ggplot_add.de.res <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins

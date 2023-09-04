@@ -1,3 +1,15 @@
+#' Plot for a GATC track
+#'
+#' @param gatc.df df of positions of GATC sites - can be made from GATC region file
+#' @param gatc.color default is red
+#' @param gatc.size size of line
+#' @param plot.space gap to next plot
+#' @param plot.height size of plot
+#'
+#' @return
+#' @export
+#'
+#' @examples
 geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
                       plot.space = 0.1, plot.height = 0.1) {
   structure(list(
@@ -8,6 +20,16 @@ geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
   )
 }
 
+#' Constructor for GATC track plot
+#'
+#' @param object GATC track
+#' @param plot plot above
+#' @param object_name GATC track
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ggplot_add.gatc <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins
