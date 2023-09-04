@@ -1,3 +1,18 @@
+#' Plotting peaks
+#'
+#' `geom_peak.new` adds the peak location to an existing ggplot2 object
+#'
+#' @param bed.file bed input of peaks
+#' @param peak.df data frame of peak locations
+#' @param peak.color can set the colour if you want
+#' @param peak.size default is 5
+#' @param plot.space gap to next plot - default 0.1
+#' @param plot.height height of plot - leave it at default
+#'
+#' @return
+#' @export
+#'
+#' @examples
 geom_peak.new <- function(bed.file = NULL, peak.df = NULL, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.1) {
   structure(list(
@@ -8,11 +23,26 @@ geom_peak.new <- function(bed.file = NULL, peak.df = NULL, peak.color = "black",
   )
 }
 
+#' how to make the above plot
+#'
+#' code for the `geom_peak.new` plot
+#'
+#' @param object this is what goes in - peak.df or bed.file
+#' @param plot this is the plot you're adding to
+#' @param object_name "peak.new
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ggplot_add.peak.new <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins
   if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
     plot.data <- plot[[1]]$layers[[1]]$data
+    if(!("data.frame" %in% class(plot.data))) {
+      plot.data <- plot[[1]]$data
+    }
   } else if ("patchwork" %in% class(plot) && length(plot[[1]]$layers) == 2) {
     plot.data <- plot[[1]]$layers[[2]]$data
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
