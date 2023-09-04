@@ -11,8 +11,11 @@ geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
 ggplot_add.gatc <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins
-  if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
+  if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) != 2) {
     plot.data <- plot[[1]]$layers[[1]]$data
+    if(!("data.frame" %in% class(plot.data))) {
+      plot.data <- plot[[1]]$data
+    }
   } else if ("patchwork" %in% class(plot) && length(plot[[1]]$layers) == 2) {
     plot.data <- plot[[1]]$layers[[2]]$data
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
@@ -68,4 +71,4 @@ ggplot_add.gatc <- function(object, plot, object_name) {
   )
 }
 
-}
+
