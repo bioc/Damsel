@@ -53,7 +53,7 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   peak.plot <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = valid.bed,
-      mapping = aes_string(
+      mapping = ggplot2::aes_string(
         x = "start",
         y = "1",
         xend = "end",
@@ -67,51 +67,9 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   # add theme
   peak.plot <- peak.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
   # assemble plot
-  patchwork::wrap_plots(plot + theme(plot.margin = margin(t = plot.space, b = plot.space)),
+  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                         peak.plot,
                         ncol = 1, heights = c(1, plot.height)
   )
 }
 
-
-GetRegion_hack <- function(df, chr, start, end = NULL) {
-  # subset used chromosome
-  df <- df[df$seqnames == chr, ] %>% dplyr::arrange(start)
-  rownames(df) <- NULL
-
-  df.select <- df[df$end >= start & df$start <= end, ]
-  init.start <- df.select[1, "start"]
-  if (init.start < start) {
-    df.select[1, "start"] <- start
-  }
-  if (!is.null(end)) {
-    final.end <- df.select[nrow(df.select), "end"]
-    if (final.end > end) {
-      df.select[nrow(df.select), "end"] <- end
-    }
-  }
-  return(df.select)
-}
-
-theme_peak_hack <- function(margin.len, x.range) {
-  list(
-    ggplot2::theme_classic(),
-    ggplot2::theme(
-      axis.line.y = element_blank(),
-      axis.text.y = element_blank(),
-      axis.title.y.right = element_text(color = "black", angle = 90, vjust = 0.5),
-      axis.ticks.y = element_blank(),
-      axis.text.x = element_blank(),
-      axis.title.x = element_blank(),
-      axis.ticks.x = element_blank(),
-      panel.border = element_rect(colour = "black", fill = NA, size = 1),
-      plot.margin = margin(t = margin.len, b = margin.len)
-    ),
-    ggplot2::scale_y_continuous(
-      limits = c(1 - 0.1, 1 + 0.1),
-      expand = c(0, 0), position = "right"
-    ),
-    ggplot2::scale_x_continuous(expand = c(0, 0)),
-    ggplot2::coord_cartesian(xlim = x.range)
-  )
-}

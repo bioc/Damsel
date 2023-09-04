@@ -37,11 +37,11 @@ ggplot_add.regions.lfc <- function(object, plot, object_name) {
   #df_regions <- dd_de(final_edgeR_results_ad, regions = regions_for_testing)
   df_regions <- dplyr::filter(region.df, seqnames == plot.chr, start >= plot.region.start, end <= plot.region.end)
   df_colour <- df_regions %>%
-      dplyr::mutate(number = 1:n()) %>%
+      dplyr::mutate(number = 1:dplyr::n()) %>%
       .[rep(seq_len(nrow(.)), times = 4),] %>%
       .[order(.$number),] %>%
       dplyr::group_by(number) %>%
-      dplyr::mutate(num = 1:n()) %>%
+      dplyr::mutate(num = 1:dplyr::n()) %>%
       dplyr::mutate(Position = dplyr::case_when(num == 1 ~ start,
                                   num == 2 ~ start,
                                   num == 3 ~ end,
@@ -52,10 +52,10 @@ ggplot_add.regions.lfc <- function(object, plot, object_name) {
                                   TRUE ~ 0))
 
   regions.plot <- ggplot2::ggplot() +
-    ggplot2::geom_polygon(data = df_colour, aes(x = Position, y = y_axis_2)) +
+    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = Position, y = y_axis_2)) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::labs(y = "logFC")
-  patchwork::wrap_plots(plot + theme(plot.margin = margin(t = plot.space, b = plot.space)),
+  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                         regions.plot,
                         ncol = 1, heights = c(1, plot.height)
   )

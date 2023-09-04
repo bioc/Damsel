@@ -71,12 +71,12 @@ hack_adjustZoom <- function(obj, plot, zoom.region, zoom.offset, color, fill, si
 hack_applyTheme <- function(plot, xlabel, subchr, aspect.ratio) {
   plot <- plot + ggbio::theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     ggplot2::scale_y_continuous(breaks = 5, labels = subchr) +
-    ggplot2::theme(strip.background = element_rect(colour = 'NA', fill = 'NA')) +
-    ggplot2::theme(strip.text.y = element_text(colour = 'white')) +
+    ggplot2::theme(strip.background = ggplot2::element_rect(colour = 'NA', fill = 'NA')) +
+    ggplot2::theme(strip.text.y = ggplot2::element_text(colour = 'white')) +
     ggplot2::theme(legend.position = "none") +
     ggplot2::xlab("")
-  plot <- plot + ggplot2::theme(aspect.ratio = aspect.ratio, axis.ticks.y = element_blank())
+  plot <- plot + ggplot2::theme(aspect.ratio = aspect.ratio, axis.ticks.y = ggplot2::element_blank())
   if(!xlabel)
-    plot <- plot + ggplot2::theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+    plot <- plot + ggplot2::theme(axis.text.x = ggplot2::element_blank(), axis.ticks.x = ggplot2::element_blank())
   plot
 }
