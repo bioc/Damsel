@@ -13,10 +13,10 @@
 #' @export
 #'
 #' @examples
-geom_peak.new <- function(bed.file = NULL, peak.df = NULL, peak.color = "black", peak.size = 5,
+geom_peak.new <- function(peak.df = NULL, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.1) {
   structure(list(
-    bed.file = bed.file, peak.df = peak.df, peak.color = peak.color, peak.size = peak.size,
+    peak.df = peak.df, peak.color = peak.color, peak.size = peak.size,
     plot.space = plot.space, plot.height = plot.height
   ),
   class = "peak.new"
@@ -69,15 +69,9 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  # prepare peak dataframe
-  if (!is.null(bed.file)) {
-    bed.info <- utils::read.table(file = bed.file, header = FALSE, sep = "\t", stringsAsFactors = FALSE)
-    bed.info <- bed.info[c(1, 2, 3)]
-    colnames(bed.info) <- c("seqnames", "start", "end")
-  } else if (!is.null(peak.df)) {
-    bed.info <- peak.df
-    bed.info <- bed.info[,c("seqnames", "start", "end")]
-  }
+  bed.info <- peak.df
+  bed.info <- bed.info[,c("seqnames", "start", "end")]
+
   # convert to 1-based
   bed.info$start <- as.numeric(bed.info$start) + 1
 
