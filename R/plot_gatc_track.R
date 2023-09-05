@@ -61,8 +61,7 @@ ggplot_add.gatc <- function(object, plot, object_name) {
   plot.height <- object$plot.height
 
   bed.info <- gatc.df
-  bed.info <- bed.info[c(1, 2, 3)]
-  colnames(bed.info) <- c("seqnames", "start", "end")
+  bed.info <- bed.info[,c("seqnames", "start", "end")]
   # convert to 1-based
   bed.info$start <- as.numeric(bed.info$start) + 1
 
