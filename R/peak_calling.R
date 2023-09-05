@@ -76,26 +76,13 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
       .[order(.$ave_pVal),] %>%
       dplyr::mutate(rank_p = 1:nrow(.)) %>%
       .[order(.$consec_dm),] %>%
-      stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:6]))) %>%
+      stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:10]))) %>%
       plyranges::as_granges() %>%
       data.frame() %>%
       dplyr::group_by(seqnames) %>%
-      dplyr::mutate(gap = start - lag(end)) %>%
+      dplyr::mutate(gap = start - dplyr::lag(end)) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(number = 1:nrow(.))
-  peaks <- peaks %>%
-      dplyr::mutate(info = dplyr::case_when(width <= 2000 ~ "significant binding",
-                                     width > 2000 && width <= 10000 ~ "less significant",
-                                     width > 10000 ~ "unexpected width")) #some kind of message about peaks that are too big or something
-#change 1:nrow(peaks) to i in seq_len or something
-  for(i in 1:nrow(peaks)) {
-    if(peaks[i,]$gap == 5) {
-      peaks[i-1,] <- peaks[i-1,] %>% dplyr::mutate(end = peaks[i,]$end,
-                                                   n_regions_dm = n_regions_dm + peaks[i,]$n_regions_dm,
-                                                   width = width + peaks[i,]$width + 4)
-      peaks <- peaks[-i,]
-    }
-  }
   peaks
 }
 
