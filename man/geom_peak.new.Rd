@@ -5,7 +5,6 @@
 \title{Plotting peaks}
 \usage{
 geom_peak.new(
-  bed.file = NULL,
   peak.df = NULL,
   peak.color = "black",
   peak.size = 5,
@@ -14,8 +13,6 @@ geom_peak.new(
 )
 }
 \arguments{
-\item{bed.file}{bed input of peaks}
-
 \item{peak.df}{data frame of peak locations}
 
 \item{peak.color}{can set the colour if you want}
@@ -25,6 +22,8 @@ geom_peak.new(
 \item{plot.space}{gap to next plot - default 0.1}
 
 \item{plot.height}{height of plot - leave it at default}
+
+\item{bed.file}{bed input of peaks}
 }
 \description{
 `geom_peak.new` adds the peak location to an existing ggplot2 object
