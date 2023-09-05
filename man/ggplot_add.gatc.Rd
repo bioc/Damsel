@@ -4,7 +4,7 @@
 \alias{ggplot_add.gatc}
 \title{Constructor for GATC track plot}
 \usage{
-ggplot_add.gatc(object, plot, object_name)
+\method{ggplot_add}{gatc}(object, plot, object_name)
 }
 \arguments{
 \item{object}{GATC track}

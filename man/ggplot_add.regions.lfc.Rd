@@ -4,7 +4,7 @@
 \alias{ggplot_add.regions.lfc}
 \title{Constructor for plotting lfc results across regions}
 \usage{
-ggplot_add.regions.lfc(object, plot, object_name)
+\method{ggplot_add}{regions.lfc}(object, plot, object_name)
 }
 \arguments{
 \item{object}{thing to plot}

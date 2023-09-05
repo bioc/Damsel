@@ -4,7 +4,7 @@
 \alias{ggplot_add.regions.counts}
 \title{Constructor for ggplot addable}
 \usage{
-ggplot_add.regions.counts(object, plot, object_name)
+\method{ggplot_add}{regions.counts}(object, plot, object_name)
 }
 \arguments{
 \item{object}{regions.counts}

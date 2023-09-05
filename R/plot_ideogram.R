@@ -38,7 +38,7 @@ hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
     subchr <- sort(unique(as.character(seqnames(obj))))[1]
     message("use ", subchr, " automatically")
     obj <- obj[seqnames(obj) == subchr]
-    obj <- keepSeqlevels(obj, subchr)
+    obj <- GenomeInfoDb::keepSeqlevels(obj, subchr)
   } else {
     obj <- hack_selectChromosome(obj, subchr)
   }
@@ -65,12 +65,12 @@ hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
 hack_selectChromosome <- function(obj, subchr) {
   if(length(subchr)) {
     obj <- obj[seqnames(obj) == subchr]
-    obj <- keepSeqlevels(obj, subchr)
+    obj <- GenomeInfoDb::keepSeqlevels(obj, subchr)
   } else {
     subchr <- sort(unique(as.character(seqnames(obj))))[1]
     message("use ", subchr, " automatically")
     obj <- obj[seqnames(obj) == subchr]
-    obj <- keepSeqlevels(obj, subchr)
+    obj <- GenomeInfoDb::keepSeqlevels(obj, subchr)
   }
   if(length(unique(as.character(seqnames(obj)))) > 1)
     stop("Mulptiple chromosome information found")

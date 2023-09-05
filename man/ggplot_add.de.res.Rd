@@ -4,7 +4,7 @@
 \alias{ggplot_add.de.res}
 \title{Constructor for de results plot}
 \usage{
-ggplot_add.de.res(object, plot, object_name)
+\method{ggplot_add}{de.res}(object, plot, object_name)
 }
 \arguments{
 \item{object}{de results}

@@ -4,7 +4,7 @@
 \alias{ggplot_add.peak.new}
 \title{how to make the above plot}
 \usage{
-ggplot_add.peak.new(object, plot, object_name)
+\method{ggplot_add}{peak.new}(object, plot, object_name)
 }
 \arguments{
 \item{object}{this is what goes in - peak.df or bed.file}
