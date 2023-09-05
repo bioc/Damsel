@@ -48,6 +48,9 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
   } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 1) {
     plot.data <- plot$layers[[1]]$data
+    if(!("data.frame" %in% class(plot.data))) {
+      plot.data <- plot$data
+    }
   } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 2) {
     plot.data <- plot$layers[[2]]$data
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
@@ -69,11 +72,12 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   # prepare peak dataframe
   if (!is.null(bed.file)) {
     bed.info <- utils::read.table(file = bed.file, header = FALSE, sep = "\t", stringsAsFactors = FALSE)
+    bed.info <- bed.info[c(1, 2, 3)]
+    colnames(bed.info) <- c("seqnames", "start", "end")
   } else if (!is.null(peak.df)) {
     bed.info <- peak.df
+    bed.info <- bed.info[,c("seqnames", "start", "end")]
   }
-  bed.info <- bed.info[c(1, 2, 3)]
-  colnames(bed.info) <- c("seqnames", "start", "end")
   # convert to 1-based
   bed.info$start <- as.numeric(bed.info$start) + 1
 
