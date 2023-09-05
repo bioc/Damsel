@@ -19,14 +19,18 @@ Depends:
 RoxygenNote: 7.2.3
 Imports: 
     biomaRt,
+    biovizBase,
     dplyr,
     edgeR,
     exomeCopy,
+    GenomeInfoDb,
+    ggbio,
     ggplot2,
     goseq,
     limma,
     magrittr,
     parallel,
+    patchwork,
     plyranges,
     reshape2,
     stringr,
