@@ -10,10 +10,10 @@
 #'
 #' @return A heatmap style plot of the samples, coloured by correlation value. Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 #' @examples
-#'
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
-#' counts.df
-#'
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' corr_heatmap(counts.df, method = "spearman)
 #' @export
 #corrHeatmap

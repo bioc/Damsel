@@ -2,7 +2,6 @@
 #'
 #' `geom_peak.new` adds the peak location to an existing ggplot2 object
 #'
-#' @param bed.file bed input of peaks
 #' @param peak.df data frame of peak locations
 #' @param peak.color can set the colour if you want
 #' @param peak.size default is 5
@@ -13,14 +12,19 @@
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
 #' dge <- edgeR_set_up(counts.df)
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-#' peaks
-#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+#' plot_counts_all_bams(counts_df,
+#'                      seqnames = "chr2L",
+#'                      start_region = 1,
+#'                      end_region = 40000,
+#'                      n_col = 1) +
 #'   geom_peak.new(peaks)
 #' # The plots can be layered -------------------------------------------------------------------------------------
 geom_peak.new <- function(peak.df, peak.color = "black", peak.size = 5,

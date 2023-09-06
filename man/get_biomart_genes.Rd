@@ -25,5 +25,7 @@ data.frame of information about the genes. Columns include (I don't know what or
 Also identifies the number of GATC regions matching to each gene.
 }
 \examples{
-get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
+get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                  version = 109,
+                  regions = regions_gatc_drosophila_dm6)
 }

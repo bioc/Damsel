@@ -19,16 +19,18 @@ data.frame of annotated peaks and genes in a horrible messy format I don't like 
 }
 \examples{
 # set up peaks
-counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams,
+                          regions = regions_gatc_drosophila_dm6,
+                          cores = 2)
 counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-counts.df
 dge <- edgeR_set_up(counts.df)
 de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-de_results
 peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-peaks
 # set up genes
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
+genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                           version = 109,
+                           regions = regions_gatc_drosophila_dm6)
 
 gene_annotate(peaks, genes)
 }

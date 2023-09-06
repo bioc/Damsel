@@ -17,11 +17,12 @@ refer to [edgeR::plotMDS()] for details
 * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
 }
 \examples{
-counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams,
+                          regions = regions_gatc_drosophila_dm6,
+                          cores = 2)
 counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-counts.df
-
 dge <- edgeR_set_up(counts.df)
-dge
+
 edgeR_plot_mds(dge)
 }

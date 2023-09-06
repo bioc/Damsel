@@ -13,9 +13,11 @@
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
 #'
 #' edgeR_set_up(counts.df)
 #dmSetUp
@@ -73,12 +75,13 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
-#'
 #' dge <- edgeR_set_up(counts.df)
-#' dge
+#'
 #' edgeR_plot_mds(dge)
 #dmPlotMDS
 edgeR_plot_mds <- function(dge) {
@@ -103,11 +106,13 @@ edgeR_plot_mds <- function(dge) {
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
 #' dge <- edgeR_set_up(counts.df)
-#' dge
+#'
 #' edgeR_results(dge, p.value = 0.05, lfc = 1)
 #dmResults
 #also need to update this fn - adjusted p val
@@ -145,12 +150,14 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
 #' dge <- edgeR_set_up(counts.df)
-#' dge
-#' egeR_results_plot(dge, p.value = 0.05, lfc = 1)
+#'
+#' edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 #dmPlotResults
 edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
   if(!is.numeric(p.value) | length(p.value) > 1) {

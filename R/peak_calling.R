@@ -10,14 +10,14 @@
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
-#'
 #' dge <- edgeR_set_up(counts.df)
-#' dge
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' de_results
+#'
 #' aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
 #need to rename fn - aggregatePeaks
 aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
@@ -111,13 +111,14 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
 #' @export
 #'
 #' @examples
-#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' counts.df
 #' dge <- edgeR_set_up(counts.df)
-#' dge
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' de_results
+#'
 #' add_de(de_results, regions = regions_gatc_drosophila_dm6)
 add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(de_results)) {

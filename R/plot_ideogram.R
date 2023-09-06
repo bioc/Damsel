@@ -25,7 +25,7 @@ hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
                           zoom.offset = 0.2, size = 1,
                           aspect.ratio = 1/20, ..., genome){
   if(missing(obj)){
-    data(ideoCyto, package = "biovizBase")
+    ideoCyto <- biovizBase::ideoCyto
     if(genome %in% names(ideoCyto)){
       obj <- ideoCyto[[genome]]
     }else{

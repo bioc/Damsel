@@ -18,13 +18,13 @@ data frame of peaks. columns are chromosome name, start, end, and width of peak,
 `aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
 }
 \examples{
-counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams,
+                          regions = regions_gatc_drosophila_dm6,
+                          cores = 2)
 counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-counts.df
-
 dge <- edgeR_set_up(counts.df)
-dge
 de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-de_results
+
 aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
 }

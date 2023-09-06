@@ -22,9 +22,11 @@ Refer to [edgeR::?`DGEListClass`] for details
 `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 }
 \examples{
-counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams,
+                          regions = regions_gatc_drosophila_dm6,
+                          cores = 2)
 counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-counts.df
 
 edgeR_set_up(counts.df)
 }
