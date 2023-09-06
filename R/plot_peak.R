@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-geom_peak.new <- function(peak.df = NULL, peak.color = "black", peak.size = 5,
+geom_peak.new <- function(peak.df, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.1) {
   structure(list(
     peak.df = peak.df, peak.color = peak.color, peak.size = peak.size,
@@ -36,6 +36,9 @@ geom_peak.new <- function(peak.df = NULL, peak.color = "black", peak.size = 5,
 #'
 #' @examples
 ggplot_add.peak.new <- function(object, plot, object_name) {
+  if(!is.data.frame(object$peak.df)) {
+    stop("data.frame of peaks is required")
+  }
   # get plot data
   # get plot data, plot data should contain bins
   if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {

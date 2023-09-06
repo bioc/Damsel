@@ -10,7 +10,19 @@
 #' @export
 #'
 #' @examples
-plot_counts_all_bams <- function(df, seqnames, start_region, end_region, n_col = 3) {
+plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region = NULL, n_col = 3) {
+  if(!is.data.frame(df)) {
+    stop("data.frame of counts is required")
+  }
+  if(!(seqnames %in% df$seqnames)) {
+    stop("seqnames must be element of seqnames in provided data.frame")
+  }
+  if(is.null(start_region) | !is.numeric(start_region)) {
+    stop("numeric element for start_region is required")
+  }
+  if(is.null(end_region) | !is.numeric(end_region)) {
+    stop("numeric element for end_region is required")
+  }
   df <- df
   colnames(df) <- chartr("-", "_", colnames(df))
   df <- df %>% dplyr::filter(seqnames == seqnames, start >= start_region, end <= end_region)

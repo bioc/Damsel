@@ -9,7 +9,7 @@
 #' @export
 #'
 #' @examples
-geom_regions.lfc <- function(region.df = NULL, region.color = "black",
+geom_regions.lfc <- function(region.df, region.color = "black",
                              plot.space = 0.1, plot.height = 1) {
   structure(list(
     region.df = region.df, region.color = region.color,
@@ -30,6 +30,9 @@ geom_regions.lfc <- function(region.df = NULL, region.color = "black",
 #'
 #' @examples
 ggplot_add.regions.lfc <- function(object, plot, object_name) {
+  if(!is.data.frame(object$region.df)) {
+    stop("data.frame of de results is required")
+  }
   # get plot data
   # get plot data, plot data should contain bins
   if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
@@ -39,6 +42,9 @@ ggplot_add.regions.lfc <- function(object, plot, object_name) {
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
   } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 1) {
     plot.data <- plot$layers[[1]]$data
+    if(!("data.frame" %in% class(plot.data))) {
+      plot.data <- plot$data
+    }
   } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 2) {
     plot.data <- plot$layers[[2]]$data
     colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
