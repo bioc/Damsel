@@ -9,10 +9,20 @@
 #' @param plot.space gap to next plot - default 0.1
 #' @param plot.height height of plot - leave it at default
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#' dge <- edgeR_set_up(counts.df)
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+#' peaks
+#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+#'   geom_peak.new(peaks)
+#' # The plots can be layered -------------------------------------------------------------------------------------
 geom_peak.new <- function(peak.df, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.1) {
   structure(list(
@@ -23,18 +33,8 @@ geom_peak.new <- function(peak.df, peak.color = "black", peak.size = 5,
   )
 }
 
-#' how to make the above plot
-#'
-#' code for the `geom_peak.new` plot
-#'
-#' @param object this is what goes in - peak.df or bed.file
-#' @param plot this is the plot you're adding to
-#' @param object_name "peak.new
-#'
-#' @return
+
 #' @export
-#'
-#' @examples
 ggplot_add.peak.new <- function(object, plot, object_name) {
   if(!is.data.frame(object$peak.df)) {
     stop("data.frame of peaks is required")

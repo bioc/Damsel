@@ -5,10 +5,21 @@
 #' @param plot.space gap to next plot
 #' @param plot.height height of plot
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#' dge <- edgeR_set_up(counts.df)
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' de_results
+#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' de_results
+#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+#'   geom_regions.lfc(de_results)
+#' # The plots can be layered -------------------------------------------------------------------------------------
 geom_regions.lfc <- function(region.df, region.color = "black",
                              plot.space = 0.1, plot.height = 1) {
   structure(list(
@@ -19,16 +30,8 @@ geom_regions.lfc <- function(region.df, region.color = "black",
   )
 }
 
-#' Constructor for plotting lfc results across regions
-#'
-#' @param object thing to plot
-#' @param plot plot being added to
-#' @param object_name thing to plot
-#'
-#' @return
+
 #' @export
-#'
-#' @examples
 ggplot_add.regions.lfc <- function(object, plot, object_name) {
   if(!is.data.frame(object$region.df)) {
     stop("data.frame of de results is required")

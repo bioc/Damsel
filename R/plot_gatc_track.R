@@ -6,10 +6,18 @@
 #' @param plot.space gap to next plot
 #' @param plot.height size of plot
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#' gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6, seqnames = paste0("chr", seqnames), start = start - 3, end = start + 4)
+#'
+#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+#'   geom_gatc(gatc_sites)
+#' # The plots can be layered -------------------------------------------------------------------------------------
 geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
                       plot.space = 0.1, plot.height = 0.1) {
   structure(list(
@@ -20,16 +28,8 @@ geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
   )
 }
 
-#' Constructor for GATC track plot
-#'
-#' @param object GATC track
-#' @param plot plot above
-#' @param object_name GATC track
-#'
-#' @return
+
 #' @export
-#'
-#' @examples
 ggplot_add.gatc <- function(object, plot, object_name) {
   if(!is.data.frame(object$gatc.df)) {
     stop("data.frame of GATC sites is required")
