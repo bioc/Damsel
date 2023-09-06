@@ -4,7 +4,13 @@
 \alias{plot_counts_all_bams}
 \title{Plot for just counts for all samples across a given region}
 \usage{
-plot_counts_all_bams(df, seqnames, start_region, end_region, n_col = 3)
+plot_counts_all_bams(
+  df,
+  seqnames,
+  start_region = NULL,
+  end_region = NULL,
+  n_col = 3
+)
 }
 \arguments{
 \item{df}{df of counts as outputted from [process_bams()]}

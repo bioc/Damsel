@@ -5,7 +5,7 @@
 \title{Plotting peaks}
 \usage{
 geom_peak.new(
-  peak.df = NULL,
+  peak.df,
   peak.color = "black",
   peak.size = 5,
   plot.space = 0.1,

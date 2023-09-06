@@ -5,7 +5,7 @@
 \title{Plot lfc results across the regions}
 \usage{
 geom_regions.lfc(
-  region.df = NULL,
+  region.df,
   region.color = "black",
   plot.space = 0.1,
   plot.height = 1
