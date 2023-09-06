@@ -15,7 +15,7 @@
 #' @param ... other args passed on
 #' @param genome if don't have an object give a genome name
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
@@ -53,15 +53,7 @@ hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
   p
 }
 
-#' helper for hack_Ideogram - select chromosome
-#'
-#' @param obj see `hack_Ideogram`
-#' @param subchr chromsoome to use
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 hack_selectChromosome <- function(obj, subchr) {
   if(length(subchr)) {
     obj <- obj[seqnames(obj) == subchr]
@@ -77,21 +69,7 @@ hack_selectChromosome <- function(obj, subchr) {
   obj
 }
 
-#' adjust the zoom of the highlight region
-#'
-#' @param obj as above
-#' @param plot as above
-#' @param zoom.region as above
-#' @param zoom.offset as above
-#' @param color as above
-#' @param fill as above
-#' @param size as above
-#' @param alpha as above
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 hack_adjustZoom <- function(obj, plot, zoom.region, zoom.offset, color, fill, size, alpha) {
   if(length(zoom.region)) {
     if(length(zoom.region) != 2)
@@ -113,17 +91,7 @@ hack_adjustZoom <- function(obj, plot, zoom.region, zoom.offset, color, fill, si
   }
 }
 
-#' Theme for ideogram
-#'
-#' @param plot as above
-#' @param xlabel as above
-#' @param subchr as above
-#' @param aspect.ratio as above
-#'
-#' @return
-#' @export
-#'
-#' @examples
+
 hack_applyTheme <- function(plot, xlabel, subchr, aspect.ratio) {
   plot <- plot + ggbio::theme_alignment(grid = FALSE, ylabel = TRUE, border = FALSE) +
     ggplot2::scale_y_continuous(breaks = 5, labels = subchr) +
