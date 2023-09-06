@@ -23,6 +23,9 @@ geom_regions.counts(
 
 \item{plot.height}{height of plot}
 }
+\value{
+plot
+}
 \description{
 GGplot addable counts graph for all samples
 }

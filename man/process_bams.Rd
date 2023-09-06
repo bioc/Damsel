@@ -21,3 +21,10 @@ A data frame containing the GATC region information in the form in the columns: 
 \description{
 `process_bams()` obtains the counts for the regions between GATC sites, from BAM files specified in the path.
 }
+\examples{
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams, regions = regions_gatc_drosophila_dm6, cores=2)
+counts.df
+# rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2 ...
+counts.df[,c(1:6,7,10,8,11,9,12)]
+}

@@ -24,3 +24,6 @@ data.frame of information about the genes. Columns include (I don't know what or
 `get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
 Also identifies the number of GATC regions matching to each gene.
 }
+\examples{
+get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
+}

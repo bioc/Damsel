@@ -20,3 +20,11 @@ MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, wi
 `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 * for further details, see [edgeR::plotSmear()]
 }
+\examples{
+counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df
+dge <- edgeR_set_up(counts.df)
+dge
+egeR_results_plot(dge, p.value = 0.05, lfc = 1)
+}

@@ -23,6 +23,19 @@ geom_gatc(
 
 \item{plot.height}{size of plot}
 }
+\value{
+plot
+}
 \description{
 Plot for a GATC track
+}
+\examples{
+counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df
+gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6, seqnames = paste0("chr", seqnames), start = start - 3, end = start + 4)
+
+plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+  geom_gatc(gatc_sites)
+# The plots can be layered -------------------------------------------------------------------------------------
 }

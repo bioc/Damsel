@@ -50,6 +50,9 @@ hack_Ideogram(
 
 \item{genome}{if don't have an object give a genome name}
 }
+\value{
+plot
+}
 \description{
 Plot ideogram
 }
