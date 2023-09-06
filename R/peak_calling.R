@@ -10,6 +10,15 @@
 #' @export
 #'
 #' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#'
+#' dge <- edgeR_set_up(counts.df)
+#' dge
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' de_results
+#' aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
 #need to rename fn - aggregatePeaks
 aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(dm_results)) {
@@ -86,6 +95,30 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   peaks
 }
 
+#' Add de_results to full region df
+#'
+#' Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
+#' Is also required for some plotting fns
+#'
+#' @param de_results as outputted from [edgeR_results()]
+#' @param regions data.frame of regions, default is regions_gatc_drosophila_dm6
+#'
+#' @return full data.frame of regions with added information about the de results;
+#' * de - 1,0,-1,NA ;
+#' * logFC: 0 if de is NA ;
+#' * adjust.p: 1 if de is NA :
+#' * meth_status: Upreg, No_sig, Downreg, Not_included
+#' @export
+#'
+#' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#' dge <- edgeR_set_up(counts.df)
+#' dge
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' de_results
+#' add_de(de_results, regions = regions_gatc_drosophila_dm6)
 add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(de_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
