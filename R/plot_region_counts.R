@@ -6,10 +6,21 @@
 #' @param end_region end
 #' @param n_col n_columns to facet the graph by - default is 3
 #'
-#' @return
+#' @return ggplot
 #' @export
 #'
 #' @examples
+#' counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df
+#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3)
+#' # Can use this plot to layer other plots, just set n_col = 1 and start layering --------------------------------------
+#' dge <- edgeR_set_up(counts.df)
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' de_results
+#' plot_counts_all_bams(counts_df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
+#'   geom_de.res(de_results)
 plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region = NULL, n_col = 3) {
   if(!is.data.frame(df)) {
     stop("data.frame of counts is required")
@@ -58,7 +69,7 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
 #' @param plot.space gap to next plot
 #' @param plot.height height of plot
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
@@ -72,16 +83,8 @@ geom_regions.counts <- function(region.df = NULL, n_col = 1, region.color = "bla
   )
 }
 
-#' Constructor for ggplot addable
-#'
-#' @param object regions.counts
-#' @param plot plot being added to
-#' @param object_name regions.counts
-#'
-#' @return
+
 #' @export
-#'
-#' @examples
 ggplot_add.regions.counts <- function(object, plot, object_name) {
   # get plot data
   # get plot data, plot data should contain bins
