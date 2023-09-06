@@ -18,7 +18,8 @@
 #' dge <- edgeR_set_up(counts.df)
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #'
-#' aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+#' head(peaks)
 #need to rename fn - aggregatePeaks
 aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(dm_results)) {
@@ -119,7 +120,8 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
 #' dge <- edgeR_set_up(counts.df)
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #'
-#' add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' head(de_results)
 add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(de_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")

@@ -12,9 +12,10 @@
 #' @export
 #'
 #' @examples
-#' get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-#'                   version = 109,
-#'                   regions = regions_gatc_drosophila_dm6)
+#' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+#'                            version = 109,
+#'                            regions = regions_gatc_drosophila_dm6)
+#' head(genes)
 #getGenes
 get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosophila_dm6) {
   if(!is.character(species)) {
@@ -85,7 +86,8 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #'                            version = 109,
 #'                            regions = regions_gatc_drosophila_dm6)
 #'
-#' gene_annotate(peaks, genes)
+#' annotated_peaks <- gene_annotate(peaks, genes)
+#' head(annotated_peaks)
 gene_annotate <- function(peaks, genes) {
   if(!is.data.frame(peaks)) {
     stop("Require data.frame of peaks as outputted from `aggregate_peaks")
@@ -139,7 +141,8 @@ gene_annotate <- function(peaks, genes) {
 #' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
 #' annotated_peaks <- gene_annotate(peaks, genes)
 #'
-#' gene_annotate_organised(annotated_peaks)
+#' annotated_peaks <- gene_annotate_organised(annotated_peaks)
+#' head(annotated_peaks)
 gene_annotate_organised <- function(annotated_peaks) {
   if(!is.data.frame(annotated_peaks)) {
     stop("Requires data.frame of annotated peaks as outputted from `gene_annotate")

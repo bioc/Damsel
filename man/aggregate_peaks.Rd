@@ -26,5 +26,6 @@ counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
 dge <- edgeR_set_up(counts.df)
 de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 
-aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+head(peaks)
 }

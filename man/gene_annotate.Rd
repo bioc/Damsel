@@ -32,5 +32,6 @@ genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
                            version = 109,
                            regions = regions_gatc_drosophila_dm6)
 
-gene_annotate(peaks, genes)
+annotated_peaks <- gene_annotate(peaks, genes)
+head(annotated_peaks)
 }

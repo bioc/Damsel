@@ -29,5 +29,6 @@ peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
 annotated_peaks <- gene_annotate(peaks, genes)
 
-gene_annotate_organised(annotated_peaks)
+annotated_peaks <- gene_annotate_organised(annotated_peaks)
+head(annotated_peaks)
 }
