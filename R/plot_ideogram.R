@@ -1,3 +1,19 @@
+
+Ideogram_wrap <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands = TRUE,
+                          color = "red", fill = "red", alpha = 0.7,
+                          zoom.region = NULL,
+                          zoom.offset = 0.2, size = 1,
+                          aspect.ratio = 1/20, ..., genome) {
+  Ideo <- ggbio::Ideogram(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands = TRUE,
+                          color = "red", fill = "red", alpha = 0.7,
+                          zoom.region = NULL,
+                          zoom.offset = 0.2, size = 1,
+                          aspect.ratio = 1/20, ..., genome)@ggplot
+  Ideo
+
+}
+
+
 #' Plot ideogram
 #'
 #' @param obj as [ggbio::Ideogram()]
@@ -33,15 +49,15 @@ hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
     }
   }
   ## do we need subchr here
-  obj.ori <- obj
-  if(!length(subchr)){
-    subchr <- sort(unique(as.character(seqnames(obj))))[1]
-    message("use ", subchr, " automatically")
-    obj <- obj[seqnames(obj) == subchr]
-    obj <- GenomeInfoDb::keepSeqlevels(obj, subchr)
-  } else {
-    obj <- hack_selectChromosome(obj, subchr)
-  }
+  #obj.ori <- obj
+  #if(!length(subchr)){
+   # subchr <- sort(unique(as.character(seqnames(obj))))[1]
+  #  message("use ", subchr, " automatically")
+   # obj <- obj[seqnames(obj) == subchr]
+  #  obj <- GenomeInfoDb::keepSeqlevels(obj, subchr)
+  #} else {
+   # obj <- hack_selectChromosome(obj, subchr)
+  #}
   if(!biovizBase::isIdeogram(obj))
     cytobands <- FALSE
 
