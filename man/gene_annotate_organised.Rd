@@ -26,7 +26,9 @@ dge <- edgeR_set_up(counts.df)
 de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
 # set up genes
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", version = 109, regions = regions_gatc_drosophila_dm6)
+genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                           version = 109,
+                           regions = regions_gatc_drosophila_dm6)
 annotated_peaks <- gene_annotate(peaks, genes)
 
 annotated_peaks <- gene_annotate_organised(annotated_peaks)

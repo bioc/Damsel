@@ -45,5 +45,5 @@ plot_counts_all_bams(counts_df,
                      end_region = 40000,
                      n_col = 1) +
   geom_gatc(gatc_sites)
-# The plots can be layered -------------------------------------------------------------------------------------
+# The plots can be layered -------------------------------------------------
 }

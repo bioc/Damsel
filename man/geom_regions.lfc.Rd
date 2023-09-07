@@ -41,5 +41,5 @@ plot_counts_all_bams(counts_df,
                      end_region = 40000,
                      n_col = 1) +
   geom_regions.lfc(de_results)
-# The plots can be layered -------------------------------------------------------------------------------------
+# The plots can be layered -------------------------------------------------
 }
