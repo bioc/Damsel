@@ -6,7 +6,7 @@ test_that("geom_region.lfc: output is ggplot", {
 })
 
 test_that("geom_region.lfc: Output is error", {
-  expect_error(geom_regions.lfc())
+  expect_error(ggplot2::ggplot() + geom_regions.lfc())
   expect_error(plot_counts_all_bams(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)], seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
                  geom_regions.lfc())
   expect_error(plot_counts_all_bams(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)], seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
@@ -16,6 +16,6 @@ test_that("geom_region.lfc: Output is error", {
 })
 
 test_that("geom_region.lfc: Output is no error", {
-  plot_counts_all_bams(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)], seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
-    geom_regions.lfc(add_de(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))))
+  expect_no_error(plot_counts_all_bams(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)], seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
+    geom_regions.lfc(add_de(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])))))
 })
