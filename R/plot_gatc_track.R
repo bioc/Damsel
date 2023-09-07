@@ -85,13 +85,13 @@ ggplot_add.gatc <- function(object, plot, object_name) {
   gatc.plot <- ggplot2::ggplot() +
     ggplot2::geom_segment(
       data = valid.bed,
-      mapping = ggplot2::aes_string(
-        x = "start",
-        y = "1",
-        xend = "end",
-        yend = "1"
+      mapping = ggplot2::aes(
+        x = start,
+        y = 1,
+        xend = end,
+        yend = 1
       ),
-      size = gatc.size,
+      linewidth = gatc.size,
       color = gatc.color
     ) +
     ggplot2::labs(y = "GATC")

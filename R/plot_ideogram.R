@@ -100,7 +100,7 @@ hack_adjustZoom <- function(obj, plot, zoom.region, zoom.offset, color, fill, si
                                                         xmax = substitute(x2),
                                                         ymin = substitute(y1),
                                                         ymax = substitute(y2))),
-                                      color = color, fill = fill, size = size,
+                                      color = color, fill = fill, linewidth = size,
                                       alpha = alpha)
   } else {
     plot

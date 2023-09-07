@@ -105,7 +105,7 @@ ggplot_add.de.res <- function(object, plot, object_name) {
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_blank(),
-      panel.border = ggplot2::element_rect(colour = "black", fill = NA, size = 1),
+      panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
       plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
     )
 

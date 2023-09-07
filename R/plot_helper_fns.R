@@ -31,7 +31,7 @@ theme_peak_hack <- function(margin.len, x.range) {
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_blank(),
-      panel.border = ggplot2::element_rect(colour = "black", fill = NA, size = 1),
+      panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
       plot.margin = ggplot2::margin(t = margin.len, b = margin.len)
     ),
     ggplot2::scale_y_continuous(
