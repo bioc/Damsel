@@ -23,7 +23,7 @@
 #'                      end_region = 40000,
 #'                      n_col = 1) +
 #'   geom_regions.lfc(de_results)
-#' # The plots can be layered -------------------------------------------------------------------------------------
+#' # The plots can be layered -------------------------------------------------
 geom_regions.lfc <- function(region.df, region.color = "black",
                              plot.space = 0.1, plot.height = 1) {
   structure(list(

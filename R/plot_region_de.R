@@ -22,7 +22,7 @@
 #'                      end_region = 40000,
 #'                      n_col = 1) +
 #'   geom_de.res(de_results)
-#' # The plots can be layered -------------------------------------------------------------------------------------
+#' # The plots can be layered ------------------------------------------------
 geom_de.res <- function(de_results.df = NULL,
                         plot.space = 0.1, plot.height = 0.3) {
   structure(list(

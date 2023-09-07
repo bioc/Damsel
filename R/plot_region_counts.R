@@ -20,7 +20,8 @@
 #'                      start_region = 1,
 #'                      end_region = 40000,
 #'                      n_col = 3)
-#' # Can use this plot to layer other plots, just set n_col = 1 and start layering --------------------------------------
+#' # Can use this plot to layer other plots,
+#'   just set n_col = 1 and start layering ----------------------------------
 #' dge <- edgeR_set_up(counts.df)
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
