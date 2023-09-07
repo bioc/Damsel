@@ -41,8 +41,7 @@ As a DamID analysis tool, Damsel requires a GATC region file for analysis. These
 #2.1 Introducing the GATC region file
 The GATC region file for Drosophila melanogaster v6 is available to you via data.
 ```{r}
-#data("regions_gatc_drosophila_dm6")
-#not sure how to write it actually
+data("regions_gatc_drosophila_dm6")
 ```
 It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
 
@@ -64,14 +63,17 @@ Note: Damsel requires BAM files that have been mapped to the reference genome.
 Provided the path to a folder of BAM files (and their .bai files) and the appropriate GATC region file, the function `process_bams()` will extract the counts for each region for each available BAM and add them as columns to a data frame. The columns will be named by the BAM file name - please rename them before running `process_bams` if they do not make sense.
 -the function makes use of [exomeCopy::countBaminGranges()]
 ```{r}
-#process_bams(path, region = regions_gatc_drosophila_dm6)
+counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), 
+                          regions = regions_gatc_drosophila_dm6)
+head(counts.df)
 ```
 -If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
--Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the dataframe.
 ```{r}
-#example on rearranging columns
-#df[,c(1:6,8,7,blah,blah)]
+counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+head(counts.df)
 ```
+
+-Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the dataframe.
 
 -The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
 
@@ -82,12 +84,22 @@ At this stage, the similarities and differences between the samples can be analy
 The default for all Damsel correlation analysis is the non-parametric "spearman's" correlation.
 The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
 ```{r}
-#corr_heatmap(df)
+corr_heatmap(df = counts.df, method = "spearman")
 ```
 
 Two specific samples can also be compared using `ggscatter` which plots a scatterplot of the two samples, overlaid with the correlation results. [ggpubr::ggscatter()]
 ```{r}
-#ggpubr::ggscatter(df, sample_1 = col_1, sample_2 = col_2)
+ggpubr::ggscatter(df = counts.df, 
+                  sample_1 = `Wing_Dam-1_S1_s.bam`, 
+                  sample_2 = `Wing_Sd-1_S2_s.bam`)
+```
+
+
+#2.4 Visualisation of coverage
+
+A specific region can be selected to view the counts across samples.
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3)
 ```
 
 
@@ -106,7 +118,8 @@ For ease of use, Damsel has four main edgeR based functions which compile differ
 -vi. estimates the dispersion
 
 ```{r}
-#edgeR_set_up(df)
+dge <- edgeR_set_up(counts.df)
+head(dge)
 ```
 The output from this step is a DGEList? containing all of the information from the steps.
 
@@ -116,7 +129,7 @@ It's important to visualise the differences between the samples. This can be don
 You would expect the Dam samples to cluster together, and for the Fusion samples to cluster together.
 You would expect the majority of the variation to be within the 1st dimension (the x axis), and less variation in the 2nd dimension (y axis)
 ```{r}
-#edgeR_plot_mds(dge)
+edgeR_plot_mds(dge)
 ```
 
 #3.3 Identifying differentially methylated regions
@@ -130,7 +143,8 @@ After exploring the data visually, it's time to identify the enriched regions. `
 Outputted is a data frame with the region position, logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
 
 ```{r}
-#edgeR_results(dge)
+de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+head(de_results)
 ```
 
 
@@ -138,26 +152,57 @@ Outputted is a data frame with the region position, logFC (log fold change), log
 The results from the above differential methylation analysis can be visualised in an MA style plot with `edgeR_results_plot`
 MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 ```{r}
-#edgeR_results_plot(results)
+edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 ```
 
+The edgeR results can be plotted alongside the counts as well.
+Before plotting these, the de_results must be added back to the original data frame in order to recover the regions excluded from edgeR analysis. 
+-These regions were excluded due to having low counts. To distinguish them, they are given logFC = 0, and adjust.p = 1
+```{r}
+head(add_de(de_results))
+```
+
+-Plot with the de_results
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+  geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
+```
+-Plot with logFC
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+  geom_regions.lfc(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
+```
+-Plot with both
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+  geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
+```
+-Plot the other option - it's one and the same
 
 ##4. Identifying peaks (bridges)
 As you could see from the plot of the differential methylation results, there are 10s of 1000s of enriched regions. To reduce the scale of this data to something that can be more biologically meaningul, enriched regions can be compiled into peaks.
 
-# ?Plotting
-idk
 # Aggregating the regions
 Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were excluded from edgeR analysis for being too small given a p value of 1.
 
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
 
 ```{r}
-#aggregate_peaks(dm_results)
+peaks <- aggregate_peaks(de_results, regions_gatc_drosophila_dm6)
+head(peaks)
+nrow(peaks)
 ```
 
-# ?Plotting
--idk
+# Plotting
+A peak plot layer can be added to our graph
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+  geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_peak.new(peak.df = peaks)
+```
+
 
 
 ##5. Identifying genes associated with peaks
@@ -179,7 +224,10 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 
 ```{r}
 #data(gene_file)
-#get_biomart_genes(species, version, regions)
+genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", 
+                           version = 109, 
+                           regions = regions_gatc_drosophila_dm6)
+head(genes)
 ```
 
 
@@ -187,7 +235,17 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 This can be visualised with ...
 
 #5.3 Annotating genes to peaks
-yeah I don't actually have a good fn for that yet
+```{r}
+annotated_peaks <- gene_annotate(peaks, genes)
+head(annotated_peaks)
+```
+
+
+```{r}
+annotated_peaks <- gene_annotate_organised(annotated_peaks)
+head(annotated_peaks)
+```
+
 #5.4 Interpreting results/Plotting?
 also don't have a good fn for that yet
 
