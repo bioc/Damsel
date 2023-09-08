@@ -1,3 +1,28 @@
+#' Plotting de results with lfc
+#'
+#' @param de_results.df results as outputted from `edgeR_results`
+#' @param plot.space space to next plot
+#' @param plot.height height of plot
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#' path_to_bams <- system.file("extdata", package = "Damsel")
+#' counts.df <- process_bams(path_to_bams,
+#'                           regions = regions_gatc_drosophila_dm6,
+#'                           cores = 2)
+#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' dge <- edgeR_set_up(counts.df)
+#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' plot_counts_all_bams(counts.df,
+#'                      seqnames = "chr2L",
+#'                      start_region = 1,
+#'                      end_region = 40000,
+#'                      n_col = 1) +
+#'   geom_de.res.lfc(de_results)
+#' # The plots can be layered ------------------------------------------------
 geom_de.res.lfc <- function(de_results.df,
                             plot.space = 0.1, plot.height = 0.3) {
   structure(list(
@@ -87,9 +112,6 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
       panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
       plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
     )
-
-  # add theme
-  #gatc.plot <- gatc.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
 
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
