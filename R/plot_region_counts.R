@@ -44,6 +44,9 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
   if(is.null(end_region) | !is.numeric(end_region)) {
     stop("numeric element for end_region is required")
   }
+  if(end_region <= start_region) {
+    stop("end_region must be greater than start_region")
+  }
   df <- df
   colnames(df) <- chartr("-", "_", colnames(df))
   df <- df %>% dplyr::filter(seqnames == seqnames, start >= start_region, end <= end_region)
