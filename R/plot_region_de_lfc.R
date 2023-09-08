@@ -32,6 +32,7 @@ geom_de.res.lfc <- function(de_results.df,
   )
 }
 
+#' @export
 ggplot_add.de.res.lfc <- function(object, plot, object_name) {
   if(!is.data.frame(object$de_results.df)) {
     stop("data.frame of de results is required")
