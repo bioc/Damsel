@@ -39,9 +39,11 @@ Utilising the power of edgeR for differential analysis and goseq for gene ontolo
 As a DamID analysis tool, Damsel requires a GATC region file for analysis. These regions serve as a guide to extract counts from the BAM files.
 
 #2.1 Introducing the GATC region file
-The GATC region file for Drosophila melanogaster v6 is available to you via data.
+The GATC region file for Drosophila melanogaster v6 is available to you.
 ```{r}
-data("regions_gatc_drosophila_dm6")
+#b/c lazy loading don't need data call
+#data("regions_gatc_drosophila_dm6")
+head(regions_gatc_drosophila_dm6)
 ```
 It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
 
@@ -88,11 +90,7 @@ corr_heatmap(df = counts.df, method = "spearman")
 ```
 
 Two specific samples can also be compared using `ggscatter` which plots a scatterplot of the two samples, overlaid with the correlation results. [ggpubr::ggscatter()]
-```{r}
-ggpubr::ggscatter(df = counts.df, 
-                  sample_1 = `Wing_Dam-1_S1_s.bam`, 
-                  sample_2 = `Wing_Sd-1_S2_s.bam`)
-```
+
 
 
 #2.4 Visualisation of coverage
@@ -170,7 +168,7 @@ plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region
 -Plot with logFC
 ```{r}
 plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
-  geom_regions.lfc(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
+  geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 -Plot with both
 ```{r}
@@ -228,7 +226,6 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 -iii. identifies the number of GATC regions that overlap with each gene
 
 ```{r}
-#data(gene_file)
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", 
                            version = 109, 
                            regions = regions_gatc_drosophila_dm6)
