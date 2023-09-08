@@ -31,7 +31,7 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   if(missing(regions)) {
     message("Default of drosophila dm6 regions used")
   }
-  results <- add_de(de_results=dm_results, regions=regions_gatc_drosophila_dm6)
+  results <- add_de(de_results=dm_results, regions=regions)
   df_a <- results %>%
       dplyr::mutate(number = 1:nrow(.),
                     trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
@@ -92,7 +92,8 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
       dplyr::group_by(seqnames) %>%
       dplyr::mutate(gap = start - dplyr::lag(end)) %>%
       dplyr::ungroup() %>%
-      dplyr::mutate(number = 1:nrow(.))
+      dplyr::mutate(number = 1:nrow(.)) %>%
+      data.frame()
   peaks
 }
 
