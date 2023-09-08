@@ -13,6 +13,9 @@ geom_de.res.lfc(de_results.df, plot.space = 0.1, plot.height = 0.3)
 
 \item{plot.height}{height of plot}
 }
+\value{
+plot
+}
 \description{
 Plotting de results with lfc
 }

@@ -4,7 +4,7 @@
 #' @param plot.space space to next plot
 #' @param plot.height height of plot
 #'
-#' @return
+#' @return plot
 #' @export
 #'
 #' @examples
