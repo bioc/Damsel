@@ -179,6 +179,11 @@ plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region
   geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 -Plot the other option - it's one and the same
+```{r}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+  geom_de.res.lfc(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
+```
+
 
 ##4. Identifying peaks (bridges)
 As you could see from the plot of the differential methylation results, there are 10s of 1000s of enriched regions. To reduce the scale of this data to something that can be more biologically meaningul, enriched regions can be compiled into peaks.
