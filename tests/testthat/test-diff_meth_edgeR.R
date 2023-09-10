@@ -18,7 +18,7 @@ test_that("edgeR set up: Output is no error/message", {
 
 ##MDS plot
 test_that("edgeR mds: Output is an MDS plot", {
-  expect_s4_class(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel")[,c(1:6,7,10,8,11,9,12)]))), "MDS")
+  expect_s4_class(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])), "MDS")
   expect_s4_class(edgeR_plot_mds(readRDS(test_path("fixtures", "test_dge.rds"))), "MDS")
 })
 
