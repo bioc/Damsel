@@ -69,7 +69,10 @@ ggplot_add.regions.lfc <- function(object, plot, object_name) {
   plot.height <- object$plot.height
 
   #df_regions <- dd_de(final_edgeR_results_ad, regions = regions_for_testing)
-  df_regions <- dplyr::filter(region.df, seqnames == plot.chr, start >= plot.region.start, end <= plot.region.end)
+  df_regions <- dplyr::filter(region.df,
+                              seqnames == plot.chr,
+                              start >= plot.region.start,
+                              end <= plot.region.end)
   df_colour <- df_regions %>%
       dplyr::mutate(number = 1:dplyr::n()) %>%
       .[rep(seq_len(nrow(.)), times = 4),] %>%

@@ -68,7 +68,10 @@ ggplot_add.de.res <- function(object, plot, object_name) {
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  df_regions <- dplyr::filter(de_results.df, seqnames == plot.chr, start >= plot.region.start,  end <= plot.region.end)
+  df_regions <- dplyr::filter(de_results.df,
+                              seqnames == plot.chr,
+                              start >= plot.region.start,
+                              end <= plot.region.end)
   df_colour <- df_regions %>%
       dplyr::mutate(number = 1:dplyr::n()) %>%
       .[rep(seq_len(nrow(.)), times = 4),] %>%
