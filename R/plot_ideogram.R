@@ -32,9 +32,6 @@ Ideogram_wrap <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
 #' @param genome if don't have an object give a genome name
 #'
 #' @return plot
-#' @export
-#'
-#' @examples
 hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands = TRUE,
                           color = "red", fill = "red", alpha = 0.7,
                           zoom.region = NULL,

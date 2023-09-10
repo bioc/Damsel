@@ -11,9 +11,7 @@
 #'  * Plot of goodness of fit of model
 #'  * Plot of sample data
 #'  * Plot of sample data without bias correction (should be messy)
-#' @export
-#'
-#' @examples
+
 #geneOntology?
 goseq_fn <- function(regions, genes, peaks) {
   goseq_genes_peaks <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
