@@ -39,7 +39,7 @@ gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6,
                             seqnames = paste0("chr", seqnames),
                             start = start - 3, end = start + 4)
 
-plot_counts_all_bams(counts_df,
+plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
                      start_region = 1,
                      end_region = 40000,

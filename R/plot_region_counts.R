@@ -15,7 +15,7 @@
 #'                           regions = regions_gatc_drosophila_dm6,
 #'                           cores = 2)
 #' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' plot_counts_all_bams(counts_df,
+#' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
 #'                      end_region = 40000,
@@ -24,7 +24,7 @@
 #' dge <- edgeR_set_up(counts.df)
 #' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
-#' plot_counts_all_bams(counts_df,
+#' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
 #'                      end_region = 40000,
