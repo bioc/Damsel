@@ -33,6 +33,7 @@ Imports:
     patchwork,
     plyranges,
     reshape2,
+    S4Vectors,
     stringr,
     tidyr
 VignetteBuilder: knitr
