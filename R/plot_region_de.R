@@ -24,7 +24,7 @@
 #'   geom_de.res(de_results)
 #' # The plots can be layered ------------------------------------------------
 geom_de.res <- function(de_results.df = NULL,
-                        plot.space = 0.1, plot.height = 0.3) {
+                        plot.space = 0.1, plot.height = 0.1) {
   structure(list(
     de_results.df = de_results.df, plot.space = 0.1, plot.height = plot.height
   ),

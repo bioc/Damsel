@@ -4,7 +4,7 @@
 \alias{geom_de.res}
 \title{Plotting de results}
 \usage{
-geom_de.res(de_results.df = NULL, plot.space = 0.1, plot.height = 0.3)
+geom_de.res(de_results.df = NULL, plot.space = 0.1, plot.height = 0.1)
 }
 \arguments{
 \item{de_results.df}{results df plus add_de: `add_de(edgeR_results())`}

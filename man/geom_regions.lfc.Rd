@@ -8,7 +8,7 @@ geom_regions.lfc(
   region.df,
   region.color = "black",
   plot.space = 0.1,
-  plot.height = 1
+  plot.height = 0.2
 )
 }
 \arguments{

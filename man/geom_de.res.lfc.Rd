@@ -4,7 +4,7 @@
 \alias{geom_de.res.lfc}
 \title{Plotting de results with lfc}
 \usage{
-geom_de.res.lfc(de_results.df, plot.space = 0.1, plot.height = 0.3)
+geom_de.res.lfc(de_results.df, plot.space = 0.1, plot.height = 0.1)
 }
 \arguments{
 \item{de_results.df}{results as outputted from `edgeR_results`}

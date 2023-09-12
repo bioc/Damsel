@@ -25,7 +25,7 @@
 #'   geom_regions.lfc(de_results)
 #' # The plots can be layered -------------------------------------------------
 geom_regions.lfc <- function(region.df, region.color = "black",
-                             plot.space = 0.1, plot.height = 1) {
+                             plot.space = 0.1, plot.height = 0.2) {
   structure(list(
     region.df = region.df, region.color = region.color,
     plot.space = plot.space, plot.height = plot.height

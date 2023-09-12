@@ -8,8 +8,8 @@ geom_gatc(
   gatc.df = NULL,
   gatc.color = "red",
   gatc.size = 5,
-  plot.space = 0.1,
-  plot.height = 0.1
+  plot.space = 0.2,
+  plot.height = 0.05
 )
 }
 \arguments{

@@ -9,7 +9,7 @@ geom_peak.new(
   peak.color = "black",
   peak.size = 5,
   plot.space = 0.1,
-  plot.height = 0.1
+  plot.height = 0.05
 )
 }
 \arguments{
