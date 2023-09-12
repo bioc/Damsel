@@ -10,7 +10,9 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.height = 7,
+  fig.width = 9
 )
 ```
 
@@ -18,27 +20,15 @@ knitr::opts_chunk$set(
 library(Damsel)
 ```
 
-##thoughts
-sketch out a format
--introduce data
--process data
--optional correlation plots
--then methylation analysis
--plots
--then finding peaks, any plots
--add the genes
--do the goseq
-
-
-##1. Introduction
+# 1. Introduction
 This document gives an introduction to the R package Damsel, for use in DamID analysis; from BAM file input to gene ontology analysis.
 Designed for use with DamID data, the Damsel methodology could be modified for use on any similar technology that seeks to identify enriched regions relative to a control sample. 
 Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
 
-##2. Processing the BAM files
+# 2. Processing the BAM files
 As a DamID analysis tool, Damsel requires a GATC region file for analysis. These regions serve as a guide to extract counts from the BAM files.
 
-#2.1 Introducing the GATC region file
+## 2.1 Introducing the GATC region file
 The GATC region file for Drosophila melanogaster v6 is available to you.
 ```{r}
 #b/c lazy loading don't need data call
@@ -60,12 +50,13 @@ The GATC regions are not evenly distributed across the genome, and vary greatly 
 This can be explored in more detail via boxplots and #that one function I was making looking for patterns in the distribution
 
 
-#2.2 Extracting the counts within the GATC regions
+## 2.2 Extracting the counts within the GATC regions
 Note: Damsel requires BAM files that have been mapped to the reference genome.
 Provided the path to a folder of BAM files (and their .bai files) and the appropriate GATC region file, the function `process_bams()` will extract the counts for each region for each available BAM and add them as columns to a data frame. The columns will be named by the BAM file name - please rename them before running `process_bams` if they do not make sense.
 -the function makes use of [exomeCopy::countBaminGranges()]
 ```{r}
-counts.df <- process_bams(path_to_bams = system.file("extdata", package = "Damsel"), 
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams, 
                           regions = regions_gatc_drosophila_dm6)
 head(counts.df)
 ```
@@ -80,12 +71,12 @@ head(counts.df)
 -The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
 
 
-#2.3 Correlation analysis of samples
+## 2.3 Correlation analysis of samples
 At this stage, the similarities and differences between the samples can be analysed via correlation.
  `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 The default for all Damsel correlation analysis is the non-parametric "spearman's" correlation.
 The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
-```{r}
+```{r heatmap, fig.height=6, fig.width=6}
 corr_heatmap(df = counts.df, method = "spearman")
 ```
 
@@ -93,20 +84,20 @@ Two specific samples can also be compared using `ggscatter` which plots a scatte
 
 
 
-#2.4 Visualisation of coverage
+## 2.4 Visualisation of coverage
 
 A specific region can be selected to view the counts across samples.
-```{r}
+```{r coverage, fig.height=7, fig.width=10}
 plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3)
 ```
 
 
-##3. Differential methylation analysis
+# 3. Differential methylation analysis
 The goal with DamID analysis is to identify regions that are enriched in the fusion sample relative to the control. In Damsel, this step is referred to as differential methylation analysis, and makes use of [edgeR].
 
 For ease of use, Damsel has four main edgeR based functions which compile different steps and functions from within edgeR. 
 
-#3.1 Setting up edgeR analysis
+## 3.1 Setting up edgeR analysis
 `edgeR_set_up` sets up the edgeR analysis for differential methylation testing. Taking the dataframe of samples and regions as input, it conducts the following steps:
 -i. it extracts the sample data
 -ii. groups the samples (Dam or Fusion)
@@ -121,16 +112,16 @@ head(dge)
 ```
 The output from this step is a DGEList? containing all of the information from the steps.
 
-#3.2 Examining the data - multidimensional scaling plot
+## 3.2 Examining the data - multidimensional scaling plot
 It's important to visualise the differences between the samples. This can be done with `edgeR_plot_mds`
 
 You would expect the Dam samples to cluster together, and for the Fusion samples to cluster together.
 You would expect the majority of the variation to be within the 1st dimension (the x axis), and less variation in the 2nd dimension (y axis)
-```{r}
+```{r mds, fig.height=6, fig.width=6}
 edgeR_plot_mds(dge)
 ```
 
-#3.3 Identifying differentially methylated regions
+## 3.3 Identifying differentially methylated regions
 After exploring the data visually, it's time to identify the enriched regions. `edgeR_results` compiles the edgeR functions for differential testing with one key modification - it outputs the results with the adjusted p values instead of the raw p values.
 
 `edgeR_results` conducts the following key steps:
@@ -146,10 +137,10 @@ head(de_results)
 ```
 
 
-#3.4 Plotting the results
+## 3.4 Plotting the results
 The results from the above differential methylation analysis can be visualised in an MA style plot with `edgeR_results_plot`
 MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
-```{r}
+```{r ma, fig.height=6, fig.width=8}
 edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 ```
 
@@ -161,32 +152,32 @@ head(add_de(de_results))
 ```
 
 -Plot with the de_results
-```{r}
-plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
   geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 -Plot with logFC
-```{r}
-plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
   geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 -Plot with both
-```{r}
-plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
   geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
   geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 -Plot the other option - it's one and the same
-```{r}
-plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
   geom_de.res.lfc(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6))
 ```
 
 
-##4. Identifying peaks (bridges)
+# 4. Identifying peaks (bridges)
 As you could see from the plot of the differential methylation results, there are 10s of 1000s of enriched regions. To reduce the scale of this data to something that can be more biologically meaningul, enriched regions can be compiled into peaks.
 
-# Aggregating the regions
+## Aggregating the regions
 Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were excluded from edgeR analysis for being too small given a p value of 1.
 
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
@@ -197,10 +188,10 @@ head(peaks)
 nrow(peaks)
 ```
 
-# Plotting
+## Plotting
 A peak plot layer can be added to our graph
-```{r}
-plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 3) +
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region = 40000, n_col = 1) +
   geom_regions.lfc(region.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
   geom_de.res(de_results.df = add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
   geom_peak.new(peak.df = peaks)
@@ -208,7 +199,7 @@ plot_counts_all_bams(counts.df, seqnames = "chr2L", start_region = 1, end_region
 
 
 
-##5. Identifying genes associated with peaks
+# 5. Identifying genes associated with peaks
 The peak information itself - while interesting, has no biological meaning. As the peaks represent a region that the Fusion protein interacted with on the DNA, likely as a transcription factor, we wish to identify the gene that is being affected. To do so, we need to associate the peaks with a potential "target" gene.
 
 Note: any gene identified here is only a potential target that must be validated in laboratory procedures. There is no method available that is able to accurately predict the location and target genes of enhancers, so a key and potentially incorrect assumption in this part of the analysis is that all peaks represent binding to a local enhancer or promoter - that it is close or overlapping to the target gene.
@@ -217,7 +208,7 @@ It must also be noted that the Drosophila melanogaster genome and transcription 
 
 In the Damsel methodology, peaks are considered to associate with genes if they overlap the gene body or are within 2.5kb upstream of the genes transcription start site. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
 
-#5.1 Extract genes from Ensembl using biomaRt
+## 5.1 Extract genes from Ensembl using biomaRt
 Obtaining information about the genes is done through accessing Ensembl via biomaRt. As this can be a slow process, it has been provided for Drosophila melanogaster dm6 and can be loaded via `data`.
 
 Functions to undertake this are also available (`get_biomart_genes`), and follow these general steps:
@@ -233,10 +224,10 @@ head(genes)
 ```
 
 
-#5.2 Examine distribution of genes and GATC regions
+## 5.2 Examine distribution of genes and GATC regions
 This can be visualised with ...
 
-#5.3 Annotating genes to peaks
+## 5.3 Annotating genes to peaks
 ```{r}
 annotated_peaks <- gene_annotate(peaks, genes)
 head(annotated_peaks)
@@ -248,12 +239,13 @@ annotated_peaks <- gene_annotate_organised(annotated_peaks)
 head(annotated_peaks)
 ```
 
-#5.4 Interpreting results/Plotting?
+## 5.4 Interpreting results/Plotting?
 also don't have a good fn for that yet
 
-##6. Gene ontology
+# 6. Gene ontology
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
-#6.1 GO analysis with goseq
+
+## 6.1 GO analysis with goseq
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
  
 Outputs list of 4 graphs
@@ -266,8 +258,8 @@ Plot of sample data without bias correction (should be messy)
 #goseq_fn(regions, genes, peaks)
 ```
 
-#6.2 KEGG???
+## 6.2 KEGG???
 
 
-##7. Motif analysis??
+# 7. Motif analysis??
 
