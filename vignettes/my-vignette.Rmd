@@ -12,7 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.height = 7,
-  fig.width = 9
+  fig.width = 12
 )
 ```
 
@@ -31,8 +31,6 @@ As a DamID analysis tool, Damsel requires a GATC region file for analysis. These
 ## 2.1 Introducing the GATC region file
 The GATC region file for Drosophila melanogaster v6 is available to you.
 ```{r}
-#b/c lazy loading don't need data call
-#data("regions_gatc_drosophila_dm6")
 head(regions_gatc_drosophila_dm6)
 ```
 It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
