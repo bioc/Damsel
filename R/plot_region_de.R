@@ -1,10 +1,15 @@
 #' Plotting de results
 #'
+#' `geom_de.res` is a ggplot layer that visualises the de results across a given region.
+#' * regions are 1, 0, -1, or NA and coloured as such (grey for NA)
+#' * cannot be plotted by itself, must be added to an existing plot - see examples.
+#'
+#'
 #' @param de_results.df results df plus add_de: `add_de(edgeR_results())`
 #' @param plot.space gap to next plot
 #' @param plot.height height of plot
 #'
-#' @return plot
+#' @return ggplot_add object
 #' @export
 #'
 #' @examples

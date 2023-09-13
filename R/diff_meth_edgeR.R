@@ -1,5 +1,5 @@
 
-#' Differential methylation analysis
+#' DGE object for differential methylation analysis
 #'
 #' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
@@ -102,7 +102,15 @@ edgeR_plot_mds <- function(dge) {
 #' @param p.value p value threshold for minimum significance. Default is 0.05
 #' @param lfc minimum log fold change for significant results. Default is 1
 #'
-#' @return data frame of differential methylation results. Columns are as follows; rownames(Region position), logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
+#' @return data frame of differential methylation results.
+#' Columns are as follows;
+#' * rownames(Region position),
+#' * logFC (log fold change),
+#' * logCPM (log counts per million),
+#' * F (F statistic used to identify significance),
+#' * PValue,
+#' * adjustedP (P Value with multiple test correction),
+#' * de (result: -1,0,1)
 #' @export
 #'
 #' @examples

@@ -7,13 +7,14 @@
 gene_annotate_organised(annotated_peaks)
 }
 \arguments{
-\item{annotated_peaks}{data.frame of annotated messy peaks I don't like from [gene_annotate()]}
+\item{annotated_peaks}{data.frame of annotated peaks [gene_annotate()]}
 }
 \value{
 organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
+* contains information about the peak and gene location (for the closest gene), and provides a list of other nearby genes and their distance to the peak.
 }
 \description{
-`gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format. meaning I probably want it all as 1 fn
+`gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format.
 }
 \examples{
 # set up peaks

@@ -24,10 +24,11 @@ plot_counts_all_bams(
 \item{n_col}{n_columns to facet the graph by - default is 3}
 }
 \value{
-ggplot
+ggplot object
 }
 \description{
-Plot for just counts for all samples across a given region
+`plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.
+* this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")

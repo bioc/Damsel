@@ -1,11 +1,16 @@
 #' Plot lfc results across the regions
 #'
+#' `geom_regions.lfc` is a ggplot layer that visualises the logFC results across a given region.
+#' * cannot be plotted by itself, must be added to an existing plot - see examples.
+#' * recommend using geom_de.res.lfc instead
+#'
+#'
 #' @param region.df results df plus add_de: `add_de(edgeR_results())`
 #' @param region.color leave as default
 #' @param plot.space gap to next plot
 #' @param plot.height height of plot
 #'
-#' @return plot
+#' @return ggplot_add object
 #' @export
 #'
 #' @examples

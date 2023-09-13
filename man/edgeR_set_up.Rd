@@ -2,7 +2,7 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_set_up}
 \alias{edgeR_set_up}
-\title{Differential methylation analysis}
+\title{DGE object for differential methylation analysis}
 \usage{
 edgeR_set_up(df, lib.size = NULL, keep_a = 0.5, keep_b = 3)
 }

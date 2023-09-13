@@ -24,10 +24,11 @@ geom_peak.new(
 \item{plot.height}{height of plot - leave it at default}
 }
 \value{
-plot
+ggplot_add object
 }
 \description{
-`geom_peak.new` adds the peak location to an existing ggplot2 object
+`geom_peak.new` is a ggplot layer that visualises the positions of peaks across a given region.
+* cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")

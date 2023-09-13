@@ -1,6 +1,8 @@
 #' Plotting peaks
 #'
-#' `geom_peak.new` adds the peak location to an existing ggplot2 object
+#' `geom_peak.new` is a ggplot layer that visualises the positions of peaks across a given region.
+#' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
+#'
 #'
 #' @param peak.df data frame of peak locations
 #' @param peak.color can set the colour if you want
@@ -8,7 +10,7 @@
 #' @param plot.space gap to next plot - default 0.1
 #' @param plot.height height of plot - leave it at default
 #'
-#' @return plot
+#' @return ggplot_add object
 #' @export
 #'
 #' @examples

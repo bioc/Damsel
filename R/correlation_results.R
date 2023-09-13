@@ -8,7 +8,8 @@
 #' @param df data frame as outputted from [process_bams()]
 #' @param method correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.
 #'
-#' @return A heatmap style plot of the samples, coloured by correlation value. Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
+#' @return A ggplot object. A heatmap style plot of the samples, coloured by correlation value.
+#' Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 #' @examples
 #' path_to_bams <- system.file("extdata", package = "Damsel")
 #' counts.df <- process_bams(path_to_bams,

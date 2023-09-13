@@ -8,7 +8,18 @@
 #' @param version Ensembl version of genome. Default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
 #' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
 #'
-#' @return data.frame of information about the genes. Columns include (I don't know what order right now): chromosome, start, end, width, strand, gene name, ensembl_gene_id, ensembl_transcript_id, n_overlapping_gatc_regions
+#' @return data.frame of information about the genes.
+#' Columns include:
+#' * seqnames,
+#' * start,
+#' * end,
+#' * width,
+#' * strand,
+#' * ensembl_gene_id,
+#' * gene_name,
+#' * ensembl_transcript_id,
+#' * TSS (transcription start site),
+#' * n_regions (number of overlapping GATC regions)
 #' @export
 #'
 #' @examples
@@ -64,11 +75,15 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #' Annotating peaks to their closest gene
 #'
 #' `gene_annotate` takes both the peaks and genes as input and returns the paired results.
+#' * The output of this function is a very large data frame with some confusing columns, the following function will help simplify the results.
 #'
 #' @param peaks data.frame of peaks as outputted from [aggregate_peaks]
 #' @param genes data frame of gene information as outputted from [get_biomart_genes]
 #'
-#' @return data.frame of annotated peaks and genes in a horrible messy format I don't like to look at.
+#' @return data.frame of annotated peaks and genes.
+#' Contains all columns of output of get_biomart_genes (with gene added as a prefix to seqnames, start, end, width, strand),
+#' and all columns of output from aggregate_peaks.
+#' Contains additional columns providing the: peak midpoint, distance from the midpoint to the start of the gene, etc
 #' @export
 #'
 #' @examples
@@ -120,11 +135,12 @@ gene_annotate <- function(peaks, genes) {
 
 #' Tabular display of peak statistical information and their closest genes
 #'
-#' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format. meaning I probably want it all as 1 fn
+#' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format.
 #'
-#' @param annotated_peaks data.frame of annotated messy peaks I don't like from [gene_annotate()]
+#' @param annotated_peaks data.frame of annotated peaks [gene_annotate()]
 #'
 #' @return organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
+#' * contains information about the peak and gene location (for the closest gene), and provides a list of other nearby genes and their distance to the peak.
 #' @export
 #'
 #' @examples

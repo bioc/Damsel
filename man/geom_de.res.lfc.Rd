@@ -7,17 +7,19 @@
 geom_de.res.lfc(de_results.df, plot.space = 0.1, plot.height = 0.1)
 }
 \arguments{
-\item{de_results.df}{results as outputted from `edgeR_results`}
+\item{de_results.df}{results as outputted from `add_de(edgeR_results())`}
 
 \item{plot.space}{space to next plot}
 
 \item{plot.height}{height of plot}
 }
 \value{
-plot
+ggplot_add object
 }
 \description{
-Plotting de results with lfc
+`geom_de.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
+* regions are coloured by de result: 1, 0, -1, NA (grey for NA)
+* cannot be plotted by itself, must be added to an existing plot - see examples.
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")

@@ -18,7 +18,18 @@ get_biomart_genes(
 \item{regions}{data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.}
 }
 \value{
-data.frame of information about the genes. Columns include (I don't know what order right now): chromosome, start, end, width, strand, gene name, ensembl_gene_id, ensembl_transcript_id, n_overlapping_gatc_regions
+data.frame of information about the genes.
+Columns include:
+* seqnames,
+* start,
+* end,
+* width,
+* strand,
+* ensembl_gene_id,
+* gene_name,
+* ensembl_transcript_id,
+* TSS (transcription start site),
+* n_regions (number of overlapping GATC regions)
 }
 \description{
 `get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.

@@ -21,10 +21,12 @@ geom_regions.lfc(
 \item{plot.height}{height of plot}
 }
 \value{
-plot
+ggplot_add object
 }
 \description{
-Plot lfc results across the regions
+`geom_regions.lfc` is a ggplot layer that visualises the logFC results across a given region.
+* cannot be plotted by itself, must be added to an existing plot - see examples.
+* recommend using geom_de.res.lfc instead
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")

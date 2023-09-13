@@ -1,10 +1,15 @@
 #' Plotting de results with lfc
 #'
-#' @param de_results.df results as outputted from `edgeR_results`
+#' `geom_de.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
+#' * regions are coloured by de result: 1, 0, -1, NA (grey for NA)
+#' * cannot be plotted by itself, must be added to an existing plot - see examples.
+#'
+#'
+#' @param de_results.df results as outputted from `add_de(edgeR_results())`
 #' @param plot.space space to next plot
 #' @param plot.height height of plot
 #'
-#' @return plot
+#' @return ggplot_add object
 #' @export
 #'
 #' @examples

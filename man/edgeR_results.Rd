@@ -14,7 +14,15 @@ edgeR_results(dge, p.value = 0.05, lfc = 1)
 \item{lfc}{minimum log fold change for significant results. Default is 1}
 }
 \value{
-data frame of differential methylation results. Columns are as follows; rownames(Region position), logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
+data frame of differential methylation results.
+Columns are as follows;
+* rownames(Region position),
+* logFC (log fold change),
+* logCPM (log counts per million),
+* F (F statistic used to identify significance),
+* PValue,
+* adjustedP (P Value with multiple test correction),
+* de (result: -1,0,1)
 }
 \description{
 `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.

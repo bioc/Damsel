@@ -6,7 +6,19 @@
 #' @param dm_results data frame of differential methylation results obtained from [edgeR_results]
 #' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
 #'
-#' @return data frame of peaks. columns are chromosome name, start, end, and width of peak, peak identifier, n of dm regions within the peak, gap in bp to the next peak, and peak rank (based on p value).
+#' @return data frame of peaks.
+#' Columns are
+#' * seqnames,
+#' * start,
+#' * end,
+#' * width,
+#' * consec_dm (peak identifier),
+#' * n_regions_dm (n of dm regions within the peak),
+#' * ave_logFC (average logFC calculated across regions),
+#' * ave_pVal (average adjusted P Value calculated across the regions),
+#' * rank_p (based on average p value).
+#' * gap (gap in bp to the next peak),
+#' * number (peak number in order of position)
 #' @export
 #'
 #' @examples

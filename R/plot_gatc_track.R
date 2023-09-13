@@ -1,12 +1,15 @@
 #' Plot for a GATC track
 #'
+#' `geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
+#' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
+#'
 #' @param gatc.df df of positions of GATC sites - can be made from GATC region file
 #' @param gatc.color default is red
 #' @param gatc.size size of line
 #' @param plot.space gap to next plot
 #' @param plot.height size of plot
 #'
-#' @return plot
+#' @return ggplot_add object.
 #' @export
 #'
 #' @examples

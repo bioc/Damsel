@@ -12,10 +12,14 @@ gene_annotate(peaks, genes)
 \item{genes}{data frame of gene information as outputted from [get_biomart_genes]}
 }
 \value{
-data.frame of annotated peaks and genes in a horrible messy format I don't like to look at.
+data.frame of annotated peaks and genes.
+Contains all columns of output of get_biomart_genes (with gene added as a prefix to seqnames, start, end, width, strand),
+and all columns of output from aggregate_peaks.
+Contains additional columns providing the: peak midpoint, distance from the midpoint to the start of the gene, etc
 }
 \description{
 `gene_annotate` takes both the peaks and genes as input and returns the paired results.
+* The output of this function is a very large data frame with some confusing columns, the following function will help simplify the results.
 }
 \examples{
 # set up peaks

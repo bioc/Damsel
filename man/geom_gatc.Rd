@@ -24,10 +24,11 @@ geom_gatc(
 \item{plot.height}{size of plot}
 }
 \value{
-plot
+ggplot_add object.
 }
 \description{
-Plot for a GATC track
+`geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
+* cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")
