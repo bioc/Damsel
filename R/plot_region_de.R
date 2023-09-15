@@ -87,8 +87,8 @@ ggplot_add.de.res <- function(object, plot, object_name) {
     ggplot2::geom_segment(ggplot2::aes(x=end, xend=end, y=de, yend=0)) +
     ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=de, yend=de)) +
     ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=0, yend=0)) +
-    ggplot2::scale_x_continuous(expand = c(0,0),
-                                ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end))) +
+    ggplot2::scale_x_continuous(expand = c(0,0)) +
+    ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
     ggplot2::scale_y_continuous(limits = c(-5, 5),
                                 expand = c(0, 0),
                                 position = "right") +
