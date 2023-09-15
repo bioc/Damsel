@@ -6,6 +6,9 @@ GetRegion_hack <- function(df, chr, start, end = NULL) {
   rownames(df) <- NULL
 
   df.select <- df[df$end >= start & df$start <= end, ]
+  if(nrow(df.select) == 0) {
+    return(df.select)
+  }
   init.start <- df.select[1, "start"]
   if (init.start < start) {
     df.select[1, "start"] <- start
