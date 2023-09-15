@@ -74,6 +74,16 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
 
   # get valid bed
   valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
+  if(nrow(valid.bed) == 0) {
+    message("No peak data available for this region")
+    peak.plot <- ggplot2::ggplot() +
+      ggplot2::geom_blank() +
+      ggplot2::labs(y = "Peak") +
+      theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+    patchwork::wrap_plots(plot + theme(plot.margin = margin(t = plot.space, b = plot.space)),
+                          peak.plot,
+                          ncol = 1, heights = c(1, plot.height))
+  }
 
   peak.plot <- ggplot2::ggplot() +
     ggplot2::geom_segment(

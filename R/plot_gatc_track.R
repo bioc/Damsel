@@ -72,6 +72,16 @@ ggplot_add.gatc <- function(object, plot, object_name) {
 
   # get valid bed
   valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
+  if(nrow(valid.bed) == 0) {
+    message("No GATC site data available for this region")
+    gatc.plot <- ggplot2::ggplot() +
+      ggplot2::geom_blank() +
+      ggplot2::labs(y = "GATC") +
+      theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+    patchwork::wrap_plots(plot + theme(plot.margin = margin(t = plot.space, b = plot.space)),
+                          gatc.plot,
+                          ncol = 1, heights = c(1, plot.height))
+  }
 
   gatc.plot <- ggplot2::ggplot() +
     ggplot2::geom_segment(
