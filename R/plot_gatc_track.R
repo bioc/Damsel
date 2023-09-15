@@ -78,7 +78,7 @@ ggplot_add.gatc <- function(object, plot, object_name) {
       ggplot2::geom_blank() +
       ggplot2::labs(y = "GATC") +
       theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
-    patchwork::wrap_plots(plot + theme(plot.margin = margin(t = plot.space, b = plot.space)),
+    patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = margin(t = plot.space, b = plot.space)),
                           gatc.plot,
                           ncol = 1, heights = c(1, plot.height))
   }
