@@ -75,7 +75,9 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
     ggplot2::ggplot() +
     ggplot2::geom_polygon(ggplot2::aes(x = Position, y = raw_counts)) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
-    ggplot2::facet_wrap(~ bam, ncol = n_col)
+    ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
+    ggplot2::facet_wrap(~ bam, ncol = n_col) +
+    ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region))
 }
 
 
@@ -88,7 +90,6 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
 #' @param plot.height height of plot
 #'
 #' @return plot
-#' @export
 geom_regions.counts <- function(region.df = NULL, n_col = 1, region.color = "black",
                                 plot.space = 0.1, plot.height = 1) {
   structure(list(
@@ -144,7 +145,9 @@ ggplot_add.regions.counts <- function(object, plot, object_name) {
     ggplot2::ggplot() +
     ggplot2::geom_polygon(ggplot2::aes(x = Position, y = raw_counts)) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
-    ggplot2::facet_wrap(~ bam, ncol = n_col)
+    ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
+    ggplot2::facet_wrap(~ bam, ncol = n_col) +
+    ggplot2::labs(title = paste0(seqnames, ":", plot.region.start, "-", plot.region.start))
 
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                         counts.plot,
