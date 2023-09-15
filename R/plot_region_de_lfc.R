@@ -42,30 +42,18 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
   if(!is.data.frame(object$de_results.df)) {
     stop("data.frame of de results is required")
   }
-  # get plot data
-  # get plot data, plot data should contain bins
-  if (("patchwork" %in% class(plot)) && length(plot[[1]]$layers) == 1) {
-    plot.data <- plot[[1]]$layers[[1]]$data
-    if(!("data.frame" %in% class(plot.data))) {
-      plot.data <- plot[[1]]$data
-    }
-  } else if ("patchwork" %in% class(plot) && length(plot[[1]]$layers) == 2) {
-    plot.data <- plot[[1]]$layers[[2]]$data
-    colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
-  } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 1) {
-    plot.data <- plot$layers[[1]]$data
-    if(!("data.frame" %in% class(plot.data))) {
-      plot.data <- plot$data
-    }
-  } else if (!("patchwork" %in% class(plot)) && length(plot$layers) == 2) {
-    plot.data <- plot$layers[[2]]$data
-    colnames(plot.data) <- c("start", "end", "y1", "y2", "seqnames")
+  plot2 <- plot
+  while("patchwork" %in% class(plot2)) {
+    plot2 <- plot2[[1]]
   }
+  plot.data <- plot2$labels$title
+  plot.data <- stringr::str_split_1(plot.data, ":")
   # prepare plot range
   # the plot region are not normal, so start is minimum value
-  plot.chr <- as.character(plot.data[1, "seqnames"])
-  plot.region.start <- min(plot.data[, "start"])
-  plot.region.end <- max(plot.data[, "end"])
+  plot.chr <- plot.data[1]
+  plot.data <- stringr::str_split_1(plot.data[2], "-")
+  plot.region.start <- plot.data[1] %>% as.numeric()
+  plot.region.end <- plot.data[2] %>% as.numeric()
 
   # get parameters
   de_results.df <- object$de_results.df
