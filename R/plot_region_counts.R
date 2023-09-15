@@ -50,8 +50,8 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
     stop("end_region must be greater than start_region")
   }
   df <- df
-  colnames(df) <- chartr("-", "_", colnames(df))
-  df <- df %>% filter(seqnames == {{seqnames}}) %>% filter(start >= start_region, end <= end_region)
+  #colnames(df) <- chartr("-", "_", colnames(df))
+  df <- df %>% dplyr::filter(seqnames == {{seqnames}}) %>% dplyr::filter(start >= start_region, end <= end_region)
   if(nrow(df) == 0) {
     stop("No data available for provided region, make the region larger")
   }
