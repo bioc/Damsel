@@ -65,9 +65,10 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     message("No gene data available for this region")
     gene_plot <- ggplot2::ggplot() +
       ggplot2::geom_blank() +
-      ggplot2::labs("Gene") +
+      ggplot2::labs(y = "Gene") +
       ggplot2::scale_x_continuous(expand = c(0,0)) +
       ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
+      ggplot2::scale_y_continuous(position = "right") +
       ggplot2::theme_classic() +
       ggplot2::theme(
         #axis.line.y = ggplot2::element_blank(),
@@ -89,6 +90,8 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
   gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
+    ggplot2::labs(y = "Gene") +
+    ggplot2::scale_y_continuous(position = "right") +
     ggplot2::theme_classic() +
     ggplot2::theme(
       #axis.line.y = ggplot2::element_blank(),

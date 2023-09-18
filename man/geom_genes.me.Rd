@@ -20,11 +20,14 @@ ggplot layer
 Plotting genes
 }
 \examples{
-counts.df <- readRDS(test_path("fixtures", "test_counts_df.rds"))
-genes <- readRDS(test_path("fixtures", "test_genes.rds"))
-
-head(counts.df)
-head(genes)
+path_to_bams <- system.file("extdata", package = "Damsel")
+counts.df <- process_bams(path_to_bams,
+                          regions = regions_gatc_drosophila_dm6,
+                          cores = 2)
+counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                           version = 109,
+                           regions = regions_gatc_drosophila_dm6)
 
 plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
