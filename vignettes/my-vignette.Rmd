@@ -344,10 +344,19 @@ knitr::kable(head(annotated_peaks))
 
 
 ## 5.4 Interpreting results/Plotting?
-also don't have a good fn for that yet
-WIP
+Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. 
 
-
+```{r, fig.height=9, fig.width=10}
+plot_counts_all_bams(counts.df, 
+                     seqnames = "chr2L", 
+                     start_region = 1, 
+                     end_region = 40000, n_col = 1) +
+  geom_de.res.lfc(de_results.df = 
+                    add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_peak.new(peak.df = peaks) +
+  geom_gatc(gatc_sites) +
+  geom_genes.me(genes)
+```
 
 # 6. Gene ontology - NOT CURRENTLY AVAILABLE
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
