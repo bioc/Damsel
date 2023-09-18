@@ -35,5 +35,6 @@ Imports:
     reshape2,
     S4Vectors,
     stringr,
-    tidyr
+    tidyr,
+    TxDb.Dmelanogaster.UCSC.dm6.ensGene
 VignetteBuilder: knitr
