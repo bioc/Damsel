@@ -94,10 +94,10 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     ggplot2::scale_y_continuous(position = "right") +
     ggplot2::theme_classic() +
     ggplot2::theme(
-      #axis.line.y = ggplot2::element_blank(),
-      #axis.text.y = ggplot2::element_blank(),
+      axis.line.y = ggplot2::element_blank(),
+      axis.text.y = ggplot2::element_blank(),
       axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
-      #axis.ticks.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_blank(),
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_blank(),
