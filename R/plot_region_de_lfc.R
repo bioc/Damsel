@@ -85,13 +85,17 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
     dplyr::mutate(abs_fc = ifelse(abs_max >= abs_min, abs_max, abs_min),
                   abs_fc = round(abs_fc))
 
+  colours <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
+
   de_res.plot <- df_regions %>%
-    ggplot2::ggplot(ggplot2::aes(x = start, y = de, colour = as.factor(de))) +
-    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = Position, y = y_axis_2, fill = as.factor(de))) +
+    ggplot2::ggplot(ggplot2::aes(x = start, y = de, colour = meth_status)) +
+    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = Position, y = y_axis_2, fill = meth_status)) +
     ggplot2::geom_segment(ggplot2::aes(xend=start, yend=0)) +
     ggplot2::geom_segment(ggplot2::aes(x=end, xend=end, y=de, yend=0)) +
     ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=de, yend=de)) +
     ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=0, yend=0)) +
+    ggplot2::scale_colour_manual(values = colours) +
+    ggplot2::scale_fill_manual(values = colours) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
     ggplot2::scale_y_continuous(limits = c(-(df_fc$abs_fc), df_fc$abs_fc),
