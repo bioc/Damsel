@@ -358,6 +358,8 @@ plot_counts_all_bams(counts.df,
   geom_genes.me(genes)
 ```
 
+* If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
+
 # 6. Gene ontology - NOT CURRENTLY AVAILABLE
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
 
