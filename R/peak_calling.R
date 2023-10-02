@@ -93,16 +93,16 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
       dplyr::mutate(ave_logFC = mean(logFC),
                     ave_pVal = mean(adjust.p)) %>%
       dplyr::ungroup() %>%
-      dplyr::distinct(seqnames, dm_start, dm_end, meth_status, de, consec_dm, n_regions_dm, ave_logFC, ave_pVal) %>%
-      dplyr::filter(!is.na(consec_dm), n_regions_dm != 2, de == 1) %>%
+      dplyr::distinct(seqnames, dm_start, dm_end, meth_status, consec_dm, n_regions_dm, ave_logFC, ave_pVal) %>%
+      dplyr::filter(!is.na(consec_dm), n_regions_dm != 2, meth_status == "Upreg") %>%
       .[order(.$ave_pVal),] %>%
       dplyr::mutate(rank_p = 1:nrow(.)) %>%
       .[order(.$consec_dm),] %>%
-      stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:10]))) %>%
+      stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:9]))) %>%
       plyranges::as_granges() %>%
       data.frame() %>%
       dplyr::group_by(seqnames) %>%
-      dplyr::mutate(gap = start - dplyr::lag(end)) %>%
+      dplyr::mutate(gap = dplyr::lead(start) - end) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(number = 1:nrow(.)) %>%
       data.frame()
