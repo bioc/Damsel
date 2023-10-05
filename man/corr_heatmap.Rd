@@ -12,7 +12,7 @@ corr_heatmap(df, method = "spearman")
 \item{method}{correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.}
 }
 \value{
-A ggplot object. A heatmap style plot of the samples, coloured by correlation value.
+A `ggplot` object. A heatmap style plot of the samples, coloured by correlation value.
 Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 }
 \description{

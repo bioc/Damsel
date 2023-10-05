@@ -186,6 +186,6 @@ edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
                                                                  abs(logFC) < lfc ~ 0,
                                                                  logFC > lfc & adjust.p < p.value ~ 1, TRUE ~ 0))
   detags <- rownames(dge)[as.logical(lrt_table$de)]
-  edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Scalloped/Dam")
+  edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Fusion/Dam")
 }
 
