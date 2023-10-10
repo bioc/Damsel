@@ -58,14 +58,17 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, core
   files <- paste0(path_to_bams, files$file)
   df <- regions
   #test format of seqnames and separate them
-  one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>%
+  names_chrom <- names(Rsamtools::scanBamHeader(files[1])[[1]][[1]])
+  same_name <- df$seqnames %in% names_chrom %>% unique()
+  if(same_name == TRUE) {
+    one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>%
       data.frame()
-  colnames(one_count) <- files
-#want i in seq_len or something
-  for(i in 1:ncol(one_count)) {
-    if(sum(one_count[,i]) == 0) {
-      one_count[,i] <- exomeCopy::countBamInGRanges(files[i], plyranges::as_granges(dplyr::mutate(df, seqnames = paste0("chr", seqnames))))
-    }
+    colnames(one_count) <- files
+  } else {
+    df$seqnames <- paste0("chr", df$seqnames)
+    one_count <- parallel::mclapply(files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>%
+      data.frame()
+    colnames(one_count) <- files
   }
 
   df2 <- cbind(df, one_count)
