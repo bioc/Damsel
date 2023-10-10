@@ -196,7 +196,24 @@ aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6)
     dplyr::mutate(number = 1:nrow(.)) %>%
     data.frame()
 
-  gaps <- gaps_fn_new(peaks) %>%
+  gaps <- gaps_fn_new(peaks)
+  if(nrow(gaps) == 0) {
+    peaks_new <- peaks %>%
+      data.frame() %>%
+      dplyr::mutate(multiple_peaks = NA,
+                    n_regions_not_dm = 0) %>%
+      .[,c(1:5,7,9:10,14,8,15)] %>%
+      .[order(.$ave_pVal),] %>%
+      dplyr::mutate(rank_p = 1:nrow(.)) %>%
+      .[,c(6,1:5,12,7:11)] %>%
+      .[order(.$peak_id),] %>%
+      dplyr::mutate(peak_id = ifelse(is.na(multiple_peaks),
+                                     paste0("PS_", peak_id),
+                                     paste0("PM_", peak_id)))
+    row.names(peaks_new) <- NULL
+    return(peaks_new)
+  }
+  gaps <- gaps %>%
     dplyr::mutate(multiple_peaks = n_peaks)
   peaks_no_gap <- peaks %>%
     dplyr::filter(!peak_id %in% as.double(unlist(strsplit(gaps$id, ",")))) %>%
@@ -306,7 +323,14 @@ gaps_fn_new <- function(df) {
   gaps <- df
   gaps <- gaps %>%
     dplyr::mutate(gap = dplyr::coalesce(gap, 100000),
-                  gap = ifelse(gap < 0, 10000, gap)) #this is for the NAs
+                  gap = ifelse(gap < 0, 10000, gap)) %>%
+    dplyr::group_by(seqnames) %>%
+    dplyr::mutate(gap = ifelse(dplyr::n() == 1, -5, gap)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(gap > 0)
+  if(nrow(gaps) == 0) {
+    return(gaps)
+  }
   i <- 1
   number <- c(1:nrow(gaps))
   j <- i
