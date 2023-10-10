@@ -135,33 +135,8 @@ aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6)
                                   trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
                                   trial = ifelse(dplyr::lead(trial) == trial, 0, trial),
                                   multiple = ifelse(trial == 0, FALSE, TRUE))
-  df_1 <- df_a %>%
-    dplyr::filter(multiple == TRUE) %>%
-    dplyr::group_by(seqnames, meth_status) %>%
-    dplyr::mutate(swap = ifelse(dplyr::lag(number) != (number - 1), 1, 0),
-                  swap = dplyr::coalesce(swap, 1)) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(swap) %>%
-    dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
-                  seq = ifelse(seq == 0, NA, seq)) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(meth_status) %>%
-    tidyr::fill(seq) %>%
-    dplyr::ungroup() %>%
-    data.frame()
-  df_2 <- df_a %>%
-    dplyr::filter(multiple == FALSE) %>%
-    dplyr::group_by(seqnames) %>%
-    dplyr::mutate(swap = ifelse(dplyr::lag(number) != (number - 1), 1, 0),
-                  swap = dplyr::coalesce(swap, 1)) %>%
-    dplyr::ungroup() %>%
-    dplyr::group_by(swap) %>%
-    dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
-                  seq = ifelse(seq == 0, NA, seq)) %>%
-    dplyr::ungroup() %>%
-    tidyr::fill(seq) %>%
-    dplyr::ungroup() %>%
-    data.frame()
+  df_1 <- peak_helper(df_a, TRUE, meth_status)
+  df_2 <- peak_helper(df_a, FALSE, NULL)
   df_3 <- df_aa %>%
     dplyr::mutate(peak_id = df_1[match(df_aa$Position, df_1$Position), "seq"],
                   not_consec_dm = df_2[match(df_aa$Position, df_2$Position), "seq"]) %>%
@@ -202,15 +177,8 @@ aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6)
       data.frame() %>%
       dplyr::mutate(multiple_peaks = NA,
                     n_regions_not_dm = 0) %>%
-      .[,c(1:5,7,9:10,14,8,15)] %>%
-      .[order(.$ave_pVal),] %>%
-      dplyr::mutate(rank_p = 1:nrow(.)) %>%
-      .[,c(6,1:5,12,7:11)] %>%
-      .[order(.$peak_id),] %>%
-      dplyr::mutate(peak_id = ifelse(is.na(multiple_peaks),
-                                     paste0("PS_", peak_id),
-                                     paste0("PM_", peak_id)))
-    row.names(peaks_new) <- NULL
+      .[,c(1:5,7,9:10,14,8,15)]
+    peaks_new <- order_peaks(peaks_new)
     return(peaks_new)
   }
   gaps <- gaps %>%
@@ -252,12 +220,8 @@ aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6)
   peaks_no_gap <- peaks_no_gap[,c(1:5,7,9:10,14,8,15)]
 
   peaks_new <- rbind(peaks_no_gap, gaps) %>%
-    data.frame() %>% .[order(.$ave_pVal),] %>%
-    dplyr::mutate(rank_p = 1:nrow(.)) %>%
-    .[,c(6,1:5,12,7:11)] %>%
-    .[order(.$peak_id),] %>%
-    dplyr::mutate(peak_id = ifelse(is.na(multiple_peaks), paste0("PS_", peak_id), paste0("PM_", peak_id)))
-  row.names(peaks_new) <- NULL
+    data.frame()
+  peaks_new <- order_peaks(peaks_new)
   peaks_new
 
 }
@@ -325,9 +289,12 @@ gaps_fn_new <- function(df) {
     dplyr::mutate(gap = dplyr::coalesce(gap, 100000),
                   gap = ifelse(gap < 0, 10000, gap)) %>%
     dplyr::group_by(seqnames) %>%
-    dplyr::mutate(gap = ifelse(dplyr::n() == 1, -5, gap)) %>%
+    dplyr::mutate(total_peaks = dplyr::n()) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(gap > 0)
+    dplyr::mutate(gap = ifelse(total_peaks == 1, -5, gap)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(gap > 0) %>%
+    .[,!colnames(.) == "total_peaks"]
   if(nrow(gaps) == 0) {
     return(gaps)
   }
@@ -371,4 +338,33 @@ gaps_fn_new <- function(df) {
     data.frame() %>%
     dplyr::mutate(Pos = paste0(seqnames, "-", start))
 
+}
+
+peak_helper <- function(df_a, multiple, meth_status) {
+  df <- df_a %>%
+    dplyr::filter(multiple == {{multiple}}) %>%
+    dplyr::group_by(seqnames, {{meth_status}}) %>%
+    dplyr::mutate(swap = ifelse(dplyr::lag(number) != (number - 1), 1, 0),
+                  swap = dplyr::coalesce(swap, 1)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(swap) %>%
+    dplyr::mutate(seq = ifelse(swap == 1, 1:nrow(.), 0),
+                  seq = ifelse(seq == 0, NA, seq)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by({{meth_status}}) %>%
+    tidyr::fill(seq) %>%
+    dplyr::ungroup() %>%
+    data.frame()
+  df
+}
+
+order_peaks <- function(peaks) {
+  peaks_new <- peaks %>%
+    .[order(.$ave_pVal),] %>%
+    dplyr::mutate(rank_p = 1:nrow(.)) %>%
+    .[,c(6,1:5,12,7:11)] %>%
+    .[order(.$peak_id),] %>%
+    dplyr::mutate(peak_id = ifelse(is.na(multiple_peaks), paste0("PS_", peak_id), paste0("PM_", peak_id)))
+  row.names(peaks_new) <- NULL
+  peaks_new
 }
