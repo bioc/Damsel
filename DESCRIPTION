@@ -33,6 +33,7 @@ Imports:
     patchwork,
     plyranges,
     reshape2,
+    rSamtools,
     S4Vectors,
     stringr,
     tidyr,
