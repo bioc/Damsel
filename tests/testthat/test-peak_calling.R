@@ -32,3 +32,25 @@ test_that("peaks:Output is not error/message", {
   expect_no_error(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))))
   expect_no_message(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])), regions = regions_gatc_drosophila_dm6))
 })
+
+
+##new peaks fn
+test_that("peaks_new:Output is a data.frame", {
+  expect_s3_class(aggregate_peaks_new(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))), "data.frame")
+})
+
+test_that("peaks_new:Output is error", {
+  expect_error(aggregate_peaks_new())
+  expect_error(aggregate_peaks_new(dm_results = list(a = c(1,2), b = c("E", "F"))), "Must have data frame of differential_testing results from `edgeR_results")#, ignore.case = TRUE)
+  expect_error(aggregate_peaks_new(readRDS(test_path("fixtures", "test_results.rds")), regions = 7), "Regions must be a data.frame")#, ignore.case = TRUE)
+})
+
+test_that("peaks_new:Output is message", {
+  expect_message(aggregate_peaks_new(readRDS(test_path("fixtures", "test_results.rds"))), "Default of drosophila dm6 regions used")
+})
+
+test_that("peaks_new:Output is not error/message", {
+  expect_no_error(aggregate_peaks_new(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))))
+  expect_no_message(aggregate_peaks_new(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])), regions = regions_gatc_drosophila_dm6))
+})
+

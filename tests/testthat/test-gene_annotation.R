@@ -52,3 +52,22 @@ test_that("gene_org: Output is error", {
 test_that("gene_org: Output is no error", {
   expect_no_error(gene_annotate_organised(gene_annotate(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))), get_biomart_genes(species = "dmelanogaster_gene_ensembl"))))
 })
+
+#####new annotation fn
+
+#test_that("annotate_genes.new: Output is a data.frame", {
+ # expect_s3_class(annotate_genes_new(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))), get_biomart_genes(species = "dmelanogaster_gene_ensembl"), regions = regions_gatc_drosophila_dm6), "list")
+#})
+
+test_that("annotate_genes.new: Output is error", {
+  expect_error(annotate_genes_new())
+  expect_error(annotate_genes_new(genes = readRDS(test_path("fixtures", "test_genes.rds"))))
+  expect_error(annotate_genes_new(peaks = list(a=c(2,3,4)), genes = readRDS(test_path("fixtures", "test_genes.rds"))), "Require data.frame of peaks as outputted from `aggregate_peaks")#, ignore.case = TRUE)
+  expect_error(annotate_genes_new(peaks = readRDS(test_path("fixtures", "test_peaks.rds"))))
+  expect_error(annotate_genes_new(peaks = readRDS(test_path("fixtures", "test_peaks.rds")), genes = 4), "Requires data.frame of genes as outputted from `get_biomart_genes")#, ignore.case = TRUE)
+})
+
+test_that("annotate_genes.new: Output is no error", {
+  expect_no_error(annotate_genes_new(readRDS(test_path("fixtures", "test_peaks_new.rds")), readRDS(test_path("fixtures", "test_genes.rds"))))
+  expect_no_error(annotate_genes_new(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]))), get_biomart_genes(species = "dmelanogaster_gene_ensembl"), regions = regions_gatc_drosophila_dm6))
+})
