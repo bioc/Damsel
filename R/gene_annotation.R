@@ -214,13 +214,15 @@ gene_annotate_organised <- function(annotated_peaks) {
 #' @param peaks peaks df as outputted from [aggregate_peaks()]
 #' @param genes genes df as outputted from [get_biomart_genes()]
 #' @param regions regions df, default is [regions_gatc_drosophila_dm6]
+#' @param max_distance limit for minimum distance from peak to gene.
+#' Default is 5000. If set to `NULL`, will output all available combinations.
 #'
 #' @return list of 3 dfs: closest - every peak with it's closest gene,
 #' combo - every peak with list of 5 closest genes,
 #' all - all genes matching to each peak and all information
 #'
 #' @examples
-annotate_genes_new <- function(peaks, genes, regions=regions_gatc_drosophila_dm6) {
+annotate_genes_new <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
   if(!is.data.frame(peaks)) {
     stop("Require data.frame of peaks as outputted from `aggregate_peaks")
   }
@@ -300,10 +302,8 @@ annotate_genes_new <- function(peaks, genes, regions=regions_gatc_drosophila_dm6
                   distance_TSS = TSS - peak_midpoint,
                   midpoint_is = ifelse(distance_TSS >= 0, "Upstream", "Downstream")) %>%
     dplyr::mutate(abs_TSS = abs(distance_TSS)) %>%
-    .[order(.$peak_order, .$abs_TSS),] %>%
     dplyr::group_by(peak_id) %>%
-    dplyr::mutate(count = 1:dplyr::n(),
-                  n_genes = dplyr::n()) %>%
+    dplyr::mutate(n_genes = dplyr::n()) %>%
     dplyr::ungroup()
 
   combo <- combo %>%
@@ -338,12 +338,22 @@ annotate_genes_new <- function(peaks, genes, regions=regions_gatc_drosophila_dm6
     dplyr::summarise(n_region = dplyr::n()) %>%
     data.frame()
   combo$total_regions <- n_regions[match(combo$num, n_regions$num), "n_region"]
-  #combo <- combo[,c(1:36,38)]
+
+  combo <- combo %>%
+    .[order(.$peak_order, .$min_distance),] %>%
+    dplyr::group_by(peak_id) %>%
+    dplyr::mutate(count = 1:dplyr::n()) %>%
+    dplyr::ungroup()
+
+  if(!is.null(max_distance)) {
+    combo <- dplyr::filter(combo, min_distance <= max_distance)
+  }
 
   col_order <- c("seqnames", "start", "end", "width",
                  "total_regions", "n_regions_dm", "peak_id", "rank_p",
                  "gene_position", "ensembl_gene_id", "gene_name", "midpoint_is",
                  "position")
+
   closest <- combo %>%
     dplyr::filter(count == 1) %>%
     dplyr::mutate(gene_position = paste0(gene_seqnames, ":", gene_strand, ":", gene_start, "-", gene_end),
