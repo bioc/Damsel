@@ -2,12 +2,12 @@
 #'
 #'  `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 #'
-#' @param annotation data frame of annotated genes and peaks as `annotate_peaks_new()$all`
-#' @param genes data frame of gene data
-#' @param regions data frame of regions between GATC sites - load data
-#' @param extend_by extend the start and end of the gene by default: 2000 bp.
-#' This is done to incorporate the acceptable distance of a peak to a gene.
-#' This also allows for consistency across significant and non-significant genes
+#' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`
+#' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`
+#' @param regions A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`
+#' @param extend_by Extend the start and end of the gene by a given number. We recommend leaving to the default of 2000 bp.
+#' * This is done to incorporate the acceptable distance of a peak to a gene.
+#' * This also allows for consistency across significant and non-significant genes
 #' @param bias alternatively, the bias can be input by itself.
 #' @export
 #' @return 4 objects
@@ -15,8 +15,16 @@
 #'  * Plot of goodness of fit of model
 #'  * Plot of sample data
 #'  * Plot of sample data without bias correction (should be messy)
+#'  @examples
+#'  peaks <- aggregate_peaks(random_edgeR_results())
+#'  genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+#'                            version = 109,
+#'                            regions = regions_gatc_drosophila_dm6)
+#'  annotation <- annotate_genes(peaks, genes)$all
+#'
+#'  goseq_fn(annotation, genes)
 #geneOntology?
-goseq_fn <- function(annotation, genes, regions, extend_by=2000, bias=NULL) {
+goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000, bias=NULL) {
   de_genes <- dplyr::filter(annotation, min_distance <= extend_by)
   goseq_data <- genes
   goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{extend_by}})

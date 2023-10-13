@@ -2,7 +2,7 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_plot_mds}
 \alias{edgeR_plot_mds}
-\title{Multidimensional scaling plot for samples}
+\title{Plot differences between samples: Multidimensional scaling}
 \usage{
 edgeR_plot_mds(dge)
 }
@@ -17,11 +17,7 @@ refer to [edgeR::plotMDS()] for details
 * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
 edgeR_plot_mds(dge)

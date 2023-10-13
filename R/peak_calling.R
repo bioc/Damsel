@@ -1,7 +1,7 @@
 
-#' Identify peaks by aggregating differentially methylated regions
+#' OLD:Identify peaks by aggregating differentially methylated regions
 #'
-#' `aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
+#' `aggregate_peaks_old` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
 #'
 #' @param dm_results data.frame of differential methylation results obtained from [edgeR_results]
 #'
@@ -20,7 +20,7 @@
 #' * number (peak number in order of position)
 #' @export
 #need to rename fn - aggregatePeaks
-aggregate_peaks <- function(dm_results) {
+aggregate_peaks_old <- function(dm_results) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
@@ -93,15 +93,20 @@ aggregate_peaks <- function(dm_results) {
 
 #' New: identify peaks from de results
 #'
-#' @param dm_results data.frame as outputted from `edgeR_results()`
-#' @return data.frame of peaks
+#' @description
+#' `aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.
+#'
+#' The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
+#'
+#' @param dm_results A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`
+#' @return A data.frame of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 #' @export
 #'
 #' @examples
 #' edgeR_results <- random_edgeR_result()
 #'
-#' aggregate_peaks_new(edgeR_results)
-aggregate_peaks_new <- function(dm_results) {
+#' aggregate_peaks(edgeR_results)
+aggregate_peaks <- function(dm_results) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }

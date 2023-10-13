@@ -15,13 +15,6 @@ geom_de.res(de_results.df = NULL, plot.space = 0.1, plot.height = 0.1)
 }
 \value{
 ggplot_add object
-}
-\description{
-`geom_de.res` is a ggplot layer that visualises the de results across a given region.
-* regions are 1, 0, -1, or NA and coloured as such (grey for NA)
-* cannot be plotted by itself, must be added to an existing plot - see examples.
-}
-\examples{
 path_to_bams <- system.file("extdata", package = "Damsel")
 counts.df <- process_bams(path_to_bams,
                           regions = regions_gatc_drosophila_dm6,
@@ -37,4 +30,9 @@ plot_counts_all_bams(counts.df,
                      n_col = 1) +
   geom_de.res(de_results)
 # The plots can be layered ------------------------------------------------
+}
+\description{
+`geom_de.res` is a ggplot layer that visualises the de results across a given region.
+* regions are 1, 0, -1, or NA and coloured as such (grey for NA)
+* cannot be plotted by itself, must be added to an existing plot - see examples.
 }

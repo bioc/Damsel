@@ -4,14 +4,26 @@
 \alias{goseq_fn}
 \title{Gene ontology analysis}
 \usage{
-goseq_fn(regions, genes, peaks)
+goseq_fn(
+  annotation,
+  genes,
+  regions = regions_gatc_drosophila_dm6,
+  extend_by = 2000,
+  bias = NULL
+)
 }
 \arguments{
-\item{regions}{data frame of regions between GATC sites - load data}
+\item{annotation}{A data.frame of annotated genes and peaks as `annotate_peaks()$all`}
 
-\item{genes}{data frame of gene data}
+\item{genes}{A data.frame of gene data as outputted from `get_biomart_genes()`}
 
-\item{peaks}{data frame of annotated peak data}
+\item{regions}{A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`}
+
+\item{extend_by}{Extend the start and end of the gene by a given number. We recommend leaving to the default of 2000 bp.
+* This is done to incorporate the acceptable distance of a peak to a gene.
+* This also allows for consistency across significant and non-significant genes}
+
+\item{bias}{alternatively, the bias can be input by itself.}
 }
 \value{
 4 objects
@@ -19,6 +31,14 @@ goseq_fn(regions, genes, peaks)
  * Plot of goodness of fit of model
  * Plot of sample data
  * Plot of sample data without bias correction (should be messy)
+ @examples
+ peaks <- aggregate_peaks(random_edgeR_results())
+ genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                           version = 109,
+                           regions = regions_gatc_drosophila_dm6)
+ annotation <- annotate_genes(peaks, genes)$all
+
+ goseq_fn(annotation, genes)
 }
 \description{
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.

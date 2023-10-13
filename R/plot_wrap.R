@@ -9,8 +9,8 @@
 #' @param end_region end of region to plot
 #' @param counts counts.df from [process_bams()]
 #' @param de_results edgeR results
-#' @param peaks peaks df
-#' @param genes genes df [get_biomart_genes()]
+#' @param peaks peaks data.frame
+#' @param genes genes data.frame [get_biomart_genes()]
 #' @param gatc_sites gatc sites
 #' @param extend_by extend region, default is 250
 #'

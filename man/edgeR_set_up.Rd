@@ -2,18 +2,18 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_set_up}
 \alias{edgeR_set_up}
-\title{DGE object for differential methylation analysis}
+\title{Create DGE object for differential testing}
 \usage{
 edgeR_set_up(df, lib.size = NULL, keep_a = 0.5, keep_b = 3)
 }
 \arguments{
-\item{df}{Data frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1, Fusion_1, Dam_2, Fusion_2, ...)}
+\item{df}{A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)}
 
 \item{lib.size}{Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified}
 
-\item{keep_a}{Minimum cpm of the counts - default is 0.5}
+\item{keep_a}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5}
 
-\item{keep_b}{Minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
+\item{keep_b}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
 }
 \value{
 Refer to [edgeR::?`DGEListClass`] for details
@@ -22,11 +22,7 @@ Refer to [edgeR::?`DGEListClass`] for details
 `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- random_counts()
 
 edgeR_set_up(counts.df)
 }

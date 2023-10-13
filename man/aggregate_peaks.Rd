@@ -2,42 +2,23 @@
 % Please edit documentation in R/peak_calling.R
 \name{aggregate_peaks}
 \alias{aggregate_peaks}
-\title{Identify peaks by aggregating differentially methylated regions}
+\title{New: identify peaks from de results}
 \usage{
-aggregate_peaks(dm_results, regions = regions_gatc_drosophila_dm6)
+aggregate_peaks(dm_results)
 }
 \arguments{
-\item{dm_results}{data frame of differential methylation results obtained from [edgeR_results]}
-
-\item{regions}{data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.}
+\item{dm_results}{A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`}
 }
 \value{
-data frame of peaks.
-Columns are
-* seqnames,
-* start,
-* end,
-* width,
-* consec_dm (peak identifier),
-* n_regions_dm (n of dm regions within the peak),
-* ave_logFC (average logFC calculated across regions),
-* ave_pVal (average adjusted P Value calculated across the regions),
-* rank_p (based on average p value).
-* gap (gap in bp to the next peak),
-* number (peak number in order of position)
+A data.frame of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 }
 \description{
-`aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
+`aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.
+
+The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-dge <- edgeR_set_up(counts.df)
-de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+edgeR_results <- random_edgeR_result()
 
-peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-head(peaks)
+aggregate_peaks(edgeR_results)
 }

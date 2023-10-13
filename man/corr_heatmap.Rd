@@ -2,18 +2,19 @@
 % Please edit documentation in R/correlation_results.R
 \name{corr_heatmap}
 \alias{corr_heatmap}
-\title{Plotting correlation of all samples}
+\title{Plot correlation heatmap}
 \usage{
 corr_heatmap(df, method = "spearman")
 }
 \arguments{
-\item{df}{data frame as outputted from [process_bams()]}
+\item{df}{A data.frame of GATC region counts as outputted from [process_bams()]}
 
-\item{method}{correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.}
+\item{method}{The correlation method used. If not specified, will use default of non-parametric spearman's.
+* Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.}
 }
 \value{
 A `ggplot` object. A heatmap style plot of the samples, coloured by correlation value.
-Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
+* Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 }
 \description{
 `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
@@ -21,4 +22,8 @@ Colour spectrum is determined from the minimum correlation as the lowest correla
 }
 \details{
 The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
+}
+\examples{
+counts.df <- random_counts()
+corr_heatmap(counts.df, method = "spearman")
 }

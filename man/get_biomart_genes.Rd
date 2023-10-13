@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{get_biomart_genes}
 \alias{get_biomart_genes}
-\title{Get gene information from Ensembl using biomaRt}
+\title{Extract gene information from Ensembl using biomaRt}
 \usage{
 get_biomart_genes(
   species,
@@ -11,29 +11,18 @@ get_biomart_genes(
 )
 }
 \arguments{
-\item{species}{species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl}
+\item{species}{The species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl}
 
-\item{version}{Ensembl version of genome. Default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)}
+\item{version}{The Ensembl version of the genome. If not specified, default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)}
 
-\item{regions}{data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.}
+\item{regions}{A data frame of GATC regions. If not specified, default is GATC regions from Drosophila melanogaster - dm6.}
 }
 \value{
-data.frame of information about the genes.
-Columns include:
-* seqnames,
-* start,
-* end,
-* width,
-* strand,
-* ensembl_gene_id,
-* gene_name,
-* ensembl_transcript_id,
-* TSS (transcription start site),
-* n_regions (number of overlapping GATC regions)
+A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
 }
 \description{
 `get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
-Also identifies the number of GATC regions matching to each gene.
+* Also identifies the number of GATC regions matching to each gene.
 }
 \examples{
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",

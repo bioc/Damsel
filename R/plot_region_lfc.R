@@ -11,9 +11,6 @@
 #' @param plot.height height of plot
 #'
 #' @return ggplot_add object
-#' @export
-#'
-#' @examples
 #' path_to_bams <- system.file("extdata", package = "Damsel")
 #' counts.df <- process_bams(path_to_bams,
 #'                           regions = regions_gatc_drosophila_dm6,

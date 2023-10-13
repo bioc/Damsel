@@ -4,24 +4,19 @@
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #'
-#' @param peak.df data frame of peak locations
-#' @param peak.color can set the colour if you want
-#' @param peak.size default is 5
-#' @param plot.space gap to next plot - default 0.1
-#' @param plot.height height of plot - leave it at default
+#' @param peak.df A data.frame of peaks as outputted from `aggregate_peaks()`
+#' @param peak.color Specify colour of peak, default is black
+#' @param peak.size Specify size of rectangle, default is 5
+#' @param plot.space Specify gap to next plot, default is 0.1
+#' @param plot.height Specify overall height of plot, default is 0.05
 #'
 #' @return ggplot_add object
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
+#' counts.df <- random_counts()
+#' de_results <- random_edgeR_results()
+#' peaks <- aggregate_peaks(de_results)
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,

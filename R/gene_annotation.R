@@ -1,25 +1,15 @@
 
-#' Get gene information from Ensembl using biomaRt
+#' Extract gene information from Ensembl using biomaRt
 #'
+#' @description
 #'`get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
-#' Also identifies the number of GATC regions matching to each gene.
+#' * Also identifies the number of GATC regions matching to each gene.
 #'
-#' @param species species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl
-#' @param version Ensembl version of genome. Default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
-#' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
+#' @param species The species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl
+#' @param version The Ensembl version of the genome. If not specified, default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
+#' @param regions A data frame of GATC regions. If not specified, default is GATC regions from Drosophila melanogaster - dm6.
 #'
-#' @return data.frame of information about the genes.
-#' Columns include:
-#' * seqnames,
-#' * start,
-#' * end,
-#' * width,
-#' * strand,
-#' * ensembl_gene_id,
-#' * gene_name,
-#' * ensembl_transcript_id,
-#' * TSS (transcription start site),
-#' * n_regions (number of overlapping GATC regions)
+#' @return A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
 #' @export
 #'
 #' @examples
@@ -72,7 +62,7 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 }
 
 
-#' Annotating peaks to their closest gene
+#' OLD: Annotating peaks to their closest gene
 #'
 #' `gene_annotate` takes both the peaks and genes as input and returns the paired results.
 #' * The output of this function is a very large data frame with some confusing columns, the following function will help simplify the results.
@@ -85,24 +75,6 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #' and all columns of output from aggregate_peaks.
 #' Contains additional columns providing the: peak midpoint, distance from the midpoint to the start of the gene, etc
 #' @export
-#'
-#' @examples
-#' # set up peaks
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-#' # set up genes
-#' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-#'                            version = 109,
-#'                            regions = regions_gatc_drosophila_dm6)
-#'
-#' annotated_peaks <- gene_annotate(peaks, genes)
-#' head(annotated_peaks)
 gene_annotate <- function(peaks, genes) {
   if(!is.data.frame(peaks)) {
     stop("Require data.frame of peaks as outputted from `aggregate_peaks")
@@ -133,7 +105,7 @@ gene_annotate <- function(peaks, genes) {
 }
 
 
-#' Tabular display of peak statistical information and their closest genes
+#' OLD: Tabular display of peak statistical information and their closest genes
 #'
 #' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format.
 #'
@@ -142,25 +114,6 @@ gene_annotate <- function(peaks, genes) {
 #' @return organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
 #' * contains information about the peak and gene location (for the closest gene), and provides a list of other nearby genes and their distance to the peak.
 #' @export
-#'
-#' @examples
-#' # set up peaks
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-#' # set up genes
-#' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-#'                            version = 109,
-#'                            regions = regions_gatc_drosophila_dm6)
-#' annotated_peaks <- gene_annotate(peaks, genes)
-#'
-#' annotated_peaks <- gene_annotate_organised(annotated_peaks)
-#' head(annotated_peaks)
 gene_annotate_organised <- function(annotated_peaks) {
   if(!is.data.frame(annotated_peaks)) {
     stop("Requires data.frame of annotated peaks as outputted from `gene_annotate")
@@ -211,18 +164,35 @@ gene_annotate_organised <- function(annotated_peaks) {
 
 #' New: annotation of peaks and genes
 #'
-#' @param peaks peaks df as outputted from [aggregate_peaks()]
-#' @param genes genes df as outputted from [get_biomart_genes()]
-#' @param regions regions df, default is [regions_gatc_drosophila_dm6]
-#' @param max_distance limit for minimum distance from peak to gene.
-#' Default is 5000. If set to `NULL`, will output all available combinations.
+#' @description
+#' `annotate_genes` identifies the closest gene(s) for the peaks outputted from `aggregate_peaks()`. This distance is relative, as the function will identify the closest genes, even if they are up to a million bp away. The max_distance parameter limits this, with a default setting of 5000 bp. All of the possible pairings are visible with `max_distance=NULL`
 #'
-#' @return list of 3 dfs: closest - every peak with it's closest gene,
-#' combo - every peak with list of 5 closest genes,
-#' all - all genes matching to each peak and all information
+#' The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc)
+#'
+#' @param peaks A data.frame of peaks as outputted from [aggregate_peaks()]
+#' @param genes A data.frame of genes as outputted from [get_biomart_genes()]
+#' @param regions A data.frame of GATC regions. If not specified, default is [regions_gatc_drosophila_dm6]
+#' @param max_distance The limit for minimum distance from peak to gene.
+#' * Default is 5000. If set to `NULL`, will output all available combinations.
+#'
+#' @return list of 3 data.frames:
+#' * closest - every peak with it's closest gene
+#' * top_5 - every peak with list of 5 closest genes
+#' * all - all genes matching to each peak and all information
 #'
 #' @examples
-annotate_genes_new <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
+#'
+#' edgeR_results <- random_edgeR_result()
+#' peaks <- aggregate_peaks(edgeR_results)
+#'
+#' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+#'                            version = 109,
+#'                            regions = regions_gatc_drosophila_dm6)
+#'
+#' annotate_genes(peaks, genes, max_distance = 5000)
+#' #view all combinations
+#' annotate_genes(peaks, genes, max_distance = NULL)
+annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
   if(!is.data.frame(peaks)) {
     stop("Require data.frame of peaks as outputted from `aggregate_peaks")
   }

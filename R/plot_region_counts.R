@@ -3,36 +3,30 @@
 #' `plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.
 #' * this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 #'
-#' @param df df of counts as outputted from [process_bams()]
+#' @param df A data.frame of counts as outputted from [process_bams()]
 #' @param seqnames chromosome of interest
-#' @param start_region start
-#' @param end_region end
+#' @param start_region start of region to plot
+#' @param end_region end of region to plot
 #' @param n_col n_columns to facet the graph by - default is 3
 #'
 #' @return ggplot object
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df <- random_counts()
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
 #'                      end_region = 40000,
 #'                      n_col = 3)
 #' # Can use this plot to layer other plots -----------------------------
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
+#' de_results <- random_edgeR_results()
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
 #'                      end_region = 40000,
 #'                      n_col = 1) +
-#'   geom_de.res(de_results)
+#'   geom_de.res.lfc(de_results)
 plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region = NULL, n_col = 3) {
   if(!is.data.frame(df)) {
     stop("data.frame of counts is required")

@@ -2,41 +2,36 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_results}
 \alias{edgeR_results}
-\title{Differential methylation analysis}
+\title{Differential testing}
 \usage{
-edgeR_results(dge, p.value = 0.05, lfc = 1)
+edgeR_results(
+  dge,
+  p.value = 0.05,
+  lfc = 1,
+  regions = regions_gatc_drosophila_dm6
+)
 }
 \arguments{
-\item{dge}{as outputted from [edgeR_set_up()]}
+\item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 
-\item{p.value}{p value threshold for minimum significance. Default is 0.05}
+\item{p.value}{The p value threshold for minimum significance. Default is 0.05}
 
-\item{lfc}{minimum log fold change for significant results. Default is 1}
+\item{lfc}{The minimum log fold change for significant results. Default is 1}
+
+\item{regions}{A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`}
 }
 \value{
-data frame of differential methylation results.
-Columns are as follows;
-* rownames(Region position),
-* logFC (log fold change),
-* logCPM (log counts per million),
-* F (F statistic used to identify significance),
-* PValue,
-* adjustedP (P Value with multiple test correction),
-* de (result: -1,0,1)
+A data.frame of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), de (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
 }
 \description{
 `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.
 Refer to the following pages for further details:
 * [edgeR::glmQLFit()]
-* [edgeR::glmGQLFTest()]
+* [edgeR::glmQLFTest()]
 * [edgeR::decideTestsDGE()]
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
 edgeR_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)

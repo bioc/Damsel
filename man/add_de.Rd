@@ -22,15 +22,3 @@ full data.frame of regions with added information about the de results;
 Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
 Is also required for some plotting fns
 }
-\examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-dge <- edgeR_set_up(counts.df)
-de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-
-de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
-head(de_results)
-}

@@ -1,21 +1,19 @@
-#' Plotting correlation of all samples
+#' Plot correlation heatmap
 #'
 #' `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 #' * uses the non-parametric "spearman's" correlation.
 #'
 #' The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
 #'
-#' @param df data frame as outputted from [process_bams()]
-#' @param method correlation method. Default is the non-parametric spearman's. Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.
+#' @param df A data.frame of GATC region counts as outputted from [process_bams()]
+#' @param method The correlation method used. If not specified, will use default of non-parametric spearman's.
+#' * Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.
 #'
 #' @return A `ggplot` object. A heatmap style plot of the samples, coloured by correlation value.
-#' Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
+#' * Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' corr_heatmap(counts.df, method = "spearman)
+#' counts.df <- random_counts()
+#' corr_heatmap(counts.df, method = "spearman")
 #' @export
 #corrHeatmap
 corr_heatmap <- function(df, method="spearman") {

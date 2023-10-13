@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{gene_annotate_organised}
 \alias{gene_annotate_organised}
-\title{Tabular display of peak statistical information and their closest genes}
+\title{OLD: Tabular display of peak statistical information and their closest genes}
 \usage{
 gene_annotate_organised(annotated_peaks)
 }
@@ -15,23 +15,4 @@ organised data frame of results with statistical information about each peak, al
 }
 \description{
 `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format.
-}
-\examples{
-# set up peaks
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-dge <- edgeR_set_up(counts.df)
-de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-# set up genes
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = regions_gatc_drosophila_dm6)
-annotated_peaks <- gene_annotate(peaks, genes)
-
-annotated_peaks <- gene_annotate_organised(annotated_peaks)
-head(annotated_peaks)
 }

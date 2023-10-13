@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{gene_annotate}
 \alias{gene_annotate}
-\title{Annotating peaks to their closest gene}
+\title{OLD: Annotating peaks to their closest gene}
 \usage{
 gene_annotate(peaks, genes)
 }
@@ -20,22 +20,4 @@ Contains additional columns providing the: peak midpoint, distance from the midp
 \description{
 `gene_annotate` takes both the peaks and genes as input and returns the paired results.
 * The output of this function is a very large data frame with some confusing columns, the following function will help simplify the results.
-}
-\examples{
-# set up peaks
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-dge <- edgeR_set_up(counts.df)
-de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-# set up genes
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = regions_gatc_drosophila_dm6)
-
-annotated_peaks <- gene_annotate(peaks, genes)
-head(annotated_peaks)
 }

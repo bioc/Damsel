@@ -1,12 +1,15 @@
-#' Initial processing of BAM files
+#' Obtain region counts for BAM files
 #'
-#' `process_bams()` obtains the counts for the regions between GATC sites, from BAM files specified in the path.
+#' `process_bams()` obtains the raw counts for the regions between GATC sites, from indexed BAM files specified in the path.
 #'
-#' @param path_to_bams Character string input vector. Should identify directory containing the BAM files.
-#' @param regions Data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
-#' @param cores Specify computer cores to be used to parallelise function and speed output. Default is to use all available cores. If computer is being used for multiple tasks at once, reccommend reducing the number of cores. Number of available cores can be checked using [parallel::detectCores()]
+#' @param path_to_bams A character string input vector. This must identify the directory containing the BAM files.
+#' @param regions A data.frame of GATC regions. If not specified, will use default data file `regions_gatc_drosophila_dm6`. The GATC regions can be made with `gatc_track()`.
+#' @param cores The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
+#' * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
+#' * The number of available cores can be checked using [parallel::detectCores()]
 #'
-#' @return A data frame containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
+#' @return A data.frame containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
+#' * The ".bam" extension is retained in the sample name as an identifier for the sample columns
 #' * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
 #' * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
 #'
@@ -31,7 +34,7 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, core
     message("regions missing, regions_gatc_drosophila_dm6 used instead")
   }
   if(missing(cores)) {
-    message("cores missing, [parallel::detectCores()] used instead")
+    message("cores missing, 2 cores used instead")
   }
 
   #list of all bam files

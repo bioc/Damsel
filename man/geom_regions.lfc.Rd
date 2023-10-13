@@ -22,13 +22,6 @@ geom_regions.lfc(
 }
 \value{
 ggplot_add object
-}
-\description{
-`geom_regions.lfc` is a ggplot layer that visualises the logFC results across a given region.
-* cannot be plotted by itself, must be added to an existing plot - see examples.
-* recommend using geom_de.res.lfc instead
-}
-\examples{
 path_to_bams <- system.file("extdata", package = "Damsel")
 counts.df <- process_bams(path_to_bams,
                           regions = regions_gatc_drosophila_dm6,
@@ -44,4 +37,9 @@ plot_counts_all_bams(counts.df,
                      n_col = 1) +
   geom_regions.lfc(de_results)
 # The plots can be layered -------------------------------------------------
+}
+\description{
+`geom_regions.lfc` is a ggplot layer that visualises the logFC results across a given region.
+* cannot be plotted by itself, must be added to an existing plot - see examples.
+* recommend using geom_de.res.lfc instead
 }

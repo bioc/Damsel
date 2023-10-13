@@ -7,24 +7,21 @@
 geom_genes.me(df, plot.space = 0.1, plot.height = 0.3)
 }
 \arguments{
-\item{df}{genes as outputted from `get_biomart_genes`}
+\item{df}{A data.frame of genes as outputted from `get_biomart_genes`}
 
-\item{plot.space}{gap to next plot}
+\item{plot.space}{Specify gap to next plot, default is 0.1}
 
-\item{plot.height}{height of plot}
+\item{plot.height}{Specify overall height of plot, default is 0.3}
 }
 \value{
 ggplot layer
 }
 \description{
-Plotting genes
+`geom_genes.me` is a ggplot layer that visualises the positions of genes across a given region.
+* cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- random_counts()
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
                            version = 109,
                            regions = regions_gatc_drosophila_dm6)

@@ -33,9 +33,9 @@ plot_wrap(
 
 \item{de_results}{edgeR results}
 
-\item{peaks}{peaks df}
+\item{peaks}{peaks data.frame}
 
-\item{genes}{genes df [get_biomart_genes()]}
+\item{genes}{genes data.frame [get_biomart_genes()]}
 
 \item{gatc_sites}{gatc sites}
 

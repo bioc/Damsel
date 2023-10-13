@@ -2,30 +2,26 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_results_plot}
 \alias{edgeR_results_plot}
-\title{Differential methylation results plot}
+\title{Plot differential testing results}
 \usage{
 edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 }
 \arguments{
-\item{dge}{as outputted from [edgeR_set_up()]}
+\item{dge}{DGEList object as outputted from [edgeR_set_up()]}
 
-\item{p.value}{p value threshold for minimum significance. Default is 0.05}
+\item{p.value}{The p value threshold for minimum significance. Default is 0.05}
 
-\item{lfc}{minimum log fold change for significant results. Default is 1}
+\item{lfc}{The minimum log fold change for significant results. Default is 1}
 }
 \value{
-MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
+An MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 }
 \description{
 `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 * for further details, see [edgeR::plotSmear()]
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
 edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
