@@ -1,10 +1,9 @@
-
-#' DGE object for differential methylation analysis
+#' Create DGE object for differential testing
 #'
 #' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
 #'
-#' @param df Data frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1, Fusion_1, Dam_2, Fusion_2, ...)
+#' @param df data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
 #' @param keep_a Minimum cpm of the counts - default is 0.5
 #' @param keep_b Minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
@@ -13,11 +12,7 @@
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df <- random_counts()
 #'
 #' edgeR_set_up(counts.df)
 #dmSetUp
@@ -64,7 +59,7 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
   dge
 }
 
-#' Multidimensional scaling plot for samples
+#' Plot differences between samples: Multidimensional scaling
 #'
 #' `edgeR_plot_mds` visualises the difference between samples.
 #' * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
@@ -75,11 +70,7 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
 #' edgeR_plot_mds(dge)
@@ -90,7 +81,7 @@ edgeR_plot_mds <- function(dge) {
 }
 
 
-#' Differential methylation analysis
+#' Differential testing
 #'
 #' `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.
 #' Refer to the following pages for further details:
@@ -101,8 +92,9 @@ edgeR_plot_mds <- function(dge) {
 #' @param dge as outputted from [edgeR_set_up()]
 #' @param p.value p value threshold for minimum significance. Default is 0.05
 #' @param lfc minimum log fold change for significant results. Default is 1
+#' @param regions data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`
 #'
-#' @return data frame of differential methylation results.
+#' @return data.frame of differential methylation results.
 #' Columns are as follows;
 #' * rownames(Region position),
 #' * logFC (log fold change),
@@ -114,23 +106,22 @@ edgeR_plot_mds <- function(dge) {
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
 #' edgeR_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
 #' head(edgeR_results)
 #dmResults
 #also need to update this fn - adjusted p val
-edgeR_results <- function(dge, p.value=0.05, lfc=1) {
+edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosophila_dm6) {
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }
   if(!is.numeric(lfc) | length(lfc) > 1) {
     stop("lfc must be 1 number, recommend using default value")
+  }
+  if(missing(regions)) {
+    message("regions missing, default `regions_gatc_drosophila_dm6` used instead")
   }
   group <- dge$samples$group %>% as.character()
   design <- dge$design
@@ -142,11 +133,12 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
                                     de = dplyr::case_when(logFC < -lfc & adjust.p < p.value ~ -1,
                                                    abs(logFC) < lfc ~ 0,
                                                    logFC > lfc & adjust.p < p.value ~ 1, TRUE ~ 0))
+  lrt_table <- add_de(lrt_table, regions)
   lrt_table
 }
 
 
-#' Differential methylation results plot
+#' Plot differential testing results
 #'
 #' `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 #' * for further details, see [edgeR::plotSmear()]
@@ -159,11 +151,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1) {
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+#' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
 #' edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
