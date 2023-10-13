@@ -3,10 +3,9 @@
 #'
 #' `aggregate_peaks` aggregates differentially methylated GATC regions into peaks. These peaks represent the region that the gene of interest bound in.
 #'
-#' @param dm_results data frame of differential methylation results obtained from [edgeR_results]
-#' @param regions data frame of GATC regions. Default is GATC regions from Drosophila melanogaster - dm6.
+#' @param dm_results data.frame of differential methylation results obtained from [edgeR_results]
 #'
-#' @return data frame of peaks.
+#' @return data.frame of peaks.
 #' Columns are
 #' * seqnames,
 #' * start,
@@ -20,30 +19,12 @@
 #' * gap (gap in bp to the next peak),
 #' * number (peak number in order of position)
 #' @export
-#'
-#' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#'
-#' peaks <- aggregate_peaks(de_results, regions = regions_gatc_drosophila_dm6)
-#' head(peaks)
 #need to rename fn - aggregatePeaks
-aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
+aggregate_peaks <- function(dm_results) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
-  if(!is.data.frame(regions)) {
-    stop("Regions must be a data.frame")
-  }
-  if(missing(regions)) {
-    message("Default of drosophila dm6 regions used")
-  }
-  results <- add_de(de_results=dm_results, regions=regions)
+  results <- dm_results
   df_a <- results %>%
       dplyr::mutate(number = 1:nrow(.),
                     trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
@@ -113,24 +94,18 @@ aggregate_peaks <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
 #' New: identify peaks from de results
 #'
 #' @param dm_results data.frame as outputted from `edgeR_results()`
-#' @param regions regions df. default is the provided data -
-#' `regions_gatc_drosophila_dm6`
-#'
 #' @return data.frame of peaks
 #' @export
 #'
 #' @examples
-aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
+#' edgeR_results <- random_edgeR_result()
+#'
+#' aggregate_peaks_new(edgeR_results)
+aggregate_peaks_new <- function(dm_results) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
-  if(!is.data.frame(regions)) {
-    stop("Regions must be a data.frame")
-  }
-  if(missing(regions)) {
-    message("Default of drosophila dm6 regions used")
-  }
-  df_aa <- add_de(de_results=dm_results, regions=regions)
+  df_aa <- dm_results
   df_a <- df_aa %>% dplyr::mutate(number = 1:dplyr::n(),
                                   trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
                                   trial = ifelse(dplyr::lead(trial) == trial, 0, trial),
@@ -241,18 +216,6 @@ aggregate_peaks_new <- function(dm_results, regions=regions_gatc_drosophila_dm6)
 #' * adjust.p: 1 if de is NA :
 #' * meth_status: Upreg, No_sig, Downreg, Not_included
 #' @export
-#'
-#' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' dge <- edgeR_set_up(counts.df)
-#' de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#'
-#' de_results <- add_de(de_results, regions = regions_gatc_drosophila_dm6)
-#' head(de_results)
 add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(de_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
@@ -298,6 +261,15 @@ gaps_fn_new <- function(df) {
   if(nrow(gaps) == 0) {
     return(gaps)
   }
+  gaps_check <- gaps %>%
+    dplyr::mutate(gap2 = ifelse(gap <= 150 & width <= 10000, TRUE, FALSE)) %>%
+    dplyr::filter(gap2 != FALSE) %>%
+    .[,!colnames(.) == "gap2"]
+
+  if(nrow(gaps_check) == 0) {
+    return(gaps_check)
+  }
+
   i <- 1
   number <- c(1:nrow(gaps))
   j <- i
