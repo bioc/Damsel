@@ -30,9 +30,9 @@ gatc_region_fn <- function(BSgenome_object=NULL, path_to_fasta=NULL) {
   i <- 1
   df <- cbind(start = 1, end = 1, width = 1, seq = "GATC", seqnames = "chr0") %>%
     data.frame() %>%
-    dplyr::mutate(start = as.numeric(start),
-                  end = as.numeric(end),
-                  width = as.numeric(width))
+    dplyr::mutate(start = as.numeric(.data$start),
+                  end = as.numeric(.data$end),
+                  width = as.numeric(.data$width))
 
   for(i in 1:length_names) {
     df <- rbind(df, dplyr::mutate(data.frame(Biostrings::matchPattern("GATC", fasta[[i]])),
@@ -46,11 +46,11 @@ gatc_region_fn <- function(BSgenome_object=NULL, path_to_fasta=NULL) {
   df$width <- 5
 
   regions <- df %>%
-    dplyr::group_by(seqnames) %>%
-    dplyr::mutate(start = start + 3,
-                  end = lead(start) - 1) %>%
-    dplyr::filter(!is.na(end)) %>%
-    dplyr::mutate(width = end - start + 1) %>%
+    dplyr::group_by(.data$seqnames) %>%
+    dplyr::mutate(start = .data$start + 3,
+                  end = lead(.data$start) - 1) %>%
+    dplyr::filter(!is.na(.data$end)) %>%
+    dplyr::mutate(width = .data$end - .data$start + 1) %>%
     ungroup()
 
   list(regions = regions, sites = df)

@@ -29,7 +29,7 @@ goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, ext
   goseq_data <- genes
   goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{extend_by}})
   goseq_data <- goseq_data %>%
-    dplyr::mutate(de = ifelse(ensembl_gene_id %in% de_genes$ensembl_gene_id, 1, 0))
+    dplyr::mutate(de = ifelse(.data$ensembl_gene_id %in% de_genes$ensembl_gene_id, 1, 0))
 
   gene.vector <- goseq_data$de
   names(gene.vector) <- goseq_data$ensembl_gene_id
@@ -80,12 +80,12 @@ gene_mod_extend <- function(genes, regions, extend_by=2000) {
   new <- plyranges::find_overlaps_within(regions_gr,
                                          plyranges::as_granges(genes_mod)) %>%
     data.frame() %>%
-    dplyr::group_by(ensembl_gene_id) %>%
+    dplyr::group_by(.data$ensembl_gene_id) %>%
     dplyr::mutate(n_regions = dplyr::n()) %>%
     dplyr::ungroup() %>%
     data.frame()
   genes_mod$n_regions <- new[match(genes_mod$ensembl_gene_id, new$ensembl_gene_id), "n_regions"]
   genes_mod <- genes_mod %>%
-    dplyr::mutate(n_regions = dplyr::coalesce(n_regions, 0))
+    dplyr::mutate(n_regions = dplyr::coalesce(.data$n_regions, 0))
   genes_mod
 }
