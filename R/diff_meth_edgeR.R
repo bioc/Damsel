@@ -121,9 +121,9 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosoph
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
   lrt_table <- qlf$table
   lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-                                    de = dplyr::case_when(.data$logFC < lfc & .data$adjust.p < .data$p.value ~ -1,
+                                    de = dplyr::case_when(.data$logFC < lfc & .data$adjust.p < p.value ~ -1,
                                                    abs(.data$logFC) < lfc ~ 0,
-                                                   .data$logFC > lfc & .data$adjust.p < .data$p.value ~ 1, TRUE ~ 0))
+                                                   .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0))
   lrt_table <- add_de(lrt_table, regions)
   lrt_table
 }
