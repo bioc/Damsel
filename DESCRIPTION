@@ -27,6 +27,7 @@ Imports:
     GenomeInfoDb,
     ggbio,
     ggplot2,
+    GO.db,
     goseq,
     graphics,
     limma,
@@ -41,6 +42,5 @@ Imports:
     stats,
     stringr,
     tidyr,
-    TxDb.Dmelanogaster.UCSC.dm6.ensGene,
     utils
 VignetteBuilder: knitr
