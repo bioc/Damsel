@@ -23,7 +23,6 @@ ggplot_add object
 }
 \examples{
 counts.df <- random_counts()
-dge <- edgeR_set_up(counts.df)
 de_results <- random_edgeR_results()
 plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
