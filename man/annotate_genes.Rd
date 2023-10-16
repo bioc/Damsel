@@ -34,7 +34,7 @@ The minimum distance between the peak and gene is calculated, (0 if the peak is 
 }
 \examples{
 
-edgeR_results <- random_edgeR_result()
+edgeR_results <- random_edgeR_results()
 peaks <- aggregate_peaks(edgeR_results)
 
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
