@@ -72,7 +72,7 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
     ggplot2::facet_wrap(~ bam, ncol = n_col) +
-    ggplot2::labs(title = paste0(.data$seqnames, ":", start_region, "-", end_region))
+    ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region))
 }
 
 
