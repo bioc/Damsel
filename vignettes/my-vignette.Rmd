@@ -191,44 +191,6 @@ Before plotting these, the de_results must be added back to the original data fr
 knitr::kable(head(add_de(de_results)))
 ```
 
-* Plot with the de_results
-
-```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1) +
-  geom_de.res(de_results.df = add_de(de_results, 
-                                     regions = regions_gatc_drosophila_dm6))
-```
-
-* Plot with logFC
-
-```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1) +
-  geom_regions.lfc(region.df = add_de(de_results, 
-                                      regions = regions_gatc_drosophila_dm6))
-```
-
-* Plot with both
-
-```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1) +
-  geom_regions.lfc(region.df = add_de(de_results, 
-                                      regions = regions_gatc_drosophila_dm6)) +
-  geom_de.res(de_results.df = add_de(de_results, 
-                                     regions = regions_gatc_drosophila_dm6))
-```
-
 * Instead of plotting lfc and de_results separately, we recommend instead using geom_de.res.lfc
 
 ```{r, fig.height=8, fig.width=10}
@@ -237,8 +199,7 @@ plot_counts_all_bams(counts.df,
                      start_region = 1, 
                      end_region = 40000, 
                      n_col = 1) +
-  geom_de.res.lfc(de_results.df = add_de(de_results, 
-                                         regions = regions_gatc_drosophila_dm6))
+  geom_de.res.lfc(de_results.df = de_results)
 ```
 
 * Add GATC sites
@@ -257,8 +218,7 @@ plot_counts_all_bams(counts.df,
                      start_region = 1, 
                      end_region = 40000, 
                      n_col = 1) +
-  geom_de.res.lfc(de_results.df = 
-                    add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_de.res.lfc(de_results.df = de_results) +
   geom_gatc(gatc_sites)
 ```
 
@@ -275,7 +235,7 @@ Damsel approaches peaks with a simple approach - aggregating regions of result 1
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
 
 ```{r}
-peaks <- aggregate_peaks(de_results, regions_gatc_drosophila_dm6)
+peaks <- aggregate_peaks(de_results)
 knitr::kable(head(peaks))
 nrow(peaks)
 ```
@@ -289,8 +249,7 @@ plot_counts_all_bams(counts.df,
                      seqnames = "chr2L", 
                      start_region = 1, 
                      end_region = 40000, n_col = 1) +
-  geom_de.res.lfc(de_results.df = 
-                    add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_de.res.lfc(de_results.df = de_results) +
   geom_peak.new(peak.df = peaks) +
   geom_gatc(gatc_sites)
 ```
@@ -331,16 +290,13 @@ WIP
 
 
 ## 5.3 Annotating genes to peaks
-```{r}
-annotated_peaks <- gene_annotate(peaks, genes)
-str(annotated_peaks)
-```
 
 
 ```{r}
-annotated_peaks <- gene_annotate_organised(annotated_peaks)
-knitr::kable(head(annotated_peaks))
+annotation <- annotate_genes(peaks, genes, regions = regions_gatc_drosophila_dm6, max_distance = 5000)
+knitr::kable(head(annotation))
 ```
+
 
 
 ## 5.4 Interpreting results/Plotting?
@@ -351,8 +307,7 @@ plot_counts_all_bams(counts.df,
                      seqnames = "chr2L", 
                      start_region = 1, 
                      end_region = 40000, n_col = 1) +
-  geom_de.res.lfc(de_results.df = 
-                    add_de(de_results, regions = regions_gatc_drosophila_dm6)) +
+  geom_de.res.lfc(de_results.df = de_results) +
   geom_peak.new(peak.df = peaks) +
   geom_gatc(gatc_sites) +
   geom_genes.me(genes)
@@ -373,7 +328,7 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-#goseq_fn(regions, genes, peaks)
+#goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
 ```
 
 ## 6.2 KEGG??? 
