@@ -4,7 +4,7 @@
 \alias{geom_genes.me}
 \title{Plotting genes}
 \usage{
-geom_genes.me(df, plot.space = 0.1, plot.height = 0.3)
+geom_genes.me(df, txdb, plot.space = 0.1, plot.height = 0.3)
 }
 \arguments{
 \item{df}{A data.frame of genes as outputted from `get_biomart_genes`}
@@ -21,16 +21,19 @@ ggplot layer
 * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
-counts.df <- random_counts()
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = regions_gatc_drosophila_dm6)
+if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+  counts.df <- random_counts()
+  genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                             version = 109,
+                             regions = regions_gatc_drosophila_dm6)
 
-plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1) +
-  geom_genes.me(genes)
+  txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 
+  plot_counts_all_bams(counts.df,
+                       seqnames = "chr2L",
+                       start_region = 1,
+                       end_region = 40000,
+                       n_col = 1) +
+    geom_genes.me(genes, txdb)
+}
 }
