@@ -1,10 +1,16 @@
 
 
+
+#' Create example regions
+#'
+#' @param size number of rows to create
+#'
+#' @return example data.frame with output similar to `gatc_track()$regions`
 #' @export
 random_regions <- function(size=50) {
   df <- list(start = 50, end = 85, width = 36) %>% data.frame()
   size_n <- size - 1
-  random_width <- floor(runif(size_n, 5, 1000))
+  random_width <- floor(stats::runif(size_n, 5, 1000))
   for(i in 1:size_n) {
     new_start <- df[i, "end"] + 1
     df[nrow(df) + 1,] <- list(start = new_start, end = (new_start + random_width[i] - 1), width = random_width[i])
@@ -17,12 +23,18 @@ random_regions <- function(size=50) {
 }
 
 
+
+#' Create example counts
+#'
+#' @param size number of rows to create
+#'
+#' @return example data.frame of counts similar to `process_bams()`
 #' @export
 random_counts <- function(size=50) {
   counts <- random_regions(size)
   size <- nrow(counts)
-  counts$Dam_1.bam <- rnorm(size, 100)
-  counts$Fusion_1.bam <- rnorm(size, 400)
+  counts$Dam_1.bam <- stats::rnorm(size, 100)
+  counts$Fusion_1.bam <- stats::rnorm(size, 400)
   counts$Dam_2.bam <- counts$Dam_1.bam + 7
   counts$Fusion_2.bam <- counts$Fusion_1.bam - 2
   counts$seqnames <- paste0("chr", counts$seqnames)
@@ -30,6 +42,11 @@ random_counts <- function(size=50) {
 }
 
 
+#' Create example edgeR results
+#'
+#' @param size number of rows to create
+#'
+#' @return example data.frame of edgeR results, output similar to `edgeR_results()`
 #' @export
 random_edgeR_results <- function(size=50) {
   results <- random_regions(size)

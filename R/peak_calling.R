@@ -103,7 +103,7 @@ aggregate_peaks_old <- function(dm_results) {
 #' @export
 #'
 #' @examples
-#' edgeR_results <- random_edgeR_result()
+#' edgeR_results <- random_edgeR_results()
 #'
 #' aggregate_peaks(edgeR_results)
 aggregate_peaks <- function(dm_results) {
@@ -112,9 +112,9 @@ aggregate_peaks <- function(dm_results) {
   }
   df_aa <- dm_results
   df_a <- df_aa %>% dplyr::mutate(number = 1:dplyr::n(),
-                                  trial = unsplit(lapply(split(.[,"meth_status"], .$seqnames), function(x) {sequence(rle(x)$lengths)}), .$seqnames),
-                                  trial = ifelse(dplyr::lead(trial) == trial, 0, trial),
-                                  multiple = ifelse(trial == 0, FALSE, TRUE))
+                                  trial = unsplit(lapply(split(.[,"meth_status"], .data$seqnames), function(x) {sequence(rle(x)$lengths)}), .data$seqnames),
+                                  trial = ifelse(dplyr::lead(.data$trial) == .data$trial, 0, .data$trial),
+                                  multiple = ifelse(.data$trial == 0, FALSE, TRUE))
   df_1 <- peak_helper(df_a, TRUE, meth_status)
   df_2 <- peak_helper(df_a, FALSE, NULL)
   df_3 <- df_aa %>%
@@ -125,9 +125,9 @@ aggregate_peaks <- function(dm_results) {
                   distance_dm = sum(.data$width),
                   dm_start = ifelse(dplyr::row_number() == 1, .data$start, NA),
                   dm_end = ifelse(dplyr::row_number() == dplyr::n(), .data$end, NA)) %>%
-    tidyr::fill(.data$dm_start) %>%
+    tidyr::fill(dm_start) %>%
     dplyr::ungroup() %>%
-    tidyr::fill(.data$dm_end, .direction = "up")
+    tidyr::fill(dm_end, .direction = "up")
 
   peaks <- df_3 %>%
     dplyr::group_by(.data$peak_id) %>%
@@ -164,7 +164,7 @@ aggregate_peaks <- function(dm_results) {
   gaps <- gaps %>%
     dplyr::mutate(multiple_peaks = .data$n_peaks)
   peaks_no_gap <- peaks %>%
-    dplyr::filter(!peak_id %in% as.double(unlist(strsplit(gaps$id, ",")))) %>%
+    dplyr::filter(!.data$peak_id %in% as.double(unlist(strsplit(gaps$id, ",")))) %>%
     dplyr::mutate(multiple_peaks = NA,
                   n_regions_not_dm = 0)
   gaps_regions <- plyranges::find_overlaps_within(plyranges::as_granges(df_aa),
@@ -183,8 +183,8 @@ aggregate_peaks <- function(dm_results) {
     dplyr::mutate(n_regions_dm = ifelse(.data$is_de == TRUE, .data$n_de, NA),
                   n_regions_not_dm = ifelse(.data$is_de == FALSE, .data$n_de, NA)) %>%
     dplyr::group_by(.data$Pos) %>%
-    tidyr::fill(.data$n_regions_dm) %>%
-    tidyr::fill(.data$n_regions_not_dm, .direction = "downup") %>%
+    tidyr::fill(n_regions_dm) %>%
+    tidyr::fill(n_regions_not_dm, .direction = "downup") %>%
     dplyr::ungroup() %>%
     data.frame()
 
@@ -230,7 +230,7 @@ add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
   }
   results <- de_results
   df <- regions %>%
-      dplyr::mutate(seqnames = paste0("chr", seqnames), number = 1:nrow(.))
+      dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = 1:nrow(.))
   df$de <- results[match(df$Position, row.names(results)), "de"]
   df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
   df$adjust.p <- results[match(df$Position, row.names(results)), "adjust.p"]
@@ -250,7 +250,7 @@ gaps_fn_new <- function(df) {
   gaps_work <- rbind(c(1, 1, 1, 1)) %>%
     data.frame() %>%
     stats::setNames(c("seqnames", "id", "start", "end")) %>%
-    dplyr::mutate(seqnames = as.character(seqnames))
+    dplyr::mutate(seqnames = as.character(.data$seqnames))
   end <- c()
   gaps <- df
   gaps <- gaps %>%
@@ -290,8 +290,8 @@ gaps_fn_new <- function(df) {
           break
         }
       }
-      gaps_work[nrow(gaps_work) + 1,] <- c(gaps[tail(i, 1),]$seqnames, id, start, tail(end, 1))
-      if(tail(number, 1) == 100) {
+      gaps_work[nrow(gaps_work) + 1,] <- c(gaps[utils::tail(i, 1),]$seqnames, id, start, utils::tail(end, 1))
+      if(utils::tail(number, 1) == 100) {
         break
       }
     }
@@ -313,23 +313,22 @@ gaps_fn_new <- function(df) {
   gaps_work %>%
     plyranges::as_granges() %>%
     data.frame() %>%
-    dplyr::mutate(Pos = paste0(seqnames, "-", start))
-
+    dplyr::mutate(Pos = paste0(.data$seqnames, "-", .data$start))
 }
 
 peak_helper <- function(df_a, multiple, meth_status) {
   df <- df_a %>%
     dplyr::filter(multiple == {{multiple}}) %>%
-    dplyr::group_by(seqnames, {{meth_status}}) %>%
+    dplyr::group_by(.data$seqnames, {{meth_status}}) %>%
     dplyr::mutate(swap = ifelse(dplyr::lag(.data$number) != (.data$number - 1), 1, 0),
                   swap = dplyr::coalesce(.data$swap, 1)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(.data$swap) %>%
     dplyr::mutate(seq = ifelse(.data$swap == 1, 1:nrow(.), 0),
-                  seq = ifelse(.data$seq == 0, NA, seq)) %>%
+                  seq = ifelse(.data$seq == 0, NA, .data$seq)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by({{meth_status}}) %>%
-    tidyr::fill(.data$seq) %>%
+    tidyr::fill(seq) %>%
     dplyr::ungroup() %>%
     data.frame()
   df
@@ -341,7 +340,7 @@ order_peaks <- function(peaks) {
     dplyr::mutate(rank_p = 1:nrow(.)) %>%
     .[,c(6,1:5,12,7:11)] %>%
     .[order(.$peak_id),] %>%
-    dplyr::mutate(peak_id = ifelse(is.na(.data$multiple_peaks), paste0("PS_", peak_id), paste0("PM_", peak_id)))
+    dplyr::mutate(peak_id = ifelse(is.na(.data$multiple_peaks), paste0("PS_", .data$peak_id), paste0("PM_", .data$peak_id)))
   row.names(peaks_new) <- NULL
   peaks_new
 }

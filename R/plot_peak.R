@@ -84,9 +84,9 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
     ggplot2::geom_segment(
       data = valid.bed,
       mapping = ggplot2::aes(
-        x = start,
+        x = .data$start,
         y = 1,
-        xend = end,
+        xend = .data$end,
         yend = 1
       ),
       linewidth = peak.size,

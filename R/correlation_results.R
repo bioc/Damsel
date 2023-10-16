@@ -24,20 +24,20 @@ corr_heatmap <- function(df, method="spearman") {
     message("default spearman's method is used")
   }
 
-  corr_res <- cor(df[, grepl("bam", colnames(df))], method = method)
-  median_corr <- round(median(corr_res), 1)
+  corr_res <- stats::cor(df[, grepl("bam", colnames(df))], method = method)
+  median_corr <- round(stats::median(corr_res), 1)
   min_corr <- floor(min(corr_res) * 10) / 10
   corr_res <- round(corr_res, 2)
   # Use correlation between variables as distance and reorder
-  dd <- as.dist((1 - corr_res) / 2)
-  hc <- hclust(dd)
+  dd <- stats::as.dist((1 - corr_res) / 2)
+  hc <- stats::hclust(dd)
   corr_res <- corr_res[hc$order, hc$order]
   # upper triangle
   corr_res[lower.tri(corr_res)] <- NA
   # Melt the correlation matrix
   corr_res <- reshape2::melt(corr_res, na.rm = TRUE)
   #plot heatmap
-  ggplot2::ggplot(corr_res, ggplot2::aes(Var2, Var1, fill = value)) +
+  ggplot2::ggplot(corr_res, ggplot2::aes(.data$Var2, .data$Var1, fill = .data$value)) +
     ggplot2::geom_tile(color = "white")+
     ggplot2::scale_fill_gradient2(low = "blue", high = "red",
                                  midpoint = median_corr, limit = c(min_corr,1), space = "Lab",

@@ -40,7 +40,7 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
                                                  "chromosome_name", "start_position", "end_position", "strand",
                                                  "transcription_start_site"),
                                   filters = "ensembl_transcript_id",
-                                  values = dplyr::filter(BM.info, transcript_is_canonical == 1)$ensembl_transcript_id,
+                                  values = dplyr::filter(BM.info, .data$transcript_is_canonical == 1)$ensembl_transcript_id,
                                   mart = ensembl)
   gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position),]
   colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
@@ -56,7 +56,7 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
   gene_features$n_regions <- overlap[match(gene_features$ensembl_gene_id, overlap$ensembl_gene_id), "n_regions"]
   gene_features <- gene_features %>%
       dplyr::mutate(n_regions = dplyr::coalesce(.data$n_regions, 0),
-                    seqnames = paste0("chr", seqnames))
+                    seqnames = paste0("chr", .data$seqnames))
 
   gene_features
 }
@@ -179,10 +179,10 @@ gene_annotate_organised <- function(annotated_peaks) {
 #' * closest - every peak with it's closest gene
 #' * top_5 - every peak with list of 5 closest genes
 #' * all - all genes matching to each peak and all information
-#'
+#' @export
 #' @examples
 #'
-#' edgeR_results <- random_edgeR_result()
+#' edgeR_results <- random_edgeR_results()
 #' peaks <- aggregate_peaks(edgeR_results)
 #'
 #' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
@@ -214,11 +214,11 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
     data.frame()
 
   pair_gene <- pair_gene %>%
-    setNames(c("gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
+    stats::setNames(c("gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
                "peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
                colnames(.[11:ncol(.)])))
   pair_peak <- pair_peak %>%
-    setNames(c("peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
+    stats::setNames(c("peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
                "gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
                colnames(.[11:ncol(.)])))
 
@@ -231,7 +231,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
   overlaps <- plyranges::pair_overlaps(genes_gr, peaks_gr) %>%
     data.frame()
   overlaps <- overlaps %>%
-    setNames(c("gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
+    stats::setNames(c("gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
                "peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
                colnames(.[11:ncol(.)])))
 
@@ -248,7 +248,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
   combo <- combo %>%
     dplyr::group_by(.data$peak_id, .data$ensembl_gene_id) %>%
     dplyr::mutate(count = dplyr::n(),
-                  from = ifelse(.data$count == 1, from, "both")) %>%
+                  from = ifelse(.data$count == 1, .data$from, "both")) %>%
     dplyr::ungroup() %>%
     dplyr::distinct(.)
 
@@ -260,7 +260,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
   combo <- combo %>%
     dplyr::group_by(.data$peak_id, .data$ensembl_gene_id) %>%
     dplyr::mutate(count = dplyr::n(),
-                  from = ifelse(.data$count == 1, from, "overlap")) %>%
+                  from = ifelse(.data$count == 1, .data$from, "overlap")) %>%
     dplyr::ungroup() %>%
     dplyr::distinct(.) %>%
     .[,1:24] %>%
@@ -301,7 +301,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
     dplyr::mutate(num = 1:dplyr::n())
 
   n_regions <- plyranges::find_overlaps_within(plyranges::as_granges(dplyr::mutate(regions,
-                                                                                   seqnames = paste0("chr", seqnames))),
+                                                                                   seqnames = paste0("chr", .data$seqnames))),
                                                plyranges::as_granges(n_regions)) %>%
     data.frame() %>%
     dplyr::group_by(.data$num) %>%
@@ -316,7 +316,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
     dplyr::ungroup()
 
   if(!is.null(max_distance)) {
-    combo <- dplyr::filter(combo, min_distance <= max_distance)
+    combo <- dplyr::filter(combo, .data$min_distance <= max_distance)
   }
 
   col_order <- c("seqnames", "start", "end", "width",
@@ -326,8 +326,8 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
 
   closest <- combo %>%
     dplyr::filter(.data$count == 1) %>%
-    dplyr::mutate(gene_position = paste0(gene_seqnames, ":", gene_strand, ":", gene_start, "-", gene_end),
-                  peak_position = paste0(peak_seqnames, ":", peak_start, "-", peak_end)) %>%
+    dplyr::mutate(gene_position = paste0(.data$gene_seqnames, ":", .data$gene_strand, ":", .data$gene_start, "-", .data$gene_end),
+                  peak_position = paste0(.data$peak_seqnames, ":", .data$peak_start, "-", .data$peak_end)) %>%
     .[,col_order]
 
   combo_list <- combo %>%
@@ -348,8 +348,8 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
     cols_start <- which(colnames(combo) %in% c("seqnames", "start", "end", "width"))
 
     combo <- combo[,c(cols_start, ncol(combo),
-                      1:(head(cols_start, 1)-1),
-                      (tail(cols_start, 1)+1):(ncol(combo)-1))] %>%
+                      1:(utils::head(cols_start, 1)-1),
+                      (utils::tail(cols_start, 1)+1):(ncol(combo)-1))] %>%
       .[,!(colnames(.) %in% c("from", "peak_order", "abs_TSS", "count", "num"))]
 
   list_results <- list(closest = closest, top_five = combo_list, all = combo)
@@ -368,15 +368,4 @@ extend_upstream <- function(granges, upstream=0) {
   granges
 }
 
-gene_annotate_fn <- function(granges, upstream, peaks) {
-  on_plus <- strand(granges) == "+"
-  new_start <- start(granges) - ifelse(on_plus, upstream, 0)
-  new_end <- end(granges) + ifelse(on_plus, 0, upstream)
-  start(granges) <- new_start
-  end(granges) <- new_end
 
-  plyranges::find_overlaps_within(plyranges::as_granges(dplyr::mutate(peaks, start = peak_start, end = peak_end)),
-                       plyranges::as_granges(dplyr::mutate(data.frame(granges), gene_width = width))) %>%
-    data.frame()
-
-}

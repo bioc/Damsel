@@ -28,6 +28,7 @@ Imports:
     ggbio,
     ggplot2,
     goseq,
+    graphics,
     limma,
     magrittr,
     parallel,
@@ -37,7 +38,9 @@ Imports:
     rlang,
     Rsamtools,
     S4Vectors,
+    stats,
     stringr,
     tidyr,
-    TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    TxDb.Dmelanogaster.UCSC.dm6.ensGene,
+    utils
 VignetteBuilder: knitr

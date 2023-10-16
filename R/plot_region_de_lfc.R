@@ -14,7 +14,6 @@
 #'
 #' @examples
 #' counts.df <- random_counts()
-#' dge <- edgeR_set_up(counts.df)
 #' de_results <- random_edgeR_results()
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
@@ -54,40 +53,39 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  df_regions <- dplyr::filter(de_results.df,
-                              seqnames == plot.chr,
-                              start >= plot.region.start,
-                              end <= plot.region.end)
+  df_regions <- de_results.df %>% dplyr::filter(.data$seqnames == plot.chr,
+                                                .data$start >= plot.region.start,
+                                                .data$end <= plot.region.end)
   df_colour <- df_regions %>%
     dplyr::mutate(number = 1:dplyr::n()) %>%
     .[rep(seq_len(nrow(.)), times = 4),] %>%
     .[order(.$number),] %>%
-    dplyr::group_by(number) %>%
+    dplyr::group_by(.data$number) %>%
     dplyr::mutate(num = 1:dplyr::n()) %>%
-    dplyr::mutate(Position = dplyr::case_when(num == 1 ~ start,
-                                              num == 2 ~ start,
-                                              num == 3 ~ end,
-                                              TRUE ~ end),
-                  y_axis_2 = dplyr::case_when(num == 1 ~ 0,
-                                              num == 2 ~ logFC,
-                                              num == 3 ~ logFC,
+    dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
+                                              .data$num == 2 ~ .data$start,
+                                              .data$num == 3 ~ .data$end,
+                                              TRUE ~ .data$end),
+                  y_axis_2 = dplyr::case_when(.data$num == 1 ~ 0,
+                                              .data$num == 2 ~ .data$logFC,
+                                              .data$num == 3 ~ .data$logFC,
                                               TRUE ~ 0))
 
   df_fc <- df_regions %>%
-    dplyr::summarise(abs_max = max(logFC),
-                     abs_min = abs(min(logFC))) %>%
-    dplyr::mutate(abs_fc = ifelse(abs_max >= abs_min, abs_max, abs_min),
-                  abs_fc = round(abs_fc))
+    dplyr::summarise(abs_max = max(.data$logFC),
+                     abs_min = abs(min(.data$logFC))) %>%
+    dplyr::mutate(abs_fc = ifelse(.data$abs_max >= .data$abs_min, .data$abs_max, .data$abs_min),
+                  abs_fc = round(.data$abs_fc))
 
   colours <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
 
   de_res.plot <- df_regions %>%
-    ggplot2::ggplot(ggplot2::aes(x = start, y = de, colour = meth_status)) +
-    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = Position, y = y_axis_2, fill = meth_status)) +
-    ggplot2::geom_segment(ggplot2::aes(xend=start, yend=0)) +
-    ggplot2::geom_segment(ggplot2::aes(x=end, xend=end, y=de, yend=0)) +
-    ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=de, yend=de)) +
-    ggplot2::geom_segment(ggplot2::aes(x=start, xend=end, y=0, yend=0)) +
+    ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$de, colour = .data$meth_status)) +
+    ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = .data$Position, y = .data$y_axis_2, fill = .data$meth_status)) +
+    ggplot2::geom_segment(ggplot2::aes(xend = .data$start, yend = 0)) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$de, yend = 0)) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$de, yend = .data$de)) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = 0, yend = 0)) +
     ggplot2::scale_colour_manual(values = colours) +
     ggplot2::scale_fill_manual(values = colours) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +

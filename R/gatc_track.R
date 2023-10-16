@@ -48,10 +48,10 @@ gatc_region_fn <- function(BSgenome_object=NULL, path_to_fasta=NULL) {
   regions <- df %>%
     dplyr::group_by(.data$seqnames) %>%
     dplyr::mutate(start = .data$start + 3,
-                  end = lead(.data$start) - 1) %>%
+                  end = dplyr::lead(.data$start) - 1) %>%
     dplyr::filter(!is.na(.data$end)) %>%
     dplyr::mutate(width = .data$end - .data$start + 1) %>%
-    ungroup()
+    dplyr::ungroup()
 
   list(regions = regions, sites = df)
 }

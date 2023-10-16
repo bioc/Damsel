@@ -45,33 +45,34 @@ plot_counts_all_bams <- function(df, seqnames, start_region = NULL, end_region =
   }
   df <- df
   #colnames(df) <- chartr("-", "_", colnames(df))
-  df <- df %>% dplyr::filter(seqnames == {{seqnames}}) %>% dplyr::filter(start >= start_region, end <= end_region)
+  df <- df %>% dplyr::filter(.data$seqnames == {{seqnames}}) %>%
+    dplyr::filter(.data$start >= start_region, .data$end <= end_region)
   if(nrow(df) == 0) {
     stop("No data available for provided region, make the region larger")
   }
   df <- df %>% dplyr::mutate(number = 1:dplyr::n()) %>%
       .[rep(seq_len(nrow(.)), times = 4),] %>%
       .[order(.$number),] %>%
-      dplyr::group_by(number) %>%
+      dplyr::group_by(.data$number) %>%
       dplyr::mutate(num = 1:dplyr::n()) %>%
-      dplyr::mutate(Position = dplyr::case_when(num == 1 ~ start,
-                                                num == 2 ~ start,
-                                                num == 3 ~ end,
-                                                TRUE ~ end))
-  df <- df %>% dplyr::mutate_at(ggplot2::vars(matches(".bam")), ~ dplyr::case_when(num == 1 ~ 0,
-                                                                                   num == 2 ~ .,
-                                                                                   num == 3 ~ .,
+      dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
+                                                .data$num == 2 ~ .data$start,
+                                                .data$num == 3 ~ .data$end,
+                                                TRUE ~ .data$end))
+  df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam")), ~ dplyr::case_when(.data$num == 1 ~ 0,
+                                                                                   .data$num == 2 ~ .,
+                                                                                   .data$num == 3 ~ .,
                                                                                    TRUE ~ 0))
   df <- df %>% tidyr::gather(key = "bam",
                              value = "raw_counts",
                              colnames(.[, grepl(".bam", names(.))]))
   df %>%
     ggplot2::ggplot() +
-    ggplot2::geom_polygon(ggplot2::aes(x = Position, y = raw_counts)) +
+    ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts)) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
     ggplot2::facet_wrap(~ bam, ncol = n_col) +
-    ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region))
+    ggplot2::labs(title = paste0(.data$seqnames, ":", start_region, "-", end_region))
 }
 
 
@@ -124,22 +125,21 @@ ggplot_add.regions.counts <- function(object, plot, object_name) {
   df <- df %>% dplyr::mutate(number = 1:dplyr::n()) %>%
     .[rep(seq_len(nrow(.)), times = 4),] %>%
     .[order(.$number),] %>%
-    dplyr::group_by(number) %>%
+    dplyr::group_by(.data$number) %>%
     dplyr::mutate(num = 1:dplyr::n()) %>%
-    dplyr::mutate(Position = dplyr::case_when(num == 1 ~ start,
-                                              num == 2 ~ start,
-                                              num == 3 ~ end,
-                                              TRUE ~ end))
-  df <- df %>% dplyr::mutate_at(ggplot2::vars(matches(".bam")), ~ dplyr::case_when(num == 1 ~ 0,
-                                                                                   num == 2 ~ .,
-                                                                                   num == 3 ~ .,
+    dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
+                                              .data$num == 2 ~ .data$start,
+                                              .data$num == 3 ~ .data$end,
+                                              TRUE ~ .data$end))
+  df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam")), ~ dplyr::case_when(.data$num == 1 ~ 0,
+                                                                                   .data$num == 2 ~ .,
+                                                                                   .data$num == 3 ~ .,
                                                                                    TRUE ~ 0))
-
   counts.plot <- df %>%
     ggplot2::ggplot() +
-    ggplot2::geom_polygon(ggplot2::aes(x = Position, y = raw_counts)) +
+    ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts)) +
     ggplot2::scale_x_continuous(expand = c(0,0)) +
-    ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
+    ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
     ggplot2::facet_wrap(~ bam, ncol = n_col) +
     ggplot2::labs(title = paste0(seqnames, ":", plot.region.start, "-", plot.region.start))
 

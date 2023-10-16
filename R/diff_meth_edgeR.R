@@ -160,9 +160,9 @@ edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
   lrt_table <- qlf$table
   lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-                                           de = dplyr::case_when(.data$logFC < -.data$lfc & .data$adjust.p < .data$p.value ~ -1,
-                                                                 abs(.data$logFC) < .data$lfc ~ 0,
-                                                                 .data$logFC > .data$lfc & .data$adjust.p < .data$p.value ~ 1, TRUE ~ 0))
+                                           de = dplyr::case_when(.data$logFC < -lfc & .data$adjust.p < p.value ~ -1,
+                                                                 abs(.data$logFC) < lfc ~ 0,
+                                                                 .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0))
   detags <- rownames(dge)[as.logical(lrt_table$de)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Fusion/Dam")
 }

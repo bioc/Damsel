@@ -25,7 +25,7 @@
 #'  goseq_fn(annotation, genes)
 #geneOntology?
 goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000, bias=NULL) {
-  de_genes <- dplyr::filter(annotation, min_distance <= extend_by)
+  de_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
   goseq_data <- genes
   goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{extend_by}})
   goseq_data <- goseq_data %>%
@@ -47,22 +47,22 @@ goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, ext
   plot1 <- plot(log10(GO.wall[,2]), log10(GO.samp[match(GO.wall[,1],GO.samp[,1]),2]),
                 xlab="log10(Wallenius p-values)", ylab="log10(Sampling p-values)",
                 xlim=c(-3,0))
-  abline(0,1,col=3,lty=2)
+  graphics::abline(0,1,col=3,lty=2)
 
   GO.nobias <- goseq::goseq(pwf, "dm6", "ensGene", method="Hypergeometric")
 
   plot2 <- plot(log10(GO.wall[,2]), log10(GO.nobias[match(GO.wall[,1], GO.nobias[,1]), 2]),
                 xlab = "log10(Wallenius p-values)", ylab = "log10(Hypergeometric p-values)",
                 xlim = c(-3, 0), ylim = c(-3, 0))
-  abline(0, 1, col = 3, lty = 2)
+  graphics::abline(0, 1, col = 3, lty = 2)
 
-  enriched.GO <- GO.wall$category[p.adjust(GO.wall$over_represented_pvalue, method = "BH")<.05]
-  head(enriched.GO)
+  enriched.GO <- GO.wall$category[stats::p.adjust(GO.wall$over_represented_pvalue, method = "BH")<.05]
+  utils::head(enriched.GO)
 
   list <- list(for(go in enriched.GO[1:10]){
-    print(GOTERM[[go]])
+    print(GO.db::GOTERM[[go]])
     cat("--------------------------------------\n")
-  }, head(pwf), plot1, plot2)
+  }, utils::head(pwf), plot1, plot2)
 
   list
 }
@@ -75,7 +75,7 @@ gene_mod_extend <- function(genes, regions, extend_by=2000) {
   genes_mod <- genes_mod %>%
     plyranges::as_granges() %>%
     data.frame()
-  regions_gr <- dplyr::mutate(regions, seqnames = paste0("chr", seqnames)) %>%
+  regions_gr <- dplyr::mutate(regions, seqnames = paste0("chr", .data$seqnames)) %>%
     plyranges::as_granges()
   new <- plyranges::find_overlaps_within(regions_gr,
                                          plyranges::as_granges(genes_mod)) %>%
