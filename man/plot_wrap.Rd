@@ -14,6 +14,7 @@ plot_wrap(
   de_results = NULL,
   peaks = NULL,
   genes = NULL,
+  txdb = NULL,
   gatc_sites = NULL,
   extend_by = 250
 )

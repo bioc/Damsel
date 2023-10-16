@@ -21,7 +21,7 @@
 plot_wrap <- function(peak_id = NULL, gene_id=NULL,
                       seqnames = NULL, start_region = NULL, end_region=NULL,
                       counts = NULL, de_results = NULL, peaks = NULL,
-                      genes = NULL, gatc_sites = NULL, extend_by=250) {
+                      genes = NULL, txdb = NULL, gatc_sites = NULL, extend_by=250) {
   if(is.null(peak_id) & is.null(gene_id) &
      is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
     stop("Please provide a peak id, gene id, or a region to plot (seqnames, start_region, end_region)")
@@ -99,7 +99,7 @@ plot_wrap <- function(peak_id = NULL, gene_id=NULL,
       geom_de.res.lfc(de_results) +
       geom_peak.new(peaks) +
       geom_gatc(gatc_sites) +
-      geom_genes.me(genes)
+      geom_genes.me(genes, txdb)
 
     list_plots[[i]] <- plot
   }
