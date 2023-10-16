@@ -7,6 +7,6 @@ test_that("gene_ontology: Output is error", {
 })
 
 test_that("gene_ontology: Output is no error", {
-  expect_no_error(goseq_fn(annotate_genes_new(readRDS(test_path("fixtures", "test_peaks_new.rds")), readRDS(test_path("fixtures", "test_genes.rds")), regions_gatc_drosophila_dm6)$all, readRDS(test_path("fixtures", "test_genes.rds")), regions_gatc_drosophila_dm6))
+  expect_no_error(goseq_fn(annotate_genes(readRDS(test_path("fixtures", "test_peaks_new.rds")), readRDS(test_path("fixtures", "test_genes.rds")), regions_gatc_drosophila_dm6)$all, readRDS(test_path("fixtures", "test_genes.rds")), regions_gatc_drosophila_dm6))
   #expect_no_error(goseq_fn(annotate_genes_new(aggregate_peaks(readRDS(test_path("fixtures", "test_results.rds")), regions_gatc_drosophila_dm6), readRDS(test_path("fixtures", "test_genes.rds")), regions = regions_gatc_drosophila_dm6)$all, readRDS(test_path("fixtures", "test_genes.rds")), regions_gatc_drosophila_dm6))
 })
