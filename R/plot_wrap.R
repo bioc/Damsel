@@ -35,39 +35,28 @@ plot_wrap <- function(peak_id = NULL, gene_id=NULL,
       if(!(peak_id %in% peaks$consec_dm)) {
         stop("Peak_id is not in provided peaks data.frame")
       }
-      if(length(peak_id) == 1) {
-        peaks <- dplyr::filter(peaks, .data$consec_dm == peak_id)
-      }
-      peaks <- dplyr::filter(peaks, .data$consec_dm %in% peak_id)
+      peaks_select <- dplyr::filter(peaks, .data$consec_dm %in% peak_id)
     } else if(is.character(peak_id)) {
       if(!(peak_id %in% peaks$peak_id)) {
         stop("Peak_id is not in provided peaks data.frame")
       }
-      if(length(peak_id) == 1) {
-        peaks <- dplyr::filter(peaks, .data$peak_id == peak_id)
-      }
-      peaks <- dplyr::filter(peaks, .data$peak_id %in% peak_id)
+      peaks_select <- dplyr::filter(peaks, .data$peak_id %in% {{peak_id}})
     }
-    chr <- as.character(peaks$seqnames)
-    start_region <- as.numeric(peaks$start) - extend_by
+    chr <- as.character(peaks_select$seqnames)
+    start_region <- as.numeric(peaks_select$start) - extend_by
     start_region[start_region < 0] <- 0
-    end_region <- as.numeric(peaks$end) + extend_by
+    end_region <- as.numeric(peaks_select$end) + extend_by
   }
   if(!is.null(gene_id)) {
     if(!(gene_id %in% genes$ensembl_gene_id)) {
       stop("Gene_id is not in provided genes data.frame")
     }
-    if(length(gene_id) == 1) {
-      if(!is.null(genes)) {
-        genes <- dplyr::filter(genes, .data$ensembl_gene_id == gene_id)
-      }
-    }
-    genes <- dplyr::filter(genes, .data$ensembl_gene_id %in% gene_id)
+    genes_select <- dplyr::filter(genes, .data$ensembl_gene_id %in% gene_id)
 
-    chr <- as.character(genes$seqnames)
-    start_region <- as.numeric(genes$start) - extend_by
+    chr <- as.character(genes_select$seqnames)
+    start_region <- as.numeric(genes_select$start) - extend_by
     start_region[start_region < 0] <- 0
-    end_region <- as.numeric(genes$end) + extend_by
+    end_region <- as.numeric(genes_select$end) + extend_by
   }
 
   if(!is.null(seqnames) && !is.null(start_region) && !is.null(end_region)) {
