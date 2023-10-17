@@ -16,7 +16,8 @@ plot_wrap(
   genes = NULL,
   txdb = NULL,
   gatc_sites = NULL,
-  extend_by = 250
+  extend_by = 250,
+  ...
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ plot_wrap(
 \item{gatc_sites}{gatc sites}
 
 \item{extend_by}{extend region, default is 250}
+
+\item{...}{arguments passed to geom_genes.me. Allows for adjusting of the plot appearance via gene_limits and plot.height if necessary.
+* Default for gene_limits is NULL. If the gene is disproportionately large for the plot space, we recommend reducing the size with gene_limits = c(0,2)}
 }
 \value{
 ggplot object - or list of plots if provided multiple peaks/genes

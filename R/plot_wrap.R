@@ -13,6 +13,8 @@
 #' @param genes genes data.frame [get_biomart_genes()]
 #' @param gatc_sites gatc sites
 #' @param extend_by extend region, default is 250
+#' @param ... arguments passed to geom_genes.me. Allows for adjusting of the plot appearance via gene_limits and plot.height if necessary.
+#' * Default for gene_limits is NULL. If the gene is disproportionately large for the plot space, we recommend reducing the size with gene_limits = c(0,2)
 #'
 #' @return ggplot object - or list of plots if provided multiple peaks/genes
 #' @export
@@ -21,7 +23,7 @@
 plot_wrap <- function(peak_id = NULL, gene_id=NULL,
                       seqnames = NULL, start_region = NULL, end_region=NULL,
                       counts = NULL, de_results = NULL, peaks = NULL,
-                      genes = NULL, txdb = NULL, gatc_sites = NULL, extend_by=250) {
+                      genes = NULL, txdb = NULL, gatc_sites = NULL, extend_by=250, ...) {
   if(is.null(peak_id) & is.null(gene_id) &
      is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
     stop("Please provide a peak id, gene id, or a region to plot (seqnames, start_region, end_region)")
@@ -76,7 +78,7 @@ plot_wrap <- function(peak_id = NULL, gene_id=NULL,
       geom_de.res.lfc(de_results) +
       geom_peak.new(peaks) +
       geom_gatc(gatc_sites) +
-      geom_genes.me(genes)
+      geom_genes.me(genes, txdb, ...)
     return(plot)
   }
   list_plots <- list()
@@ -88,7 +90,7 @@ plot_wrap <- function(peak_id = NULL, gene_id=NULL,
       geom_de.res.lfc(de_results) +
       geom_peak.new(peaks) +
       geom_gatc(gatc_sites) +
-      geom_genes.me(genes, txdb)
+      geom_genes.me(genes, txdb, ...)
 
     list_plots[[i]] <- plot
   }
