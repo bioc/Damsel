@@ -52,24 +52,24 @@ random_edgeR_results <- function(size=50) {
   results <- random_regions(size)
   results$seqnames <- paste0("chr", results$seqnames)
   results$number <- 1:size
-  de_options <- c(0, 1, NA, -1)
+  dm_options <- c(0, 1, NA, -1)
   peak <- rep(1, each = 4)
   zero <- rep(0, each = 2)
   pairs <- rep(de_options, each = 2)
   threes <- rep(de_options, each = 3)
-  all <- c(de_options, de_options, de_options, de_options, peak, pairs, peak, zero, threes, peak)
-  results$de <- all
-  results$logFC <- dplyr::case_when(results$de == 1 ~ runif(1, 1, 5),
-                                    results$de == 0 ~ runif(1, -1.5, 1.5),
-                                    results$de == -1 ~ runif(1, -7, -1),
+  all <- c(dm_options, dm_options, dm_options, dm_options, peak, pairs, peak, zero, threes, peak)
+  results$dm <- all
+  results$logFC <- dplyr::case_when(results$dm == 1 ~ runif(1, 1, 5),
+                                    results$dm == 0 ~ runif(1, -1.5, 1.5),
+                                    results$dm == -1 ~ runif(1, -7, -1),
                                     TRUE ~ 0)
-  results$adjust.p <- dplyr::case_when(results$de == 1 ~ runif(1, 5.58e-07, 0.05),
-                                       results$de == 0 ~ runif(1, 9.4e-02, 1),
-                                       results$de == -1 ~ runif(1, 2.93e-06, 0.05),
+  results$adjust.p <- dplyr::case_when(results$dm == 1 ~ runif(1, 5.58e-07, 0.05),
+                                       results$dm == 0 ~ runif(1, 9.4e-02, 1),
+                                       results$dm == -1 ~ runif(1, 2.93e-06, 0.05),
                                        TRUE ~ 1)
-  results$meth_status <- dplyr::case_when(results$de == 1 ~ "Upreg",
-                                          results$de == 0 ~ "No_signal",
-                                          results$de == -1 ~ "Downreg",
+  results$meth_status <- dplyr::case_when(results$dm == 1 ~ "Upreg",
+                                          results$dm == 0 ~ "No_signal",
+                                          results$dm == -1 ~ "Downreg",
                                           TRUE ~ "Not_included")
   results
 }

@@ -181,17 +181,18 @@ gene_annotate_organised <- function(annotated_peaks) {
 #' * all - all genes matching to each peak and all information
 #' @export
 #' @examples
-#'
-#' edgeR_results <- random_edgeR_results()
-#' peaks <- aggregate_peaks(edgeR_results)
+#' set.seed(123)
+#' example_regions <- random_regions()
+#' dm_results <- random_edgeR_results()
+#' peaks <- aggregate_peaks(dm_results)
 #'
 #' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
 #'                            version = 109,
-#'                            regions = regions_gatc_drosophila_dm6)
+#'                            regions = example_regions)
 #'
-#' annotate_genes(peaks, genes, max_distance = 5000)
+#' annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 #' #view all combinations
-#' annotate_genes(peaks, genes, max_distance = NULL)
+#' annotate_genes(peaks, genes, example_regions, max_distance = NULL)
 annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
   if(!is.data.frame(peaks)) {
     stop("Require data.frame of peaks as outputted from `aggregate_peaks")

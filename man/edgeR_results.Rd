@@ -31,9 +31,11 @@ Refer to the following pages for further details:
 * [edgeR::decideTestsDGE()]
 }
 \examples{
+set.seed(123)
+example_regions <- random_regions()
 counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
-edgeR_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-head(edgeR_results)
+dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1, example_regions)
+head(dm_results)
 }

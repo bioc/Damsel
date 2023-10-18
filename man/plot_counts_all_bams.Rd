@@ -5,7 +5,7 @@
 \title{Plot for just counts for all samples across a given region}
 \usage{
 plot_counts_all_bams(
-  df,
+  counts.df,
   seqnames,
   start_region = NULL,
   end_region = NULL,
@@ -13,7 +13,7 @@ plot_counts_all_bams(
 )
 }
 \arguments{
-\item{df}{A data.frame of counts as outputted from [process_bams()]}
+\item{counts.df}{A data.frame of counts as outputted from [process_bams()]}
 
 \item{seqnames}{chromosome of interest}
 
@@ -31,6 +31,7 @@ ggplot object
 * this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 }
 \examples{
+set.seed(123)
 counts.df <- random_counts()
 plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
@@ -38,11 +39,11 @@ plot_counts_all_bams(counts.df,
                      end_region = 40000,
                      n_col = 3)
 # Can use this plot to layer other plots -----------------------------
-de_results <- random_edgeR_results()
+dm_results <- random_edgeR_results()
 plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
                      start_region = 1,
                      end_region = 40000,
                      n_col = 1) +
-  geom_de.res.lfc(de_results)
+  geom_dm.res.lfc(dm_results)
 }

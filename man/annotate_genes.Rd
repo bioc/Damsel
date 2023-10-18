@@ -33,15 +33,16 @@ list of 3 data.frames:
 The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc)
 }
 \examples{
-
-edgeR_results <- random_edgeR_results()
-peaks <- aggregate_peaks(edgeR_results)
+set.seed(123)
+example_regions <- random_regions()
+dm_results <- random_edgeR_results()
+peaks <- aggregate_peaks(dm_results)
 
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
                            version = 109,
-                           regions = regions_gatc_drosophila_dm6)
+                           regions = example_regions)
 
-annotate_genes(peaks, genes, max_distance = 5000)
+annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 #view all combinations
-annotate_genes(peaks, genes, max_distance = NULL)
+annotate_genes(peaks, genes, example_regions, max_distance = NULL)
 }

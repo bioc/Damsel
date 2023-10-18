@@ -3,7 +3,7 @@
 #' `geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
-#' @param gatc.df A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`
+#' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`
 #' @param gatc.color Specify colour of lines, default is red
 #' @param gatc.size Specify size of the line, default is 5
 #' @param plot.space Specify gap to next plot, default is 0.2
@@ -13,12 +13,10 @@
 #' @export
 #'
 #' @examples
-#' path_to_bams <- system.file("extdata", package = "Damsel")
-#' counts.df <- process_bams(path_to_bams,
-#'                           regions = regions_gatc_drosophila_dm6,
-#'                           cores = 2)
-#' counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-#' gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6,
+#' set.seed(123)
+#' example_regions <- random_regions()
+#' counts.df <- random_counts()
+#' gatc_sites <- dplyr::mutate(example_regions,
 #'                             seqnames = paste0("chr", seqnames),
 #'                             start = start - 3, end = start + 4)
 #'
@@ -29,10 +27,10 @@
 #'                      n_col = 1) +
 #'   geom_gatc(gatc_sites)
 #' # The plots can be layered -------------------------------------------------
-geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
+geom_gatc <- function(gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
                       plot.space = 0.2, plot.height = 0.05) {
   structure(list(
-    gatc.df = gatc.df, gatc.color = gatc.color, gatc.size = gatc.size,
+    gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,
     plot.space = plot.space, plot.height = plot.height
   ),
   class = "gatc"
@@ -42,7 +40,7 @@ geom_gatc <- function(gatc.df = NULL, gatc.color = "red", gatc.size = 5,
 
 #' @export
 ggplot_add.gatc <- function(object, plot, object_name) {
-  if(!is.data.frame(object$gatc.df)) {
+  if(!is.data.frame(object$gatc_sites.df)) {
     stop("data.frame of GATC sites is required")
   }
   plot2 <- plot
@@ -59,13 +57,13 @@ ggplot_add.gatc <- function(object, plot, object_name) {
   plot.region.end <- plot.data[2] %>% as.numeric()
 
   # get parameters
-  gatc.df <- object$gatc.df
+  gatc_sites.df <- object$gatc_sites.df
   gatc.color <- object$gatc.color
   gatc.size <- object$gatc.size
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  bed.info <- gatc.df
+  bed.info <- gatc_sites.df
   bed.info <- bed.info[,c("seqnames", "start", "end")]
   # convert to 1-based
   bed.info$start <- as.numeric(bed.info$start) + 1

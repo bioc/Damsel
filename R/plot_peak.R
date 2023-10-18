@@ -14,9 +14,10 @@
 #' @export
 #'
 #' @examples
+#' set.seed(123)
 #' counts.df <- random_counts()
-#' de_results <- random_edgeR_results()
-#' peaks <- aggregate_peaks(de_results)
+#' dm_results <- random_edgeR_results()
+#' peaks <- aggregate_peaks(dm_results)
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
@@ -24,10 +25,10 @@
 #'                      n_col = 1) +
 #'   geom_peak.new(peaks)
 #' # The plots can be layered -------------------------------------------------
-geom_peak.new <- function(peak.df = NULL, peak.color = "black", peak.size = 5,
+geom_peak.new <- function(peaks.df = NULL, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.05) {
   structure(list(
-    peak.df = peak.df, peak.color = peak.color, peak.size = peak.size,
+    peaks.df = peaks.df, peak.color = peak.color, peak.size = peak.size,
     plot.space = plot.space, plot.height = plot.height
   ),
   class = "peak.new"
@@ -37,7 +38,7 @@ geom_peak.new <- function(peak.df = NULL, peak.color = "black", peak.size = 5,
 
 #' @export
 ggplot_add.peak.new <- function(object, plot, object_name) {
-  if(!is.data.frame(object$peak.df)) {
+  if(!is.data.frame(object$peaks.df)) {
     stop("data.frame of peaks is required")
   }
   plot2 <- plot
@@ -54,14 +55,13 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   plot.region.end <- plot.data[2] %>% as.numeric()
 
   # get parameters
-  bed.file <- object$bed.file
-  peak.df <- object$peak.df
+  peaks.df <- object$peaks.df
   peak.color <- object$peak.color
   peak.size <- object$peak.size
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  bed.info <- peak.df
+  bed.info <- peaks.df
   bed.info <- bed.info[,c("seqnames", "start", "end")]
 
   # convert to 1-based

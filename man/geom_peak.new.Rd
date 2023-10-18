@@ -5,7 +5,7 @@
 \title{Plotting peaks}
 \usage{
 geom_peak.new(
-  peak.df = NULL,
+  peaks.df = NULL,
   peak.color = "black",
   peak.size = 5,
   plot.space = 0.1,
@@ -13,8 +13,6 @@ geom_peak.new(
 )
 }
 \arguments{
-\item{peak.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
-
 \item{peak.color}{Specify colour of peak, default is black}
 
 \item{peak.size}{Specify size of rectangle, default is 5}
@@ -22,6 +20,8 @@ geom_peak.new(
 \item{plot.space}{Specify gap to next plot, default is 0.1}
 
 \item{plot.height}{Specify overall height of plot, default is 0.05}
+
+\item{peak.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
 }
 \value{
 ggplot_add object
@@ -31,9 +31,10 @@ ggplot_add object
 * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
+set.seed(123)
 counts.df <- random_counts()
-de_results <- random_edgeR_results()
-peaks <- aggregate_peaks(de_results)
+dm_results <- random_edgeR_results()
+peaks <- aggregate_peaks(dm_results)
 plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
                      start_region = 1,

@@ -2,7 +2,7 @@
 % Please edit documentation in R/peak_calling.R
 \name{aggregate_peaks}
 \alias{aggregate_peaks}
-\title{New: identify peaks from de results}
+\title{New: identify peaks from dm results}
 \usage{
 aggregate_peaks(dm_results)
 }
@@ -18,7 +18,7 @@ A data.frame of peaks. Columns are as follows: peak_id (Unique peak identifier, 
 The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 }
 \examples{
-edgeR_results <- random_edgeR_results()
+dm_results <- random_edgeR_results()
 
-aggregate_peaks(edgeR_results)
+aggregate_peaks(dm_results)
 }

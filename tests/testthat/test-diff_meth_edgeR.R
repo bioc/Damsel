@@ -6,9 +6,9 @@ test_that("edgeR set up: Output is a DGEList", {
 
 test_that("edgeR set up: Output is error", {
   expect_error(edgeR_set_up())
-  expect_error(edgeR_set_up(df = list(1,2,3)), "Must have data.frame of counts")#, ignore.case = TRUE)
-  expect_error(edgeR_set_up(df = readRDS(test_path("fixtures", "test_counts_df.rds")), keep_a = "A", keep_b = 3), "keep_a must be 1 value, recommend using default value")#, ignore.case = TRUE)
-  expect_error(edgeR_set_up(df = readRDS(test_path("fixtures", "test_counts_df.rds")), keep_a = 0.5, keep_b = c(1,2)), "keep_b must be 1 value, recommend using default value")#, ignore.case = TRUE)
+  expect_error(edgeR_set_up(counts.df = list(1,2,3)), "Must have data.frame of counts")#, ignore.case = TRUE)
+  expect_error(edgeR_set_up(counts.df = readRDS(test_path("fixtures", "test_counts_df.rds")), keep_a = "A", keep_b = 3), "keep_a must be 1 value, recommend using default value")#, ignore.case = TRUE)
+  expect_error(edgeR_set_up(counts.df = readRDS(test_path("fixtures", "test_counts_df.rds")), keep_a = 0.5, keep_b = c(1,2)), "keep_b must be 1 value, recommend using default value")#, ignore.case = TRUE)
 })
 
 

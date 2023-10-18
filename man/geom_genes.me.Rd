@@ -32,10 +32,12 @@ ggplot layer
 }
 \examples{
 if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+  set.seed(123)
+  example_regions <- random_regions()
   counts.df <- random_counts()
   genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
                              version = 109,
-                             regions = regions_gatc_drosophila_dm6)
+                             regions = example_regions)
 
   txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 

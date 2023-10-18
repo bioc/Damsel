@@ -1,11 +1,11 @@
-#' Plotting de results with lfc
+#' Plotting dm results with lfc
 #'
-#' `geom_de.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
+#' `geom_dm.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
 #' * regions are coloured by de result: 1, 0, -1, NA (grey for NA)
 #' * cannot be plotted by itself, must be added to an existing plot - see examples.
 #'
 #'
-#' @param de_results.df A data.frame of differential testing results as outputted from `edgeR_results()`
+#' @param dm_results.df A data.frame of differential testing results as outputted from `edgeR_results()`
 #' @param plot.space Specify gap to next plot, default is 0.1
 #' @param plot.height Specify overall height of plot, default is 0.1
 #'
@@ -13,26 +13,27 @@
 #' @export
 #'
 #' @examples
+#' set.seed(123)
 #' counts.df <- random_counts()
-#' de_results <- random_edgeR_results()
+#' dm_results <- random_edgeR_results()
 #' plot_counts_all_bams(counts.df,
 #'                      seqnames = "chr2L",
 #'                      start_region = 1,
 #'                      end_region = 40000,
 #'                      n_col = 1) +
-#'   geom_de.res.lfc(de_results)
-geom_de.res.lfc <- function(de_results.df,
+#'   geom_dm.res.lfc(dm_results)
+geom_dm.res.lfc <- function(dm_results.df,
                             plot.space = 0.1, plot.height = 0.1) {
   structure(list(
-    de_results.df = de_results.df, plot.space = 0.1, plot.height = plot.height
+    dm_results.df = dm_results.df, plot.space = 0.1, plot.height = plot.height
   ),
-  class = "de.res.lfc"
+  class = "dm.res.lfc"
   )
 }
 
 #' @export
-ggplot_add.de.res.lfc <- function(object, plot, object_name) {
-  if(!is.data.frame(object$de_results.df)) {
+ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
+  if(!is.data.frame(object$dm_results.df)) {
     stop("data.frame of de results is required")
   }
   plot2 <- plot
@@ -49,11 +50,11 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
   plot.region.end <- plot.data[2] %>% as.numeric()
 
   # get parameters
-  de_results.df <- object$de_results.df
+  dm_results.df <- object$dm_results.df
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  df_regions <- de_results.df %>% dplyr::filter(.data$seqnames == plot.chr,
+  df_regions <- dm_results.df %>% dplyr::filter(.data$seqnames == plot.chr,
                                                 .data$start >= plot.region.start,
                                                 .data$end <= plot.region.end)
   df_colour <- df_regions %>%
@@ -79,12 +80,12 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
 
   colours <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
 
-  de_res.plot <- df_regions %>%
-    ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$de, colour = .data$meth_status)) +
+  dm_res.plot <- df_regions %>%
+    ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$logFC, colour = .data$meth_status)) +
     ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = .data$Position, y = .data$y_axis_2, fill = .data$meth_status)) +
     ggplot2::geom_segment(ggplot2::aes(xend = .data$start, yend = 0)) +
-    ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$de, yend = 0)) +
-    ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$de, yend = .data$de)) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$logFC, yend = 0)) +
+    ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$logFC, yend = .data$logFC)) +
     ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = 0, yend = 0)) +
     ggplot2::scale_colour_manual(values = colours) +
     ggplot2::scale_fill_manual(values = colours) +
@@ -94,10 +95,7 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
                        expand = c(0, 0), position = "right") +
     ggplot2::theme_classic() +
     ggplot2::theme(
-      axis.line.y = ggplot2::element_blank(),
-      axis.text.y = ggplot2::element_blank(),
       axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
-      axis.ticks.y = ggplot2::element_blank(),
       axis.text.x = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
       axis.ticks.x = ggplot2::element_blank(),
@@ -107,7 +105,7 @@ ggplot_add.de.res.lfc <- function(object, plot, object_name) {
 
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                        de_res.plot,
+                        dm_res.plot,
                         ncol = 1, heights = c(1, plot.height)
   )
 }

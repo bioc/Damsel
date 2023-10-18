@@ -165,11 +165,13 @@ After exploring the data visually, it's time to identify the enriched regions. `
 * ii. tests the model 
 * iii. conducts p value adjustment and summarises model results by setting regions as either (1,0,-1) (log fold change and p value thresholds can be adjusted)
 
+These results are incorporated with the region data, providing a result for every region. The regions excluded from edgeR analysis are given logFC = 0, and adjust.p = 1
+
 Outputted is a data frame with the region position, logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
 
 ```{r}
-de_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-knitr::kable(head(de_results))
+dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+knitr::kable(head(dm_results))
 ```
 
 
@@ -183,13 +185,6 @@ edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 ```
 
 The edgeR results can be plotted alongside the counts as well.
-Before plotting these, the de_results must be added back to the original data frame in order to recover the regions excluded from edgeR analysis. 
-
-* These regions were excluded due to having low counts. To distinguish them, they are given logFC = 0, and adjust.p = 1
-
-```{r}
-knitr::kable(head(add_de(de_results)))
-```
 
 * Instead of plotting lfc and de_results separately, we recommend instead using geom_de.res.lfc
 
@@ -199,7 +194,7 @@ plot_counts_all_bams(counts.df,
                      start_region = 1, 
                      end_region = 40000, 
                      n_col = 1) +
-  geom_de.res.lfc(de_results.df = de_results)
+  geom_dm.res.lfc(dm_results.df = dm_results)
 ```
 
 * Add GATC sites
@@ -218,7 +213,7 @@ plot_counts_all_bams(counts.df,
                      start_region = 1, 
                      end_region = 40000, 
                      n_col = 1) +
-  geom_de.res.lfc(de_results.df = de_results) +
+  geom_dm.res.lfc(dm_results.df = dm_results) +
   geom_gatc(gatc_sites)
 ```
 
@@ -235,7 +230,7 @@ Damsel approaches peaks with a simple approach - aggregating regions of result 1
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
 
 ```{r}
-peaks <- aggregate_peaks(de_results)
+peaks <- aggregate_peaks(dm_results)
 knitr::kable(head(peaks))
 nrow(peaks)
 ```
@@ -249,8 +244,8 @@ plot_counts_all_bams(counts.df,
                      seqnames = "chr2L", 
                      start_region = 1, 
                      end_region = 40000, n_col = 1) +
-  geom_de.res.lfc(de_results.df = de_results) +
-  geom_peak.new(peak.df = peaks) +
+  geom_dm.res.lfc(dm_results) +
+  geom_peak.new(peaks) +
   geom_gatc(gatc_sites)
 ```
 
@@ -294,26 +289,50 @@ WIP
 
 ```{r}
 annotation <- annotate_genes(peaks, genes, regions = regions_gatc_drosophila_dm6, max_distance = 5000)
-knitr::kable(head(annotation))
+knitr::kable(head(annotation$closest))
+knitr::kable(head(annotation$top_five))
+knitr::kable(head(annotation$all))
 ```
 
 
 
-## 5.4 Interpreting results/Plotting?
+## 5.4 Interpreting results/Plotting
 Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. 
 
 ```{r, fig.height=9, fig.width=10}
+library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+
 plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
+                     seqnames = "chr2L",
                      start_region = 1, 
                      end_region = 40000, n_col = 1) +
-  geom_de.res.lfc(de_results.df = de_results) +
-  geom_peak.new(peak.df = peaks) +
+  geom_dm.res.lfc(dm_results) +
+  geom_peak.new(peaks) +
   geom_gatc(gatc_sites) +
-  geom_genes.me(genes)
+  geom_genes.me(genes, txdb)
 ```
 
 * If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
+
+`plot_wrap()` acts as a wrapper to create all the above layers at once, and allows for a region, a peak(s) or a gene(s) to be provided as an input. 
+```{r, fig.height=9, fig.width=10}
+plot_wrap(peak_id = peaks[1,]$peak_id, 
+          counts.df = counts.df, 
+          dm_results.df = dm_results, 
+          peaks.df = peaks, 
+          gatc_sites.df = gatc_sites, 
+          genes.df = genes, txdb = txdb)
+```
+
+```{r, fig.height=9, fig.width=10}
+plot_wrap(gene_id = genes[1,]$ensembl_gene_id, 
+          counts.df = counts.df, 
+          dm_results.df = dm_results, 
+          peaks.df = peaks, 
+          gatc_sites.df = gatc_sites, 
+          genes.df = genes, txdb = txdb)
+```
 
 # 6. Gene ontology - NOT CURRENTLY AVAILABLE
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
@@ -328,7 +347,7 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-#goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
+goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
 ```
 
 ## 6.2 KEGG??? 

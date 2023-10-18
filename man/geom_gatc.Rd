@@ -5,7 +5,7 @@
 \title{Plot for a GATC track}
 \usage{
 geom_gatc(
-  gatc.df = NULL,
+  gatc_sites.df = NULL,
   gatc.color = "red",
   gatc.size = 5,
   plot.space = 0.2,
@@ -13,7 +13,7 @@ geom_gatc(
 )
 }
 \arguments{
-\item{gatc.df}{A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`}
+\item{gatc_sites.df}{A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`}
 
 \item{gatc.color}{Specify colour of lines, default is red}
 
@@ -31,12 +31,10 @@ ggplot_add object.
 * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
-path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
-                          cores = 2)
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
-gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6,
+set.seed(123)
+example_regions <- random_regions()
+counts.df <- random_counts()
+gatc_sites <- dplyr::mutate(example_regions,
                             seqnames = paste0("chr", seqnames),
                             start = start - 3, end = start + 4)
 

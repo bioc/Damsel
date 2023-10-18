@@ -91,7 +91,7 @@ aggregate_peaks_old <- function(dm_results) {
 }
 
 
-#' New: identify peaks from de results
+#' New: identify peaks from dm results
 #'
 #' @description
 #' `aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.
@@ -103,9 +103,9 @@ aggregate_peaks_old <- function(dm_results) {
 #' @export
 #'
 #' @examples
-#' edgeR_results <- random_edgeR_results()
+#' dm_results <- random_edgeR_results()
 #'
-#' aggregate_peaks(edgeR_results)
+#' aggregate_peaks(dm_results)
 aggregate_peaks <- function(dm_results) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
@@ -171,17 +171,17 @@ aggregate_peaks <- function(dm_results) {
                                                   plyranges::as_granges(gaps)) %>%
     data.frame()
   gaps_regions <- gaps_regions %>%
-    dplyr::mutate(is_de = ifelse(.data$meth_status == "Upreg", TRUE, FALSE)) %>%
+    dplyr::mutate(is_dm = ifelse(.data$meth_status == "Upreg", TRUE, FALSE)) %>%
     dplyr::group_by(.data$Pos) %>%
     dplyr::mutate(n_regions = dplyr::n(),
                   ave_logFC = mean(.data$logFC),
                   ave_pVal = mean(.data$adjust.p)) %>%
     dplyr::ungroup() %>%
-    dplyr::group_by(.data$Pos, .data$is_de) %>%
-    dplyr::mutate(n_de = dplyr::n()) %>%
+    dplyr::group_by(.data$Pos, .data$is_dm) %>%
+    dplyr::mutate(n_dm = dplyr::n()) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(n_regions_dm = ifelse(.data$is_de == TRUE, .data$n_de, NA),
-                  n_regions_not_dm = ifelse(.data$is_de == FALSE, .data$n_de, NA)) %>%
+    dplyr::mutate(n_regions_dm = ifelse(.data$is_dm == TRUE, .data$n_dm, NA),
+                  n_regions_not_dm = ifelse(.data$is_dm == FALSE, .data$n_dm, NA)) %>%
     dplyr::group_by(.data$Pos) %>%
     tidyr::fill(n_regions_dm) %>%
     tidyr::fill(n_regions_not_dm, .direction = "downup") %>%
@@ -204,44 +204,6 @@ aggregate_peaks <- function(dm_results) {
   peaks_new <- order_peaks(peaks_new)
   peaks_new
 
-}
-
-
-#' Add de_results to full region df
-#'
-#' Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
-#' Is also required for some plotting fns
-#'
-#' @param de_results as outputted from [edgeR_results()]
-#' @param regions data.frame of regions, default is regions_gatc_drosophila_dm6
-#'
-#' @return full data.frame of regions with added information about the de results;
-#' * de - 1,0,-1,NA ;
-#' * logFC: 0 if de is NA ;
-#' * adjust.p: 1 if de is NA :
-#' * meth_status: Upreg, No_sig, Downreg, Not_included
-#' @export
-add_de <- function(de_results, regions=regions_gatc_drosophila_dm6) {
-  if(!is.data.frame(de_results)) {
-    stop("Must have data frame of differential_testing results from `edgeR_results")
-  }
-  if(!is.data.frame(regions)) {
-    stop("Regions must be a data.frame")
-  }
-  results <- de_results
-  df <- regions %>%
-      dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = 1:nrow(.))
-  df$de <- results[match(df$Position, row.names(results)), "de"]
-  df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
-  df$adjust.p <- results[match(df$Position, row.names(results)), "adjust.p"]
-  df <- df %>%
-      dplyr::mutate(meth_status = dplyr::case_when(is.na(.data$de) ~ "Not_included",
-                                                   .data$de == 1 ~ "Upreg",
-                                                   .data$de == -1 ~ "Downreg",
-                                                   TRUE ~ "No_sig"))
-  df <- df %>%
-      dplyr::mutate(logFC = dplyr::coalesce(.data$logFC, 0), adjust.p = dplyr::coalesce(.data$adjust.p, 1))
-  df
 }
 
 

@@ -3,7 +3,7 @@
 #' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
 #'
-#' @param df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
+#' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
 #' @param keep_a Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
 #' @param keep_b Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
@@ -16,8 +16,8 @@
 #'
 #' edgeR_set_up(counts.df)
 #dmSetUp
-edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
-  if(!is.data.frame(df)) {
+edgeR_set_up <- function(counts.df, lib.size=NULL, keep_a=0.5, keep_b=3) {
+  if(!is.data.frame(counts.df)) {
     stop("Must have data.frame of counts")
   }
   if(!is.numeric(keep_a) | length(keep_a) > 1) {
@@ -27,14 +27,14 @@ edgeR_set_up <- function(df, lib.size=NULL, keep_a=0.5, keep_b=3) {
     stop("keep_b must be 1 value, recommend using default value")
   }
 
-  matrix <- as.matrix(df[,grepl("bam", colnames(df))]) # can I be sure they would have "bam" in it?
-  rownames(matrix) <- df$Position
+  matrix <- as.matrix(counts.df[,grepl("bam", colnames(counts.df))]) # can I be sure they would have "bam" in it?
+  rownames(matrix) <- counts.df$Position
 
   n_samples <- seq(1:(ncol(matrix)/2))
 
   group <- rep(c("Dam", "Fusion"), times = length(n_samples)) #specify that this order is required
 
-  dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = df[,2:5])
+  dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = counts.df[,2:5])
 
   keep <- rowSums(edgeR::cpm(dge) >= keep_a) >= keep_b #potentially will mess with
   dge <- dge[keep, , keep.lib.sizes = FALSE]
@@ -98,11 +98,13 @@ edgeR_plot_mds <- function(dge) {
 #' @export
 #'
 #' @examples
+#' set.seed(123)
+#' example_regions <- random_regions()
 #' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
-#' edgeR_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
-#' head(edgeR_results)
+#' dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1, example_regions)
+#' head(dm_results)
 #dmResults
 #also need to update this fn - adjusted p val
 edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosophila_dm6) {
@@ -121,7 +123,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosoph
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
   lrt_table <- qlf$table
   lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-                                    de = dplyr::case_when(.data$logFC < lfc & .data$adjust.p < p.value ~ -1,
+                                    dm = dplyr::case_when(.data$logFC < lfc & .data$adjust.p < p.value ~ -1,
                                                    abs(.data$logFC) < lfc ~ 0,
                                                    .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0))
   lrt_table <- add_de(lrt_table, regions)
@@ -160,10 +162,47 @@ edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
   qlf <- edgeR::glmQLFTest(fit, coef = 2)
   lrt_table <- qlf$table
   lrt_table <- lrt_table %>% dplyr::mutate(adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-                                           de = dplyr::case_when(.data$logFC < -lfc & .data$adjust.p < p.value ~ -1,
+                                           dm = dplyr::case_when(.data$logFC < -lfc & .data$adjust.p < p.value ~ -1,
                                                                  abs(.data$logFC) < lfc ~ 0,
                                                                  .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0))
-  detags <- rownames(dge)[as.logical(lrt_table$de)]
+  detags <- rownames(dge)[as.logical(lrt_table$dm)]
   edgeR::plotSmear(qlf, de.tags=detags, ylab = "logFC - Fusion/Dam")
 }
 
+
+#' Add dm_results to full region df
+#'
+#' Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
+#' Is also required for some plotting fns
+#'
+#' @param dm_results as outputted from [edgeR_results()]
+#' @param regions data.frame of regions, default is regions_gatc_drosophila_dm6
+#'
+#' @return full data.frame of regions with added information about the de results;
+#' * de - 1,0,-1,NA ;
+#' * logFC: 0 if de is NA ;
+#' * adjust.p: 1 if de is NA :
+#' * meth_status: Upreg, No_sig, Downreg, Not_included
+#' @export
+add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
+  if(!is.data.frame(dm_results)) {
+    stop("Must have data frame of differential testing results from `edgeR_results")
+  }
+  if(!is.data.frame(regions)) {
+    stop("Regions must be a data.frame")
+  }
+  results <- dm_results
+  df <- regions %>%
+    dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = 1:nrow(.))
+  df$dm <- results[match(df$Position, row.names(results)), "dm"]
+  df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
+  df$adjust.p <- results[match(df$Position, row.names(results)), "adjust.p"]
+  df <- df %>%
+    dplyr::mutate(meth_status = dplyr::case_when(is.na(.data$dm) ~ "Not_included",
+                                                 .data$dm == 1 ~ "Upreg",
+                                                 .data$dm == -1 ~ "Downreg",
+                                                 TRUE ~ "No_sig"))
+  df <- df %>%
+    dplyr::mutate(logFC = dplyr::coalesce(.data$logFC, 0), adjust.p = dplyr::coalesce(.data$adjust.p, 1))
+  df
+}

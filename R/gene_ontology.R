@@ -16,22 +16,24 @@
 #'  * Plot of sample data
 #'  * Plot of sample data without bias correction (should be messy)
 #'  @examples
+#'  set.seed(123)
+#'  example_regions <- random_regions()
 #'  peaks <- aggregate_peaks(random_edgeR_results())
 #'  genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
 #'                            version = 109,
-#'                            regions = regions_gatc_drosophila_dm6)
-#'  annotation <- annotate_genes(peaks, genes)$all
+#'                            regions = example_regions)
+#'  annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
-#'  goseq_fn(annotation, genes)
+#'  goseq_fn(annotation, genes, example_regions)
 #geneOntology?
 goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000, bias=NULL) {
-  de_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
+  dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
   goseq_data <- genes
   goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{extend_by}})
   goseq_data <- goseq_data %>%
-    dplyr::mutate(de = ifelse(.data$ensembl_gene_id %in% de_genes$ensembl_gene_id, 1, 0))
+    dplyr::mutate(dm = ifelse(.data$ensembl_gene_id %in% dm_genes$ensembl_gene_id, 1, 0))
 
-  gene.vector <- goseq_data$de
+  gene.vector <- goseq_data$dm
   names(gene.vector) <- goseq_data$ensembl_gene_id
 
   if(is.null(bias)) {

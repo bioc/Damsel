@@ -10,12 +10,12 @@ plot_wrap(
   seqnames = NULL,
   start_region = NULL,
   end_region = NULL,
-  counts = NULL,
-  de_results = NULL,
-  peaks = NULL,
-  genes = NULL,
+  counts.df = NULL,
+  dm_results.df = NULL,
+  peaks.df = NULL,
+  genes.df = NULL,
   txdb = NULL,
-  gatc_sites = NULL,
+  gatc_sites.df = NULL,
   extend_by = 250,
   ...
 )
@@ -31,15 +31,15 @@ plot_wrap(
 
 \item{end_region}{end of region to plot}
 
-\item{counts}{counts.df from [process_bams()]}
+\item{counts.df}{counts.df from [process_bams()]}
 
-\item{de_results}{edgeR results}
+\item{dm_results.df}{edgeR results}
 
-\item{peaks}{peaks data.frame}
+\item{peaks.df}{peaks data.frame}
 
-\item{genes}{genes data.frame [get_biomart_genes()]}
+\item{genes.df}{genes data.frame [get_biomart_genes()]}
 
-\item{gatc_sites}{gatc sites}
+\item{gatc_sites.df}{gatc sites}
 
 \item{extend_by}{extend region, default is 250}
 
