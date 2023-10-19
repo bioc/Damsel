@@ -1,8 +1,6 @@
 ---
 title: "my-vignette"
 output: rmarkdown::html_vignette
-  toc: true
-  toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{my-vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -95,7 +93,7 @@ knitr::kable(head(counts.df))
 * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
 
 ```{r}
-counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
+counts.df <- counts.df[,c(1:6,9,7,10,8)]
 knitr::kable(head(counts.df))
 ```
 
@@ -304,7 +302,7 @@ To respect that some species have genes with more overlap than others, `annotate
 annotation <- annotate_genes(peaks, genes, regions = regions_gatc_drosophila_dm6, max_distance = 5000)
 knitr::kable(head(annotation$closest))
 knitr::kable(head(annotation$top_five))
-knitr::kable(head(annotation$all))
+knitr::kable(str(annotation$all))
 ```
 
 
@@ -362,7 +360,7 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
+#goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
 ```
 
 ## 6.2 KEGG??? 
