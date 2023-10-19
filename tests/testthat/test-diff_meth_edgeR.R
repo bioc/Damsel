@@ -1,7 +1,7 @@
 
 ##edgeR set up
 test_that("edgeR set up: Output is a DGEList", {
-  expect_s4_class(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)]), "DGEList")
+  expect_s4_class(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)]), "DGEList")
 })
 
 test_that("edgeR set up: Output is error", {
@@ -13,12 +13,12 @@ test_that("edgeR set up: Output is error", {
 
 
 test_that("edgeR set up: Output is no error/message", {
-  expect_no_error(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)[,c(1:6,7,10,8,11,9,12)]))
+  expect_no_error(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)[,c(1:6,9,7,10,8)]))
 })
 
 ##MDS plot
 test_that("edgeR mds: Output is an MDS plot", {
-  expect_s4_class(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])), "MDS")
+  expect_s4_class(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])), "MDS")
   expect_s4_class(edgeR_plot_mds(readRDS(test_path("fixtures", "test_dge.rds"))), "MDS")
 })
 
@@ -27,12 +27,12 @@ test_that("edgeR mds: Output is error", {
 })
 
 test_that("edgeR mds: Output is no error", {
-  expect_no_error(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])))
+  expect_no_error(edgeR_plot_mds(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])))
 })
 
 ##EdgeR results
 test_that("edgeR res: Output is a data frame", {
-  expect_s3_class(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])), "data.frame")
+  expect_s3_class(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])), "data.frame")
 })
 
 test_that("edgeR res: Output is error", {
@@ -44,7 +44,7 @@ test_that("edgeR res: Output is error", {
 })
 
 test_that("edgeR res: Output is no error", {
-  expect_no_error(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])))
+  expect_no_error(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])))
 })
 
 ##results plot - fn currently doesn't work - just added contents of results fn for now
@@ -63,5 +63,5 @@ test_that("edgeR res plot: Output is error", {
 })
 
 test_that("edgeR res plot: Output is no error", {
-  expect_no_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,7,10,8,11,9,12)])))
+  expect_no_error(edgeR_results_plot(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])))
 })
