@@ -1,3 +1,7 @@
+# Damsel 0.3.0
+## Bug fixes
+* streamlined outputs
+
 # Damsel 0.2.0
 ## New features
 * New peak output and functionality (combines peaks with small gaps)
