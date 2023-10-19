@@ -54,3 +54,52 @@ A `ggplot` object - or list of plots if provided multiple peaks/genes
 \description{
 `plot_wrap` plots all the available plots at once
 }
+\examples{
+if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+  set.seed(123)
+  example_regions <- random_regions()
+  gatc_sites <- dplyr::mutate(example_regions,
+                              seqnames = paste0("chr", seqnames),
+                              start = start - 3, end = start + 4)
+  counts.df <- random_counts()
+  dm_results <- random_edgeR_results()
+  peaks <- aggregate_peaks(dm_results)
+  genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
+                             version = 109,
+                             regions = example_regions)
+
+  txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+
+## plot using a peak_id
+  plot_wrap(peak_id = peaks[1,]$peak_id,
+            counts.df = counts.df,
+            dm_results.df = dm_results,
+            peaks.df = peaks,
+            gatc_sites.df = gatc_sites,
+            genes.df = genes, txdb = txdb)
+
+## plot using a gene id
+   plot_wrap(gene_id = genes[1,]$ensembl_gene_id,
+            counts.df = counts.df,
+            dm_results.df = dm_results,
+            peaks.df = peaks,
+            gatc_sites.df = gatc_sites,
+            genes.df = genes, txdb = txdb)
+
+## plot providing a region
+   plot_wrap(seqnames = "chr2L", start_region = 1, end_region = 5000,
+            counts.df = counts.df,
+            dm_results.df = dm_results,
+            peaks.df = peaks,
+            gatc_sites.df = gatc_sites,
+            genes.df = genes, txdb = txdb)
+
+## plot multiple peaks or genes by providing a vector of id's
+   plot_wrap(peak_id = peaks[1:2,]$peak_id,
+            counts.df = counts.df,
+            dm_results.df = dm_results,
+            peaks.df = peaks,
+            gatc_sites.df = gatc_sites,
+            genes.df = genes, txdb = txdb)
+}
+}

@@ -19,3 +19,12 @@ The first; "regions" provides the GATC regions used in downstream analysis. The 
 \description{
 `gatc_region_fn` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.
 }
+\examples{
+if (require("BSgenome.Dmelanogaster.UCSC.dm6")) {
+  gatc <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
+
+  head(gatc$regions)
+
+  head(gatc$sites)
+}
+}

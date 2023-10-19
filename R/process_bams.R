@@ -20,7 +20,7 @@
 #'                           cores=2)
 #' head(counts.df)
 #' # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
-#' head(counts.df[,c(1:6,7,10,8,11,9,12)])
+#' head(counts.df[,c(1:6,9,7,10,8)])
 #' @export
 #rename to processBams
 process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, cores=2) {
