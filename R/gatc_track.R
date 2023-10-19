@@ -11,10 +11,18 @@
 #' The first; "regions" provides the GATC regions used in downstream analysis. The second, "sites", provides the positions of the GATC sites, and is used in plotting the results.
 #' @export
 #' @examples
+#' if (require("BSgenome.Dmelanogaster.UCSC.dm6")) {
+#'   gatc <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
 #'
+#'   head(gatc$regions)
 #'
+#'   head(gatc$sites)
+#' }
 gatc_region_fn <- function(BSgenome_object=NULL, path_to_fasta=NULL) {
   if(!is.null(BSgenome_object)) {
+    if(!(class(BSgenome_object) %in% "BSgenome")) {
+      stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
+    }
     fasta <- BSgenome_object
     names_fasta <- GenomeInfoDb::seqnames(BSgenome_object)
     length_names <- stringr::str_detect(names_fasta, "M")
