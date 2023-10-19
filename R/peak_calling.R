@@ -99,7 +99,7 @@ aggregate_peaks_old <- function(dm_results) {
 #' The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 #'
 #' @param dm_results A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`
-#' @return A data.frame of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
+#' @return A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 #' @export
 #'
 #' @examples

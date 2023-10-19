@@ -19,7 +19,7 @@ goseq_fn(
 
 \item{regions}{A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`}
 
-\item{extend_by}{Extend the start and end of the gene by a given number. We recommend leaving to the default of 2000 bp.
+\item{extend_by}{A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 * This is done to incorporate the acceptable distance of a peak to a gene.
 * This also allows for consistency across significant and non-significant genes}
 

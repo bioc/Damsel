@@ -1,6 +1,8 @@
 ---
 title: "my-vignette"
 output: rmarkdown::html_vignette
+  toc: true
+  toc_depth: 2
 vignette: >
   %\VignetteIndexEntry{my-vignette}
   %\VignetteEngine{knitr::rmarkdown}
@@ -28,6 +30,11 @@ Designed for use with DamID data, the Damsel methodology could be modified for u
 
 Utilising the power of edgeR for differential analysis and goseq for gene ontology bias correction, Damsel provides a unique end to end analysis for DamID.
 
+# Installation
+```{r eval=FALSE}
+BiocManager::install("Damsel")
+library(Damsel)
+```
 
 
 # 2. Processing the BAM files
@@ -41,10 +48,17 @@ The GATC region file for Drosophila melanogaster v6 is available to you.
 knitr::kable(head(regions_gatc_drosophila_dm6))
 ```
 
+It can also be generated with `gatc_region_fn()` using a `BSGenome` object or a FASTA file.
+
+
 It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
 
-If you have another species of DamID data or would prefer to make your own region file, you can use the following fn:
+If you have another species of DamID data or would prefer to make your own region file, you can use the following function, providing a BSgenome object or a FASTA file.
 
+```{r}
+library(BSgenome.Dmelanogaster.UCSC.dm6)
+knitr::kable(head(gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6)$regions))
+```
 If you already have your own GATC region file, ensure that it has the same format as `regions_gatc_drosophila_dm6` with 6 columns: 
 
 * Position: chromosome-start
@@ -85,7 +99,7 @@ counts.df <- counts.df[,c(1:6,7,10,8,11,9,12)]
 knitr::kable(head(counts.df))
 ```
 
-* Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the dataframe.
+* Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the data frame.
 
 * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
 
@@ -126,7 +140,7 @@ For ease of use, Damsel has four main edgeR based functions which compile differ
 
 ## 3.1 Setting up edgeR analysis
 
-`edgeR_set_up` sets up the edgeR analysis for differential methylation testing. Taking the dataframe of samples and regions as input, it conducts the following steps:
+`edgeR_set_up` sets up the edgeR analysis for differential methylation testing. Taking the data frame of samples and regions as input, it conducts the following steps:
 
 * it extracts the sample data
 * groups the samples (Dam or Fusion)
@@ -167,7 +181,6 @@ After exploring the data visually, it's time to identify the enriched regions. `
 
 These results are incorporated with the region data, providing a result for every region. The regions excluded from edgeR analysis are given logFC = 0, and adjust.p = 1
 
-Outputted is a data frame with the region position, logFC (log fold change), logCPM (log counts per million), F (F statistic used to identify significance), PValue, adjustedP (tbd), dm (result: -1,0,1)
 
 ```{r}
 dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
@@ -186,8 +199,6 @@ edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 
 The edgeR results can be plotted alongside the counts as well.
 
-* Instead of plotting lfc and de_results separately, we recommend instead using geom_de.res.lfc
-
 ```{r, fig.height=8, fig.width=10}
 plot_counts_all_bams(counts.df, 
                      seqnames = "chr2L", 
@@ -196,6 +207,8 @@ plot_counts_all_bams(counts.df,
                      n_col = 1) +
   geom_dm.res.lfc(dm_results.df = dm_results)
 ```
+
+Only regions that are fully contained within the provided boundaries will be plotted.
 
 * Add GATC sites
 
@@ -213,7 +226,7 @@ plot_counts_all_bams(counts.df,
                      start_region = 1, 
                      end_region = 40000, 
                      n_col = 1) +
-  geom_dm.res.lfc(dm_results.df = dm_results) +
+  geom_dm.res.lfc(dm_results) +
   geom_gatc(gatc_sites)
 ```
 
@@ -225,7 +238,9 @@ As you could see from the plot of the differential methylation results, there ar
 
 ## Aggregating the regions
 
-Damsel approaches peaks with a simple approach - aggregating regions of result 1 together into peaks. Once this has been done, peaks or regions of 1s that have gaps of less than 150 bp are compiled together, and a note is made of the gap. Peaks are ranked by their mean p value - with regions that were excluded from edgeR analysis for being too small given a p value of 1.
+Damsel identifies peaks by aggregating regions of enrichment. As DamID sequencing generally sequences the 75 bp from the GATC site, regions smaller than 150 bp are mostly non-significant in statistical testing. Because of this, gaps between peaks of less than or equal to 150 bp are combined into one longer peak.
+
+Peaks are ranked by their mean p value - with regions that were excluded from edgeR analysis for being too small given a p value of 1.
 
 Given that we know that Dam can methylate up to 5kb away, and most significantly within 1 kb, then peaks less than 2kb are considered "tightly bound",  2 kb < peaks < 10kb "bound", and peaks > 10kb "unexpected".
 
@@ -257,9 +272,9 @@ The peak information itself - while interesting, has no biological meaning. As t
 
 Note: any gene identified here is only a potential target that must be validated in laboratory procedures. There is no method available that is able to accurately predict the location and target genes of enhancers, so a key and potentially incorrect assumption in this part of the analysis is that all peaks represent binding to a local enhancer or promoter - that it is close or overlapping to the target gene.
 
-It must also be noted that the Drosophila melanogaster genome and transcription factor interactions are different to that of mammals and using the same assumptions is problematic but it's the best we have. While mammalian genes are generally spread out with little overlap, there is a large amount of overlap between Drosophila genes, requiring some intuitive interpretation of which gene the peak is potentially targeting.
+It must also be noted that the Drosophila melanogaster genome and transcription factor interactions are different to that of mammals and using the same assumptions means results must be taken cautiously. While mammalian genes are generally spread out with little overlap, there is a large amount of overlap between Drosophila genes, requiring some intuitive interpretation of which gene the peak is potentially targeting.
 
-In the Damsel methodology, peaks are considered to associate with genes if they overlap the gene body or are within 2.5kb upstream of the genes transcription start site. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
+In the Damsel methodology, peaks are considered to associate with genes if they are within 5kb upstream or downstream. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
 
 ## 5.1 Extract genes from Ensembl using biomaRt
 
@@ -279,13 +294,11 @@ knitr::kable(head(genes))
 ```
 
 
-## 5.2 Examine distribution of genes and GATC regions
-This can be visualised with ...
-WIP
+## 5.2 Annotating genes to peaks
 
+As stated above, Damsel associates genes with peaks if they are within 5 kb upstream or downstream. This maximum distance is an adjustable parameter within the `annotate_genes()` function. If set to `NULL` it will output all possible combinations as defined by `plyranges::pair_nearest`. The nature of this function means that the closest gene will be found for every peak, even if that distance is in the millions. If the user sets `max_distance=NULL`, we recommend undergoing some filtering to remove those associations.
 
-## 5.3 Annotating genes to peaks
-
+To respect that some species have genes with more overlap than others, `annotate_genes` outputs a list of data frames. The first, closest, outputs information for every peak and it's closest gene. The second data frame, top_five, outputs a string of the top five genes (if available) and their distances from each peak. The final data frame, all, provides the raw results and all possible gene and peak associations, as well as all available statistical results.
 
 ```{r}
 annotation <- annotate_genes(peaks, genes, regions = regions_gatc_drosophila_dm6, max_distance = 5000)
@@ -297,7 +310,8 @@ knitr::kable(head(annotation$all))
 
 
 ## 5.4 Interpreting results/Plotting
-Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. 
+
+Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. This plot requires the gene positions as a guide for a `Txdb` or `EnsDb` object, building off the autoplot generic built by `ggbio`.
 
 ```{r, fig.height=9, fig.width=10}
 library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
@@ -334,7 +348,8 @@ plot_wrap(gene_id = genes[1,]$ensembl_gene_id,
           genes.df = genes, txdb = txdb)
 ```
 
-# 6. Gene ontology - NOT CURRENTLY AVAILABLE
+
+# 6. Gene ontology 
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package.
 
 ## 6.1 GO analysis with goseq
@@ -354,4 +369,10 @@ goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2
 
 
 # 7. Motif analysis?? - NOT CURRENTLY AVAILABLE
+
+
+# Appendix
+```{r}
+sessionInfo()
+```
 

@@ -165,17 +165,18 @@ gene_annotate_organised <- function(annotated_peaks) {
 #' New: annotation of peaks and genes
 #'
 #' @description
-#' `annotate_genes` identifies the closest gene(s) for the peaks outputted from `aggregate_peaks()`. This distance is relative, as the function will identify the closest genes, even if they are up to a million bp away. The max_distance parameter limits this, with a default setting of 5000 bp. All of the possible pairings are visible with `max_distance=NULL`
+#' `annotate_genes` identifies the closest gene(s) for the peaks outputted from `aggregate_peaks()`.
 #'
-#' The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc)
+#' This distance is relative, as the function will identify the closest genes, even if they are up to a million bp away. The max_distance parameter limits this, with a default setting of 5000 bp. All of the possible pairings are visible with `max_distance=NULL`.
+#' The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc).
 #'
 #' @param peaks A data.frame of peaks as outputted from [aggregate_peaks()]
 #' @param genes A data.frame of genes as outputted from [get_biomart_genes()]
 #' @param regions A data.frame of GATC regions. If not specified, default is [regions_gatc_drosophila_dm6]
-#' @param max_distance The limit for minimum distance from peak to gene.
+#' @param max_distance A number providing the limit for the minimum distance from peak to gene.
 #' * Default is 5000. If set to `NULL`, will output all available combinations.
 #'
-#' @return list of 3 data.frames:
+#' @return A `list` of 3 `data.frames`:
 #' * closest - every peak with it's closest gene
 #' * top_5 - every peak with list of 5 closest genes
 #' * all - all genes matching to each peak and all information

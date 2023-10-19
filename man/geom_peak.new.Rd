@@ -13,18 +13,18 @@ geom_peak.new(
 )
 }
 \arguments{
-\item{peak.color}{Specify colour of peak, default is black}
+\item{peaks.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
 
-\item{peak.size}{Specify size of rectangle, default is 5}
+\item{peak.color}{Specify colour of peak. Default is black}
 
-\item{plot.space}{Specify gap to next plot, default is 0.1}
+\item{peak.size}{Specify size of rectangle. Default is 5}
 
-\item{plot.height}{Specify overall height of plot, default is 0.05}
+\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1}
 
-\item{peak.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
+\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.05}
 }
 \value{
-ggplot_add object
+A `ggplot_add` object.
 }
 \description{
 `geom_peak.new` is a ggplot layer that visualises the positions of peaks across a given region.

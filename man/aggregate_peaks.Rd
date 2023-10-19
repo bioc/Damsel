@@ -10,7 +10,7 @@ aggregate_peaks(dm_results)
 \item{dm_results}{A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`}
 }
 \value{
-A data.frame of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
+A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 }
 \description{
 `aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.

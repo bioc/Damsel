@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_region_counts.R
 \name{plot_counts_all_bams}
 \alias{plot_counts_all_bams}
-\title{Plot for just counts for all samples across a given region}
+\title{Plot for counts for all samples across a given region}
 \usage{
 plot_counts_all_bams(
   counts.df,
@@ -15,16 +15,16 @@ plot_counts_all_bams(
 \arguments{
 \item{counts.df}{A data.frame of counts as outputted from [process_bams()]}
 
-\item{seqnames}{chromosome of interest}
+\item{seqnames}{A character string of the chromosome of interest}
 
-\item{start_region}{start of region to plot}
+\item{start_region}{A number providing the start of region to plot}
 
-\item{end_region}{end of region to plot}
+\item{end_region}{A number providing the end of region to plot}
 
-\item{n_col}{n_columns to facet the graph by - default is 3}
+\item{n_col}{The number of columns to facet the graph by. Default is 3}
 }
 \value{
-ggplot object
+A `ggplot` object.
 }
 \description{
 `plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.

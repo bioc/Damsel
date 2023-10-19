@@ -7,10 +7,10 @@
 edgeR_plot_mds(dge)
 }
 \arguments{
-\item{dge}{as outputted from [edgeR_set_up()]}
+\item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 }
 \value{
-refer to [edgeR::plotMDS()] for details
+An object of class `MDS`. Refer to [edgeR::plotMDS()] for details
 }
 \description{
 `edgeR_plot_mds` visualises the difference between samples.

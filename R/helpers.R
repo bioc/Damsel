@@ -55,8 +55,8 @@ random_edgeR_results <- function(size=50) {
   dm_options <- c(0, 1, NA, -1)
   peak <- rep(1, each = 4)
   zero <- rep(0, each = 2)
-  pairs <- rep(de_options, each = 2)
-  threes <- rep(de_options, each = 3)
+  pairs <- rep(dm_options, each = 2)
+  threes <- rep(dm_options, each = 3)
   all <- c(dm_options, dm_options, dm_options, dm_options, peak, pairs, peak, zero, threes, peak)
   results$dm <- all
   results$logFC <- dplyr::case_when(results$dm == 1 ~ runif(1, 1, 5),

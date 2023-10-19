@@ -9,16 +9,18 @@ geom_dm.res.lfc(dm_results.df, plot.space = 0.1, plot.height = 0.1)
 \arguments{
 \item{dm_results.df}{A data.frame of differential testing results as outputted from `edgeR_results()`}
 
-\item{plot.space}{Specify gap to next plot, default is 0.1}
+\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1}
 
-\item{plot.height}{Specify overall height of plot, default is 0.1}
+\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.1}
 }
 \value{
-ggplot_add object
+A `ggplot_add` object.
 }
 \description{
-`geom_dm.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
-* regions are coloured by de result: 1, 0, -1, NA (grey for NA)
+`geom_dm.res.lfc` is a ggplot layer that visualises the dm_results and logFC across a given region.
+}
+\details{
+* regions are coloured by dm result: 1, 0, -1, NA (grey for NA)
 * cannot be plotted by itself, must be added to an existing plot - see examples.
 }
 \examples{

@@ -1,15 +1,15 @@
 #' Plotting dm results with lfc
 #'
-#' `geom_dm.res.lfc` is a ggplot layer that visualises the de_results and logFC across a given region.
-#' * regions are coloured by de result: 1, 0, -1, NA (grey for NA)
+#' `geom_dm.res.lfc` is a ggplot layer that visualises the dm_results and logFC across a given region.
+#'
+#' * regions are coloured by dm result: 1, 0, -1, NA (grey for NA)
 #' * cannot be plotted by itself, must be added to an existing plot - see examples.
 #'
-#'
 #' @param dm_results.df A data.frame of differential testing results as outputted from `edgeR_results()`
-#' @param plot.space Specify gap to next plot, default is 0.1
-#' @param plot.height Specify overall height of plot, default is 0.1
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1
+#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.1
 #'
-#' @return ggplot_add object
+#' @return A `ggplot_add` object.
 #' @export
 #'
 #' @examples

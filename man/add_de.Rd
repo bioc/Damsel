@@ -2,23 +2,22 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{add_de}
 \alias{add_de}
-\title{Add dm_results to full region df}
+\title{Add dm_results to GATC regions}
 \usage{
 add_de(dm_results, regions = regions_gatc_drosophila_dm6)
 }
 \arguments{
-\item{dm_results}{as outputted from [edgeR_results()]}
+\item{dm_results}{A data.frame as outputted from [edgeR_results()]}
 
-\item{regions}{data.frame of regions, default is regions_gatc_drosophila_dm6}
+\item{regions}{A data.frame of GATC regions, default is regions_gatc_drosophila_dm6}
 }
 \value{
-full data.frame of regions with added information about the de results;
-* de - 1,0,-1,NA ;
-* logFC: 0 if de is NA ;
-* adjust.p: 1 if de is NA :
+A `data.frame` of regions with added information about the dm results;
+* dm - 1,0,-1,NA ;
+* logFC: 0 if dm is NA ;
+* adjust.p: 1 if dm is NA :
 * meth_status: Upreg, No_sig, Downreg, Not_included
 }
 \description{
 Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
-Is also required for some plotting fns
 }

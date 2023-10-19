@@ -7,14 +7,14 @@
 edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
 }
 \arguments{
-\item{dge}{DGEList object as outputted from [edgeR_set_up()]}
+\item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 
-\item{p.value}{The p value threshold for minimum significance. Default is 0.05}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05}
 
-\item{lfc}{The minimum log fold change for significant results. Default is 1}
+\item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
 }
 \value{
-An MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
+An object of class `MA` style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 }
 \description{
 `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.

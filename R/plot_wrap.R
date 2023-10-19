@@ -2,21 +2,22 @@
 #'
 #' `plot_wrap` plots all the available plots at once
 #'
-#' @param peak_id peak identifier if wish to plot in peak centric manner
-#' @param gene_id ensembl gene id if want to plot in gene centric manner
-#' @param seqnames chromosome
-#' @param start_region start of region to plot
-#' @param end_region end of region to plot
-#' @param counts.df counts.df from [process_bams()]
-#' @param dm_results.df edgeR results
-#' @param peaks.df peaks data.frame
-#' @param genes.df genes data.frame [get_biomart_genes()]
-#' @param gatc_sites.df gatc sites
-#' @param extend_by extend region, default is 250
+#' @param peak_id A character vector of a peak identifier(s) if wish to plot in peak centric manner. Default is NULL.
+#' @param gene_id A character vector of ensembl gene id(s) if want to plot in gene centric manner. Default is NULL.
+#' @param seqnames A chromosome. Default is NULL.
+#' @param start_region A number providing the start of region to plot. Default is NULL.
+#' @param end_region A number providing the end of region to plot. Default is NULL.
+#' @param counts.df A data.frame of counts as from [process_bams()]. Default is NULL.
+#' @param dm_results.df A data.frame of dm results as from [edgeR_results()]. Default is NULL.
+#' @param peaks.df A data.frame of peaks as from [aggregate_peaks()]. Default is NULL.
+#' @param genes.df A data.frame of genes as from [get_biomart_genes()]. Default is NULL.
+#' @param txdb A TxDb object as from a TxDb package. Default is NULL.
+#' @param gatc_sites.df A data.frame of gatc sites as from [gatc_track()$sites]. Default is NULL.
+#' @param extend_by extend region. Default is 250
 #' @param ... arguments passed to geom_genes.me. Allows for adjusting of the plot appearance via gene_limits and plot.height if necessary.
 #' * Default for gene_limits is NULL. If the gene is disproportionately large for the plot space, we recommend reducing the size with gene_limits = c(0,2)
 #'
-#' @return ggplot object - or list of plots if provided multiple peaks/genes
+#' @return A `ggplot` object - or list of plots if provided multiple peaks/genes
 #' @export
 #'
 #' @examples

@@ -14,14 +14,14 @@ edgeR_results(
 \arguments{
 \item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 
-\item{p.value}{The p value threshold for minimum significance. Default is 0.05}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05}
 
-\item{lfc}{The minimum log fold change for significant results. Default is 1}
+\item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
 
 \item{regions}{A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`}
 }
 \value{
-A data.frame of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), de (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
+A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
 }
 \description{
 `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.

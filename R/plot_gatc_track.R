@@ -4,12 +4,12 @@
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`
-#' @param gatc.color Specify colour of lines, default is red
-#' @param gatc.size Specify size of the line, default is 5
-#' @param plot.space Specify gap to next plot, default is 0.2
-#' @param plot.height Specify overall height of the plot, default is 0.05
+#' @param gatc.color Specify colour of lines. Default is red
+#' @param gatc.size Specify size of the line. Default is 5
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.2
+#' @param plot.height Specify overall height of the plot. Recommend leaving to the default: 0.05
 #'
-#' @return ggplot_add object.
+#' @return A `ggplot_add` object.
 #' @export
 #'
 #' @examples

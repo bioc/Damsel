@@ -4,13 +4,13 @@
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #'
-#' @param peak.df A data.frame of peaks as outputted from `aggregate_peaks()`
-#' @param peak.color Specify colour of peak, default is black
-#' @param peak.size Specify size of rectangle, default is 5
-#' @param plot.space Specify gap to next plot, default is 0.1
-#' @param plot.height Specify overall height of plot, default is 0.05
+#' @param peaks.df A data.frame of peaks as outputted from `aggregate_peaks()`
+#' @param peak.color Specify colour of peak. Default is black
+#' @param peak.size Specify size of rectangle. Default is 5
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1
+#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.05
 #'
-#' @return ggplot_add object
+#' @return A `ggplot_add` object.
 #' @export
 #'
 #' @examples

@@ -16,7 +16,7 @@ process_bams(path_to_bams, regions = regions_gatc_drosophila_dm6, cores = 2)
 * The number of available cores can be checked using [parallel::detectCores()]}
 }
 \value{
-A data.frame containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
+A `data.frame` containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
 * The ".bam" extension is retained in the sample name as an identifier for the sample columns
 * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
 * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.

@@ -16,7 +16,7 @@ edgeR_set_up(counts.df, lib.size = NULL, keep_a = 0.5, keep_b = 3)
 \item{keep_b}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
 }
 \value{
-Refer to [edgeR::?`DGEListClass`] for details
+An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 }
 \description{
 `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].

@@ -2,13 +2,12 @@
 #'
 #' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
-#'
 #' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
 #' @param keep_a Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
 #' @param keep_b Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
 #'
-#' @return Refer to [edgeR::?`DGEListClass`] for details
+#' @return An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 #' @export
 #'
 #' @examples
@@ -64,9 +63,9 @@ edgeR_set_up <- function(counts.df, lib.size=NULL, keep_a=0.5, keep_b=3) {
 #' `edgeR_plot_mds` visualises the difference between samples.
 #' * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
 #'
-#' @param dge as outputted from [edgeR_set_up()]
+#' @param dge A DGEList object as outputted from [edgeR_set_up()]
 #'
-#' @return refer to [edgeR::plotMDS()] for details
+#' @return An object of class `MDS`. Refer to [edgeR::plotMDS()] for details
 #' @export
 #'
 #' @examples
@@ -90,11 +89,11 @@ edgeR_plot_mds <- function(dge) {
 #' * [edgeR::decideTestsDGE()]
 #'
 #' @param dge A DGEList object as outputted from [edgeR_set_up()]
-#' @param p.value The p value threshold for minimum significance. Default is 0.05
-#' @param lfc The minimum log fold change for significant results. Default is 1
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05
+#' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
 #' @param regions A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`
 #'
-#' @return A data.frame of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), de (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
+#' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
 #' @export
 #'
 #' @examples
@@ -136,11 +135,11 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosoph
 #' `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 #' * for further details, see [edgeR::plotSmear()]
 #'
-#' @param dge DGEList object as outputted from [edgeR_set_up()]
-#' @param p.value The p value threshold for minimum significance. Default is 0.05
-#' @param lfc The minimum log fold change for significant results. Default is 1
+#' @param dge A DGEList object as outputted from [edgeR_set_up()]
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05
+#' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
 #'
-#' @return An MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
+#' @return An object of class `MA` style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 #' @export
 #'
 #' @examples
@@ -170,18 +169,17 @@ edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
 }
 
 
-#' Add dm_results to full region df
+#' Add dm_results to GATC regions
 #'
 #' Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
-#' Is also required for some plotting fns
 #'
-#' @param dm_results as outputted from [edgeR_results()]
-#' @param regions data.frame of regions, default is regions_gatc_drosophila_dm6
+#' @param dm_results A data.frame as outputted from [edgeR_results()]
+#' @param regions A data.frame of GATC regions, default is regions_gatc_drosophila_dm6
 #'
-#' @return full data.frame of regions with added information about the de results;
-#' * de - 1,0,-1,NA ;
-#' * logFC: 0 if de is NA ;
-#' * adjust.p: 1 if de is NA :
+#' @return A `data.frame` of regions with added information about the dm results;
+#' * dm - 1,0,-1,NA ;
+#' * logFC: 0 if dm is NA ;
+#' * adjust.p: 1 if dm is NA :
 #' * meth_status: Upreg, No_sig, Downreg, Not_included
 #' @export
 add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {

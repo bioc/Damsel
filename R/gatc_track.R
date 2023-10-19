@@ -4,11 +4,11 @@
 #' `gatc_region_fn` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.
 #'
 #' @param BSgenome_object A BSgenome package.
-#' @param path_to_fasta An ensembl
+#' @param path_to_fasta A character string inputer vector identifying the location of the FASTA file.
 #'
-#' @return A list object composed of two data.frames
-#' * GATC regions for use in analysis
-#' * GATC sites, can be used in plotting of results
+#' @return A `list` object composed of two `data.frames`.
+#'
+#' The first; "regions" provides the GATC regions used in downstream analysis. The second, "sites", provides the positions of the GATC sites, and is used in plotting the results.
 #' @export
 #' @examples
 #'

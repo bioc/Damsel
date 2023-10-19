@@ -5,7 +5,7 @@
 #' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`
 #' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`
 #' @param regions A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`
-#' @param extend_by Extend the start and end of the gene by a given number. We recommend leaving to the default of 2000 bp.
+#' @param extend_by A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 #' * This is done to incorporate the acceptable distance of a peak to a gene.
 #' * This also allows for consistency across significant and non-significant genes
 #' @param bias alternatively, the bias can be input by itself.

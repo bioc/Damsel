@@ -1,15 +1,15 @@
-#' Plot for just counts for all samples across a given region
+#' Plot for counts for all samples across a given region
 #'
 #' `plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.
 #' * this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 #'
 #' @param counts.df A data.frame of counts as outputted from [process_bams()]
-#' @param seqnames chromosome of interest
-#' @param start_region start of region to plot
-#' @param end_region end of region to plot
-#' @param n_col n_columns to facet the graph by - default is 3
+#' @param seqnames A character string of the chromosome of interest
+#' @param start_region A number providing the start of region to plot
+#' @param end_region A number providing the end of region to plot
+#' @param n_col The number of columns to facet the graph by. Default is 3
 #'
-#' @return ggplot object
+#' @return A `ggplot` object.
 #' @export
 #'
 #' @examples
