@@ -62,106 +62,6 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 }
 
 
-#' OLD: Annotating peaks to their closest gene
-#'
-#' `gene_annotate` takes both the peaks and genes as input and returns the paired results.
-#' * The output of this function is a very large data frame with some confusing columns, the following function will help simplify the results.
-#'
-#' @param peaks data.frame of peaks as outputted from [aggregate_peaks]
-#' @param genes data frame of gene information as outputted from [get_biomart_genes]
-#'
-#' @return data.frame of annotated peaks and genes.
-#' Contains all columns of output of get_biomart_genes (with gene added as a prefix to seqnames, start, end, width, strand),
-#' and all columns of output from aggregate_peaks.
-#' Contains additional columns providing the: peak midpoint, distance from the midpoint to the start of the gene, etc
-#' @export
-gene_annotate <- function(peaks, genes) {
-  if(!is.data.frame(peaks)) {
-    stop("Require data.frame of peaks as outputted from `aggregate_peaks")
-  }
-  if(!is.data.frame(genes)) {
-    stop("Requires data.frame of genes as outputted from `get_biomart_genes")
-  }
-  annotated <- plyranges::pair_nearest(plyranges::as_granges(genes), plyranges::as_granges(peaks)) %>%
-      data.frame() %>%
-      dplyr::mutate(peak_midpoint = (granges.y.start + granges.y.end)/2,
-                    distance_to_start = granges.x.start - peak_midpoint,
-                    words = ifelse(distance_to_start >= 0, "Upstream", "Downstream"),
-                    combo = paste0(ensembl_gene_id, "-", number))
-  overlaps_only <- plyranges::pair_overlaps(plyranges::as_granges(genes), plyranges::as_granges(peaks)) %>%
-      data.frame() %>%
-      dplyr::mutate(combo = paste0(ensembl_gene_id, "-", number))
-  annotated <- annotated %>%
-      dplyr::mutate(location = ifelse(combo %in% overlaps_only$combo, "Overlap", "NA"),
-                    distance = dplyr::case_when(location == "NA" & words == "Upstream" ~ granges.x.start - granges.y.end,
-                                         location == "NA" & words == "Downstream" ~ granges.y.start - granges.x.end,
-                                         TRUE ~ 0))
-  annotated <- annotated %>%
-      dplyr::filter(distance <= 5000) %>%
-      dplyr::group_by(number) %>%
-      dplyr::mutate(peaks = dplyr::n(),
-                    min_distance = ifelse(peaks == 1, distance_to_start, min(abs(distance_to_start))))
-  annotated
-}
-
-
-#' OLD: Tabular display of peak statistical information and their closest genes
-#'
-#' `gene_annotate_organised` simplifies the output from `gene_annotate` to a clean format.
-#'
-#' @param annotated_peaks data.frame of annotated peaks [gene_annotate()]
-#'
-#' @return organised data frame of results with statistical information about each peak, alongside a list of the closest genes.
-#' * contains information about the peak and gene location (for the closest gene), and provides a list of other nearby genes and their distance to the peak.
-#' @export
-gene_annotate_organised <- function(annotated_peaks) {
-  if(!is.data.frame(annotated_peaks)) {
-    stop("Requires data.frame of annotated peaks as outputted from `gene_annotate")
-  }
-  gene_peak <- annotated_peaks
-  gene_peak <- gene_peak %>%
-      dplyr::group_by(consec_dm) %>%
-      dplyr::mutate(is_fbgn = stringr::str_detect(ensembl_gene_id, "FBgn"),
-             n_genes = dplyr::n(),
-             is_0 = ifelse(distance == 0, TRUE, FALSE),
-             min_distance = ifelse(abs(min_distance) == abs(distance_to_start), abs(min_distance), 0)) %>%
-      dplyr::mutate(has_min = ifelse(min_distance > 0, TRUE, FALSE)) %>%
-      dplyr::ungroup() %>%
-      dplyr::group_by(consec_dm, is_fbgn) %>%
-      dplyr::mutate(n_coding = dplyr::n()) %>%
-      dplyr::ungroup() %>%
-      dplyr::mutate(ratio = n_coding/n_genes) %>%
-      dplyr::group_by(consec_dm, is_0) %>%
-      dplyr::mutate(n_0 = dplyr::n()) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(is_fbgn == TRUE | ratio == 1 | has_min == 1) %>%
-      dplyr::mutate(closest = ifelse(has_min == TRUE, gene_name, NA))
-  closest <- gene_peak %>%
-      dplyr::filter(!is.na(closest)) %>%
-      dplyr::distinct(consec_dm, closest) %>%
-      dplyr::group_by(consec_dm) %>%
-      dplyr::mutate(number = 1:dplyr::n()) %>%
-      dplyr::filter(number == 1) %>%
-      dplyr::ungroup() %>%
-      data.frame()
-  others <- gene_peak %>%
-      dplyr::group_by(consec_dm, closest) %>%
-      dplyr::mutate(num = 1:dplyr::n(), check = ifelse(closest == "Yes" & num == 1, 1, 0)) %>%
-      dplyr::filter(check != 1) %>%
-      dplyr::ungroup() %>%
-      dplyr::group_by(consec_dm) %>%
-      dplyr::summarise(list_gene = toString(gene_name),
-                       list_gene_id = toString(ensembl_gene_id),
-                       distance = toString(distance)) %>%
-      dplyr::ungroup() %>%
-      data.frame()
-
-  closest$list_gene <-  others[match(closest$consec_dm, others$consec_dm), "list_gene"]
-  closest$list_gene_id <- others[match(closest$consec_dm, others$consec_dm), "list_gene_id"]
-  closest$distance <- others[match(closest$consec_dm, others$consec_dm), "distance"]
-  closest
-}
-
 #' New: annotation of peaks and genes
 #'
 #' @description
@@ -359,15 +259,5 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
 }
 
 
-
-
-extend_upstream <- function(granges, upstream=0) {
-  on_plus <- strand(granges) == "+"
-  new_start <- start(granges) - ifelse(on_plus, upstream, 0)
-  new_end <- end(granges) + ifelse(on_plus, 0, upstream)
-  start(granges) <- new_start
-  end(granges) <- new_end
-  granges
-}
 
 

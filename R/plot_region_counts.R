@@ -77,15 +77,7 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
 }
 
 
-#' GGplot addable counts graph for all samples
-#'
-#' @param region.df df of counts
-#' @param n_col n of columns to facet by
-#' @param region.color colour
-#' @param plot.space gap to next plot
-#' @param plot.height height of plot
-#'
-#' @return plot
+
 geom_regions.counts <- function(region.df = NULL, n_col = 1, region.color = "black",
                                 plot.space = 0.1, plot.height = 1) {
   structure(list(
@@ -122,7 +114,7 @@ ggplot_add.regions.counts <- function(object, plot, object_name) {
 
   df <- region.df
   colnames(df) <- chartr("-", "_", colnames(df))
-  df <- df %>% dplyr::filter(seqnames == plot.chr, start >= plot.region.start, end <= plot.region.end)
+  df <- df %>% dplyr::filter(.data$seqnames == plot.chr, .data$start >= plot.region.start, .data$end <= plot.region.end)
   df <- df %>% dplyr::mutate(number = 1:dplyr::n()) %>%
     .[rep(seq_len(nrow(.)), times = 4),] %>%
     .[order(.$number),] %>%

@@ -14,24 +14,7 @@ Ideogram_wrap <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cyto
 }
 
 
-#' Plot ideogram
-#'
-#' @param obj as [ggbio::Ideogram()]
-#' @param subchr chromosome to use
-#' @param which granges
-#' @param xlabel position
-#' @param cytobands TRUE/FALSE
-#' @param color highlight colour
-#' @param fill highlight fill colour
-#' @param alpha transparency of highlight
-#' @param zoom.region default is NULL
-#' @param zoom.offset see ggbio
-#' @param size ooh is this what I want to adjust?
-#' @param aspect.ratio how big it looks
-#' @param ... other args passed on
-#' @param genome if don't have an object give a genome name
-#'
-#' @return plot
+
 hack_Ideogram <- function(obj, subchr = NULL, which = NULL, xlabel = FALSE, cytobands = TRUE,
                           color = "red", fill = "red", alpha = 0.7,
                           zoom.region = NULL,
