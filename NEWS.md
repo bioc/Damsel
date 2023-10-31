@@ -1,6 +1,7 @@
 # Damsel 0.3.0
 ## Bug fixes
 * streamlined outputs
+* removed obselete functions
 
 # Damsel 0.2.0
 ## New features
