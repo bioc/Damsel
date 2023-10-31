@@ -7,6 +7,7 @@
 #' The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 #'
 #' @param dm_results A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`
+#' @param gap_size The maximum gap length to include in a peak that separates two significantly enriched regions (peaks). Default is 150, based on an average sequencing of 75bp.
 #' @return A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 #' @export
 #'
@@ -14,7 +15,7 @@
 #' dm_results <- random_edgeR_results()
 #'
 #' aggregate_peaks(dm_results)
-aggregate_peaks <- function(dm_results) {
+aggregate_peaks <- function(dm_results, gap_size=150) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
@@ -59,7 +60,7 @@ aggregate_peaks <- function(dm_results) {
     dplyr::mutate(number = 1:nrow(.)) %>%
     data.frame()
 
-  gaps <- gaps_fn_new(peaks)
+  gaps <- gaps_fn_new(peaks, gap_size)
   if(nrow(gaps) == 0) {
     peaks_new <- peaks %>%
       data.frame() %>%
@@ -116,7 +117,7 @@ aggregate_peaks <- function(dm_results) {
 
 
 
-gaps_fn_new <- function(df) {
+gaps_fn_new <- function(df, gap_size=150) {
   gaps_work <- rbind(c(1, 1, 1, 1)) %>%
     data.frame() %>%
     stats::setNames(c("seqnames", "id", "start", "end")) %>%
@@ -149,7 +150,7 @@ gaps_fn_new <- function(df) {
   number <- c(1:nrow(gaps))
   j <- i
   for(i in number) {
-    if(gaps[i,]$gap <= 150 && gaps[i,]$width < 10000) {
+    if(gaps[i,]$gap <= gap_size && gaps[i,]$width < 10000) {
       start <- gaps[i,]$start
       id <- gaps[i,]$peak_id
       for(j in (i+1):nrow(gaps)) {
