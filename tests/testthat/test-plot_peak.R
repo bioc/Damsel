@@ -25,4 +25,6 @@ test_that("geom_peak: Output is no error", {
     geom_peak.new(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"))[,c(1:6,9,7,10,8)])))))
   expect_no_error(plot_counts_all_bams(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
                     geom_peak.new(readRDS(test_path("fixtures", "test_peaks.rds"))))
+  expect_no_error(plot_counts_all_bams(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 1, end_region = 10000, n_col = 1) +
+                    geom_peak.new(readRDS(test_path("fixtures", "test_peaks.rds")), peak.label = TRUE))
 })

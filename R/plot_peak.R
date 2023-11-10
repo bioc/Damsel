@@ -5,6 +5,7 @@
 #'
 #'
 #' @param peaks.df A data.frame of peaks as outputted from `aggregate_peaks()`
+#' @param peak.label Specify whether peak_id labels should be added to the plot. Default is FALSE
 #' @param peak.color Specify colour of peak. Default is black
 #' @param peak.size Specify size of rectangle. Default is 5
 #' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1
@@ -24,11 +25,18 @@
 #'                      end_region = 40000,
 #'                      n_col = 1) +
 #'   geom_peak.new(peaks)
+#'
+#' plot_counts_all_bams(counts.df,
+#'                      seqnames = "chr2L",
+#'                      start_region = 1,
+#'                      end_region = 40000,
+#'                      n_col = 1) +
+#'    geom_peak.new(peaks, peak.label = TRUE)
 #' # The plots can be layered -------------------------------------------------
-geom_peak.new <- function(peaks.df = NULL, peak.color = "black", peak.size = 5,
+geom_peak.new <- function(peaks.df = NULL, peak.label = FALSE, peak.color = "black", peak.size = 5,
                           plot.space = 0.1, plot.height = 0.05) {
   structure(list(
-    peaks.df = peaks.df, peak.color = peak.color, peak.size = peak.size,
+    peaks.df = peaks.df, peak.label = peak.label, peak.color = peak.color, peak.size = peak.size,
     plot.space = plot.space, plot.height = plot.height
   ),
   class = "peak.new"
@@ -56,13 +64,14 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
 
   # get parameters
   peaks.df <- object$peaks.df
+  peak.label <- object$peak.label
   peak.color <- object$peak.color
   peak.size <- object$peak.size
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
   bed.info <- peaks.df
-  bed.info <- bed.info[,c("seqnames", "start", "end")]
+  bed.info <- bed.info[,c("seqnames", "start", "end", "peak_id")]
 
   # convert to 1-based
   bed.info$start <- as.numeric(bed.info$start) + 1
@@ -75,24 +84,31 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
       ggplot2::geom_blank() +
       ggplot2::labs(y = "Peak") +
       theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
-    patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+    return(patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                           peak.plot,
-                          ncol = 1, heights = c(1, plot.height))
+                          ncol = 1, heights = c(1, plot.height)))
   }
 
-  peak.plot <- ggplot2::ggplot() +
-    ggplot2::geom_segment(
-      data = valid.bed,
-      mapping = ggplot2::aes(
-        x = .data$start,
-        y = 1,
-        xend = .data$end,
-        yend = 1
-      ),
-      linewidth = peak.size,
-      color = peak.color
-    ) +
-    ggplot2::labs(y = "Peak")
+  if(peak.label == FALSE) {
+    peak.plot <- ggplot2::ggplot() +
+      ggplot2::geom_segment(
+        data = valid.bed,
+        mapping = ggplot2::aes(x = .data$start, y = 1,
+                               xend = .data$end, yend = 1),
+        linewidth = peak.size,
+        color = peak.color
+      ) +
+      ggplot2::labs(y = "Peak")
+  } else {
+    peak.plot <- valid.bed %>%
+      ggplot2::ggplot(ggplot2::aes(x = .data$start, y = 1)) +
+      ggplot2::geom_segment(mapping = ggplot2::aes(x = .data$start, y = 1,
+                                          xend = .data$end, yend = 1),
+                            size = peak.size, color = peak.color) +
+      ggplot2::geom_label(ggplot2::aes(x = (.data$start + .data$end)/2,
+                                       label = .data$peak_id), colour = "black", size = 3, vjust = "bottom", nudge_y = 0.02) +
+      ggplot2::labs(y = "Peak")
+  }
 
   # add theme
   peak.plot <- peak.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))

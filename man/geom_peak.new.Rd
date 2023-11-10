@@ -6,6 +6,7 @@
 \usage{
 geom_peak.new(
   peaks.df = NULL,
+  peak.label = FALSE,
   peak.color = "black",
   peak.size = 5,
   plot.space = 0.1,
@@ -14,6 +15,8 @@ geom_peak.new(
 }
 \arguments{
 \item{peaks.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
+
+\item{peak.label}{Specify whether peak_id labels should be added to the plot. Default is FALSE}
 
 \item{peak.color}{Specify colour of peak. Default is black}
 
@@ -41,5 +44,12 @@ plot_counts_all_bams(counts.df,
                      end_region = 40000,
                      n_col = 1) +
   geom_peak.new(peaks)
+
+plot_counts_all_bams(counts.df,
+                     seqnames = "chr2L",
+                     start_region = 1,
+                     end_region = 40000,
+                     n_col = 1) +
+   geom_peak.new(peaks, peak.label = TRUE)
 # The plots can be layered -------------------------------------------------
 }
