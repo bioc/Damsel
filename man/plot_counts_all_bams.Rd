@@ -9,7 +9,8 @@ plot_counts_all_bams(
   seqnames,
   start_region = NULL,
   end_region = NULL,
-  n_col = 3
+  n_col = 1,
+  layout = c("stacked", "spread")
 )
 }
 \arguments{
@@ -21,7 +22,9 @@ plot_counts_all_bams(
 
 \item{end_region}{A number providing the end of region to plot}
 
-\item{n_col}{The number of columns to facet the graph by. Default is 3}
+\item{n_col}{The number of columns to facet the graph by. Default is 1}
+
+\item{layout}{Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".}
 }
 \value{
 A `ggplot` object.
@@ -37,7 +40,14 @@ plot_counts_all_bams(counts.df,
                      seqnames = "chr2L",
                      start_region = 1,
                      end_region = 40000,
-                     n_col = 3)
+                     n_col = 1,
+                     layout = "stacked")
+plot_counts_all_bams(counts.df,
+                     seqnames = "chr2L",
+                     start_region = 1,
+                     end_region = 40000,
+                     n_col = 1,
+                     layout = "spread")
 # Can use this plot to layer other plots -----------------------------
 dm_results <- random_edgeR_results()
 plot_counts_all_bams(counts.df,

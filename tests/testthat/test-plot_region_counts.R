@@ -19,4 +19,5 @@ test_that("plot counts all bams: output is error", {
 test_that("plot counts all bams: output is no error", {
   expect_no_error(plot_counts_all_bams(process_bams(system.file("extdata", package = "Damsel")), seqnames = "chr2L", start_region = 1, end_region = 10000))
   expect_no_error(plot_counts_all_bams(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 1, end_region = 10000))
+  expect_no_error(plot_counts_all_bams(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 1, end_region = 10000, layout = "spread"))
 })
