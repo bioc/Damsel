@@ -1,3 +1,8 @@
+# Damsel 0.3.1
+## New features
+* Plotting options - counts layout and peak_id text
+* New default for differential testing: p-value set to 0.01
+
 # Damsel 0.3.0
 ## Bug fixes
 * streamlined outputs
