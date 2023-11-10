@@ -4,10 +4,12 @@
 \alias{aggregate_peaks}
 \title{New: identify peaks from dm results}
 \usage{
-aggregate_peaks(dm_results)
+aggregate_peaks(dm_results, gap_size = 150)
 }
 \arguments{
 \item{dm_results}{A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`}
+
+\item{gap_size}{The maximum gap length to include in a peak that separates two significantly enriched regions (peaks). Default is 150, based on an average sequencing of 75bp.}
 }
 \value{
 A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
