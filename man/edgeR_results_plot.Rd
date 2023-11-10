@@ -4,12 +4,12 @@
 \alias{edgeR_results_plot}
 \title{Plot differential testing results}
 \usage{
-edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
+edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 }
 \arguments{
 \item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 
-\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01}
 
 \item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
 }
@@ -24,5 +24,5 @@ An object of class `MA` style scatter plot with average logCPM on x-axis, averag
 counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
-edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
+edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 }

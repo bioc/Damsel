@@ -89,7 +89,7 @@ edgeR_plot_mds <- function(dge) {
 #' * [edgeR::decideTestsDGE()]
 #'
 #' @param dge A DGEList object as outputted from [edgeR_set_up()]
-#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
 #' @param regions A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`
 #'
@@ -102,11 +102,11 @@ edgeR_plot_mds <- function(dge) {
 #' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
-#' dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1, example_regions)
+#' dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, example_regions)
 #' head(dm_results)
 #dmResults
 #also need to update this fn - adjusted p val
-edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosophila_dm6) {
+edgeR_results <- function(dge, p.value=0.01, lfc=1, regions=regions_gatc_drosophila_dm6) {
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }
@@ -136,7 +136,7 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosoph
 #' * for further details, see [edgeR::plotSmear()]
 #'
 #' @param dge A DGEList object as outputted from [edgeR_set_up()]
-#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
 #'
 #' @return An object of class `MA` style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
@@ -146,9 +146,9 @@ edgeR_results <- function(dge, p.value=0.05, lfc=1, regions=regions_gatc_drosoph
 #' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
-#' edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
+#' edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 #dmPlotResults
-edgeR_results_plot <- function(dge, p.value=0.05, lfc=1) {
+edgeR_results_plot <- function(dge, p.value=0.01, lfc=1) {
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }
