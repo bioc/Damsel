@@ -10,7 +10,8 @@ plot_counts_all_bams(
   start_region = NULL,
   end_region = NULL,
   n_col = 1,
-  layout = c("stacked", "spread")
+  layout = c("stacked", "spread"),
+  log2_scale = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ plot_counts_all_bams(
 \item{n_col}{The number of columns to facet the graph by. Default is 1}
 
 \item{layout}{Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".}
+
+\item{log2_scale}{Determines whether or not to display the counts on a log2 scale. Default is TRUE.}
 }
 \value{
 A `ggplot` object.

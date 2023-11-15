@@ -9,6 +9,7 @@
 #' @param end_region A number providing the end of region to plot
 #' @param n_col The number of columns to facet the graph by. Default is 1
 #' @param layout Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".
+#' @param log2_scale Determines whether or not to display the counts on a log2 scale. Default is TRUE.
 #'
 #' @return A `ggplot` object.
 #' @export
@@ -36,7 +37,7 @@
 #'                      end_region = 40000,
 #'                      n_col = 1) +
 #'   geom_dm.res.lfc(dm_results)
-plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, n_col = 1, layout = c("stacked", "spread")) {
+plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, n_col = 1, layout = c("stacked", "spread"), log2_scale = TRUE) {
   if(!is.data.frame(counts.df)) {
     stop("data.frame of counts is required")
   }
@@ -75,6 +76,9 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
   df <- df %>% tidyr::gather(key = "bam",
                              value = "raw_counts",
                              colnames(.[, grepl(".bam", names(.))]))
+  if(log2_scale == TRUE) {
+    df$raw_counts <- log2(df$raw_counts)
+  }
   if(length(layout) > 1) {
     layout <- "stacked"
   }
@@ -92,7 +96,8 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
       ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
       ggplot2::facet_wrap(~ .data$dam, ncol = n_col) +
       ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region),
-                    fill = "Replicate")
+                    fill = "Replicate") +
+      ggplot2::theme_classic()
   } else if(layout == "spread") {
     plot <- df %>%
       ggplot2::ggplot() +
@@ -100,7 +105,13 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
       ggplot2::scale_x_continuous(expand = c(0,0)) +
       ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
       ggplot2::facet_wrap(~ bam, ncol = n_col) +
-      ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region))
+      ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region)) +
+      ggplot2::theme_classic()
+  }
+
+  if(log2_scale == TRUE) {
+    plot <- plot +
+      ggplot2::labs(y = "Log2_counts")
   }
   plot
 }
