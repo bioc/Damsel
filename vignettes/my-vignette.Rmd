@@ -30,7 +30,8 @@ Utilising the power of edgeR for differential analysis and goseq for gene ontolo
 
 # Installation
 ```{r eval=FALSE}
-BiocManager::install("Damsel")
+devtools::install_github("Oshlack/Damsel", 
+                         auth_token = "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")
 library(Damsel)
 ```
 
@@ -125,10 +126,40 @@ plot_counts_all_bams(counts.df,
                      seqnames = "chr2L", 
                      start_region = 1, 
                      end_region = 40000, 
-                     n_col = 3)
+                     n_col = 1,
+                     layout = "stacked")
 ```
 
 
+```{r coverage2, fig.height=7, fig.width=10}
+plot_counts_all_bams(counts.df, 
+                     seqnames = "chr2L", 
+                     start_region = 1, 
+                     end_region = 40000, 
+                     n_col = 1,
+                     layout = "stacked",
+                     log2_scale = FALSE)
+```
+
+```{r coverage3, fig.height=7, fig.width=10}
+plot_counts_all_bams(counts.df, 
+                     seqnames = "chr2L", 
+                     start_region = 1, 
+                     end_region = 40000, 
+                     n_col = 1,
+                     layout = "spread")
+```
+
+
+```{r coverage4, fig.height=7, fig.width=10}
+plot_counts_all_bams(counts.df, 
+                     seqnames = "chr2L", 
+                     start_region = 1, 
+                     end_region = 40000, 
+                     n_col = 1,
+                     layout = "spread",
+                     log2_scale = FALSE)
+```
 
 # 3. Differential methylation analysis
 
@@ -181,7 +212,7 @@ These results are incorporated with the region data, providing a result for ever
 
 
 ```{r}
-dm_results <- edgeR_results(dge, p.value = 0.05, lfc = 1)
+dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1)
 knitr::kable(head(dm_results))
 ```
 
@@ -192,7 +223,7 @@ The results from the above differential methylation analysis can be visualised i
 MA style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 
 ```{r ma, fig.height=6, fig.width=8}
-edgeR_results_plot(dge, p.value = 0.05, lfc = 1)
+edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 ```
 
 The edgeR results can be plotted alongside the counts as well.
@@ -262,7 +293,15 @@ plot_counts_all_bams(counts.df,
   geom_gatc(gatc_sites)
 ```
 
-
+```{r, fig.height=8, fig.width=10}
+plot_counts_all_bams(counts.df, 
+                     seqnames = "chr2L", 
+                     start_region = 1, 
+                     end_region = 40000, n_col = 1) +
+  geom_dm.res.lfc(dm_results) +
+  geom_peak.new(peaks, peak.label = TRUE) +
+  geom_gatc(gatc_sites)
+```
 
 # 5. Identifying genes associated with peaks
 
