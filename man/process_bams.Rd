@@ -4,16 +4,23 @@
 \alias{process_bams}
 \title{Obtain region counts for BAM files}
 \usage{
-process_bams(path_to_bams, regions = regions_gatc_drosophila_dm6, cores = 2)
+process_bams(
+  path_to_bams,
+  regions = regions_gatc_drosophila_dm6,
+  nthreads = 2,
+  ...
+)
 }
 \arguments{
 \item{path_to_bams}{A character string input vector. This must identify the directory containing the BAM files.}
 
 \item{regions}{A data.frame of GATC regions. If not specified, will use default data file `regions_gatc_drosophila_dm6`. The GATC regions can be made with `gatc_track()`.}
 
-\item{cores}{The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
+\item{nthreads}{The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
 * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
 * The number of available cores can be checked using [parallel::detectCores()]}
+
+\item{...}{Other arguments passed onto `Rsubread::featureCounts()`}
 }
 \value{
 A `data.frame` containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
@@ -28,7 +35,7 @@ A `data.frame` containing the GATC region information in the form in the columns
 path_to_bams <- system.file("extdata", package = "Damsel")
 counts.df <- process_bams(path_to_bams,
                           regions = regions_gatc_drosophila_dm6,
-                          cores=2)
+                          nthreads=2)
 head(counts.df)
 # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
 head(counts.df[,c(1:6,9,7,10,8)])
