@@ -63,10 +63,11 @@ random_edgeR_results <- function(size=50) {
                                     results$dm == 0 ~ runif(1, -1.5, 1.5),
                                     results$dm == -1 ~ runif(1, -7, -1),
                                     TRUE ~ 0)
-  results$adjust.p <- dplyr::case_when(results$dm == 1 ~ runif(1, 5.58e-07, 0.05),
+  results$PValue <- dplyr::case_when(results$dm == 1 ~ runif(1, 5.58e-07, 0.05),
                                        results$dm == 0 ~ runif(1, 9.4e-02, 1),
                                        results$dm == -1 ~ runif(1, 2.93e-06, 0.05),
                                        TRUE ~ 1)
+  results$adjust.p <- stats::p.adjust(results$PValue, method = "BH")
   results$meth_status <- dplyr::case_when(results$dm == 1 ~ "Upreg",
                                           results$dm == 0 ~ "No_signal",
                                           results$dm == -1 ~ "Downreg",
