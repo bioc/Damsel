@@ -3,8 +3,7 @@
 #'
 #' `gatc_region_fn` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.
 #'
-#' @param BSgenome_object A BSgenome package.
-#' @param path_to_fasta A character string inputer vector identifying the location of the FASTA file.
+#' @param object A BSgenome package OR the path to a FASTA file.
 #'
 #' @return A `list` object composed of two `data.frames`.
 #'
@@ -18,16 +17,19 @@
 #'
 #'   head(gatc$sites)
 #' }
-gatc_region_fn <- function(BSgenome_object=NULL, path_to_fasta=NULL) {
-  if(!is.null(BSgenome_object)) {
-    if(!(class(BSgenome_object) %in% "BSgenome")) {
-      stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
-    }
-    fasta <- BSgenome_object
-    names_fasta <- GenomeInfoDb::seqnames(BSgenome_object)
+gatc_region_fn <- function(object) {
+  if(missing(object)) {
+    stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
+  }
+  if(!class(object) %in% c("BSgenome", "character")) {
+    stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
+  }
+  if(class(object) %in% "BSgenome") {
+    fasta <- object
+    names_fasta <- GenomeInfoDb::seqnames(object)
     length_names <- stringr::str_detect(names_fasta, "M")
-  } else {
-    fasta <- Biostrings::readDNAStringSet(path_to_fasta)
+  } else if(class(object) %in% "character") {
+    fasta <- Biostrings::readDNAStringSet(object)
     names_fasta <- names(fasta)
     length_names <- stringr::str_detect(names_fasta, "mito")
   }

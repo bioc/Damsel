@@ -4,12 +4,10 @@
 \alias{gatc_region_fn}
 \title{Extract GATC regions}
 \usage{
-gatc_region_fn(BSgenome_object = NULL, path_to_fasta = NULL)
+gatc_region_fn(object)
 }
 \arguments{
-\item{BSgenome_object}{A BSgenome package.}
-
-\item{path_to_fasta}{A character string inputer vector identifying the location of the FASTA file.}
+\item{object}{A BSgenome package OR the path to a FASTA file.}
 }
 \value{
 A `list` object composed of two `data.frames`.
