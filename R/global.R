@@ -8,6 +8,7 @@
   utils::globalVariables("n_regions_dm")
   utils::globalVariables("n_regions_not_dm")
   utils::globalVariables("dm_options")
+  utils::globalVariables("logFC_match")
 
   invisible()
 }
