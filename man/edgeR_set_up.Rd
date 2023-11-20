@@ -4,10 +4,18 @@
 \alias{edgeR_set_up}
 \title{Create DGE object for differential testing}
 \usage{
-edgeR_set_up(counts.df, lib.size = NULL, keep_a = 0.5, keep_b = 3)
+edgeR_set_up(
+  counts.df,
+  max.width = 10000,
+  lib.size = NULL,
+  keep_a = 0.5,
+  keep_b = 3
+)
 }
 \arguments{
 \item{counts.df}{A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)}
+
+\item{max.width}{Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.}
 
 \item{lib.size}{Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified}
 
