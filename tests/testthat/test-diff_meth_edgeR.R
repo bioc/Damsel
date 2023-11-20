@@ -13,7 +13,7 @@ test_that("edgeR set up: Output is error", {
 
 
 test_that("edgeR set up: Output is no error/message", {
-  expect_no_error(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6, cores = 2)[,c(1:6,9,7,10,8)]))
+  expect_no_error(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = regions_gatc_drosophila_dm6)[,c(1:6,9,7,10,8)]))
 })
 
 ##MDS plot

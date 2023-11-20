@@ -3,6 +3,7 @@
 #' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
 #' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
+#' @param max.width Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
 #' @param keep_a Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
 #' @param keep_b Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
@@ -15,7 +16,7 @@
 #'
 #' edgeR_set_up(counts.df)
 #dmSetUp
-edgeR_set_up <- function(counts.df, lib.size=NULL, keep_a=0.5, keep_b=3) {
+edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, keep_a=0.5, keep_b=3) {
   if(!is.data.frame(counts.df)) {
     stop("Must have data.frame of counts")
   }
@@ -26,6 +27,7 @@ edgeR_set_up <- function(counts.df, lib.size=NULL, keep_a=0.5, keep_b=3) {
     stop("keep_b must be 1 value, recommend using default value")
   }
 
+  counts.df <- counts.df %>% filter(width <= max.width)
   matrix <- as.matrix(counts.df[,grepl("bam", colnames(counts.df))]) # can I be sure they would have "bam" in it?
   rownames(matrix) <- counts.df$Position
 
@@ -194,6 +196,7 @@ add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
     dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = 1:nrow(.))
   df$dm <- results[match(df$Position, row.names(results)), "dm"]
   df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
+  df$PValue <- results[match(df$Position, row.names(results)), "PValue"]
   df$adjust.p <- results[match(df$Position, row.names(results)), "adjust.p"]
   df <- df %>%
     dplyr::mutate(meth_status = dplyr::case_when(is.na(.data$dm) ~ "Not_included",
@@ -201,6 +204,8 @@ add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
                                                  .data$dm == -1 ~ "Downreg",
                                                  TRUE ~ "No_sig"))
   df <- df %>%
-    dplyr::mutate(logFC = dplyr::coalesce(.data$logFC, 0), adjust.p = dplyr::coalesce(.data$adjust.p, 1))
+    dplyr::mutate(logFC = dplyr::coalesce(.data$logFC, 0),
+                  PValue = dplyr::coalesce(.data$PValue, 1),
+                  adjust.p = dplyr::coalesce(.data$adjust.p, 1))
   df
 }
