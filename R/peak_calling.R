@@ -4,11 +4,12 @@
 #' @description
 #' `aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.
 #'
-#' The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
+#' Peaks are ranked using the theory behind `csaw::getBestTest()`. For each peak, the region with the lowest adjusted p-value is used as the FDR for the peak, and the corresponding logFC is used as the logFC. Using the logFC in this way is useful, as the average logFC may skew the actual data.
+#' Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 #'
 #' @param dm_results A data.frame of differential testing results for each GATC region as outputted from `edgeR_results()`
 #' @param gap_size The maximum gap length to include in a peak that separates two significantly enriched regions (peaks). Default is 150, based on an average sequencing of 75bp.
-#' @return A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
+#' @return A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, logFC_match, FDR, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 #' @export
 #'
 #' @examples
@@ -40,15 +41,16 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
 
   peaks <- df_3 %>%
     dplyr::group_by(.data$peak_id) %>%
-    dplyr::mutate(ave_logFC = mean(.data$logFC),
-                  ave_pVal = mean(.data$adjust.p)) %>%
+    dplyr::mutate(FDR = min(.data$adjust.p),
+                  logFC_match = ifelse(.data$adjust.p == .data$FDR, .data$logFC, NA)) %>%
+    tidyr::fill(logFC_match, .direction = "downup") %>%
     dplyr::ungroup() %>%
     dplyr::distinct(.data$seqnames, .data$dm_start, .data$dm_end,
-                    .data$meth_status, .data$peak_id, .data$n_regions_dm, .data$ave_logFC, .data$ave_pVal) %>%
+                    .data$meth_status, .data$peak_id, .data$n_regions_dm, .data$logFC_match, .data$FDR) %>%
     dplyr::filter(!is.na(.data$peak_id),
-                  .data$n_regions_dm != 2,
+                  #.data$n_regions_dm != 2,
                   .data$meth_status == "Upreg") %>%
-    .[order(.$ave_pVal),] %>%
+    .[order(.$FDR),] %>%
     dplyr::mutate(rank_p = 1:dplyr::n()) %>%
     .[order(.$peak_id),] %>%
     stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:9]))) %>%
@@ -83,8 +85,9 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
     dplyr::mutate(is_dm = ifelse(.data$meth_status == "Upreg", TRUE, FALSE)) %>%
     dplyr::group_by(.data$Pos) %>%
     dplyr::mutate(n_regions = dplyr::n(),
-                  ave_logFC = mean(.data$logFC),
-                  ave_pVal = mean(.data$adjust.p)) %>%
+                  FDR = min(.data$adjust.p),
+                  logFC_match = ifelse(.data$adjust.p == .data$FDR, .data$logFC, NA)) %>%
+    tidyr::fill(logFC_match, .direction = "downup") %>%
     dplyr::ungroup() %>%
     dplyr::group_by(.data$Pos, .data$is_dm) %>%
     dplyr::mutate(n_dm = dplyr::n()) %>%
@@ -97,8 +100,8 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
     dplyr::ungroup() %>%
     data.frame()
 
-  gaps$ave_logFC <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "ave_logFC"]
-  gaps$ave_pVal <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "ave_pVal"]
+  gaps$logFC_match <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "logFC_match"]
+  gaps$FDR <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "FDR"]
   gaps$n_regions <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "n_regions"]
   gaps$n_regions_dm <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "n_regions_dm"]
   gaps$n_regions_not_dm <- gaps_regions[match(gaps$Pos, gaps_regions$Pos), "n_regions_not_dm"]
@@ -207,10 +210,9 @@ peak_helper <- function(df_a, multiple, meth_status) {
 
 order_peaks <- function(peaks) {
   peaks_new <- peaks %>%
-    .[order(.$ave_pVal),] %>%
+    .[order(.$FDR),] %>%
     dplyr::mutate(rank_p = 1:nrow(.)) %>%
     .[,c(6,1:5,12,7:11)] %>%
-    .[order(.$peak_id),] %>%
     dplyr::mutate(peak_id = ifelse(is.na(.data$multiple_peaks), paste0("PS_", .data$peak_id), paste0("PM_", .data$peak_id)))
   row.names(peaks_new) <- NULL
   peaks_new

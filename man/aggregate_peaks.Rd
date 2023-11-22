@@ -12,12 +12,13 @@ aggregate_peaks(dm_results, gap_size = 150)
 \item{gap_size}{The maximum gap length to include in a peak that separates two significantly enriched regions (peaks). Default is 150, based on an average sequencing of 75bp.}
 }
 \value{
-A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, ave_logFC, ave-pVal, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
+A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, logFC_match, FDR, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 }
 \description{
 `aggregate_peaks()` aggregates upregulated regions as outputted from `edgeR_results()`. These peaks represent the region that the transcription factor of interest bound in.
 
-The average logFC and adjusted p-value is calculated for each peak, and peaks are ranked by their new p-value. Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
+Peaks are ranked using the theory behind `csaw::getBestTest()`. For each peak, the region with the lowest adjusted p-value is used as the FDR for the peak, and the corresponding logFC is used as the logFC. Using the logFC in this way is useful, as the average logFC may skew the actual data.
+Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 }
 \examples{
 dm_results <- random_edgeR_results()
