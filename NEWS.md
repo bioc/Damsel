@@ -1,6 +1,14 @@
+# Damsel 0.4.0
+## New features
+* process_bams() new count method using `Rsubread::featureCounts()` allowing for fractional counts and differentiating between single and paired end BAM files
+* edgeR_set_up() filter out large regions (> 10kb)
+* aggregate_peaks() new method for ranking peaks based on theory of `csaw::getBestTest()`
+* aggregate_peaks() retain small peaks so that they are able to be combined with the gaps fn
+* gatc_track() simplified for one argument input - identifies if input is BSgenome or FASTA
+
 # Damsel 0.3.1
 ## New features
-* Plotting options - counts layout and peak_id text
+* Plotting options - counts layout and log2 scale, and peak_id text
 * New default for differential testing: p-value set to 0.01
 
 # Damsel 0.3.0

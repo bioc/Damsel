@@ -1,8 +1,8 @@
 Package: Damsel
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.3.1
-Author: Who wrote it
+Title: Damsel: an end to end analysis of DamID
+Version: 0.4.0
+Author: Caitlin Page
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
@@ -25,7 +25,6 @@ Imports:
     Biostrings,
     dplyr,
     edgeR,
-    exomeCopy,
     GenomeInfoDb,
     ggbio,
     ggplot2,
@@ -34,13 +33,12 @@ Imports:
     graphics,
     limma,
     magrittr,
-    parallel,
     patchwork,
     plyranges,
     reshape2,
     rlang,
     Rsamtools,
-    S4Vectors,
+    Rsubread,
     stats,
     stringr,
     tidyr,
