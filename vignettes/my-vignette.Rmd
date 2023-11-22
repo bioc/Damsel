@@ -50,7 +50,7 @@ knitr::kable(head(regions_gatc_drosophila_dm6))
 It can also be generated with `gatc_region_fn()` using a `BSGenome` object or a FASTA file.
 
 
-It is a dataframe with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
+It is a `data.frame` with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
 
 If you have another species of DamID data or would prefer to make your own region file, you can use the following function, providing a BSgenome object or a FASTA file.
 
@@ -200,7 +200,7 @@ edgeR_plot_mds(dge)
 
 ## 3.3 Identifying differentially methylated regions
 
-After exploring the data visually, it's time to identify the enriched regions. `edgeR_results` compiles the edgeR functions for differential testing with one key modification - it outputs the results with the adjusted p values instead of the raw p values.
+After exploring the data visually, it's time to identify the enriched regions. `edgeR_results` compiles the edgeR functions for differential testing with one key modification - it outputs the results with the adjusted p values as well as the raw p values.
 
 `edgeR_results` conducts the following key steps:
 
