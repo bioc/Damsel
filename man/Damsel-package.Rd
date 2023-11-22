@@ -4,7 +4,7 @@
 \name{Damsel-package}
 \alias{Damsel}
 \alias{Damsel-package}
-\title{Damsel: What the Package Does (Title Case)}
+\title{Damsel: Damsel: an end to end analysis of DamID}
 \description{
 More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
 }
