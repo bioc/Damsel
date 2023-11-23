@@ -113,6 +113,7 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
 
   peaks_new <- rbind(peaks_no_gap, gaps) %>%
     data.frame()
+  peaks_new <- dplyr::filter(peaks_new, n_regions_dm != 2)
   peaks_new <- order_peaks(peaks_new)
   peaks_new
 
