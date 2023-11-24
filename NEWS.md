@@ -6,6 +6,9 @@
 * aggregate_peaks() retain small peaks so that they are able to be combined with the gaps fn
 * gatc_track() simplified for one argument input - identifies if input is BSgenome or FASTA
 
+## Bug fixes
+* geom_genes can now handle a region of only introns - previously threw an error
+
 # Damsel 0.3.1
 ## New features
 * Plotting options - counts layout and log2 scale, and peak_id text

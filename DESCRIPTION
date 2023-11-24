@@ -26,6 +26,7 @@ Imports:
     dplyr,
     edgeR,
     GenomeInfoDb,
+    GenomicFeatures,
     ggbio,
     ggplot2,
     GO.db,

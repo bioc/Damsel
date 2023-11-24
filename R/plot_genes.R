@@ -64,6 +64,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
 
   # get parameters
   df <- object$genes.df
+  df_og <- object$genes.df
   txdb <- object$txdb
   gene_limits <- object$gene_limits
   plot.space <- object$plot.space
@@ -71,40 +72,54 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
 
   #df <- df %>% filter(seqnames == plot.chr, start >= plot.region.start,  end <= plot.region.end)
   df <- GetRegion_hack(chr = plot.chr, df = df, start = plot.region.start, end = plot.region.end)
+
   if(nrow(df) == 0) {
     message("No gene data available for this region")
     gene_plot <- ggplot2::ggplot() +
       ggplot2::geom_blank() +
-      ggplot2::labs(y = "Gene") +
-      ggplot2::scale_x_continuous(expand = c(0,0)) +
-      ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
-      ggplot2::scale_y_continuous(limits = gene_limits,
-                                  position = "right") +
-      ggplot2::theme_classic() +
-      ggplot2::theme(
-        axis.line.y = ggplot2::element_blank(),
-        axis.text.y = ggplot2::element_blank(),
-        axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
-        axis.ticks.y = ggplot2::element_blank(),
-        axis.text.x = ggplot2::element_blank(),
-        axis.title.x = ggplot2::element_blank(),
-        axis.ticks.x = ggplot2::element_blank(),
-        panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
-        plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
-      )
+      theme_gene_plot(plot.start=plot.region.start, plot.end=plot.region.end, gene_lim=gene_limits)
     return(patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                           gene_plot,
                           ncol = 1, heights = c(1, 0.2)))
   }
+
   df <- df[,c(1:3,5:ncol(df))]
+  df_og <- df_og %>%
+    dplyr::filter(ensembl_gene_id %in% df$ensembl_gene_id)
+
+  #check for exons
+  exons <- GenomicFeatures::exons(txdb) %>%
+    data.frame() %>%
+    dplyr::filter(seqnames == plot.chr, start >= plot.region.start, end <= plot.region.end)
+  if(nrow(exons) == 0) {
+    gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot +
+      theme_gene_plot(plot.start=plot.region.start, plot.end=plot.region.end, gene_lim=gene_limits)
+    print_plot <- patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+                                        gene_plot,
+                                        ncol = 1, heights = c(1, plot.height)
+    )
+    return(suppressWarnings(print(print_plot)))
+  }
 
   gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot +
-    ggplot2::scale_x_continuous(expand = c(0,0)) +
-    ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
-    ggplot2::labs(y = "Gene") +
-    ggplot2::scale_y_continuous(limits = gene_limits,
-                                position = "right") +
-    ggplot2::theme_classic() +
+    theme_gene_plot(plot.start=plot.region.start, plot.end=plot.region.end, gene_lim=gene_limits)
+  # assemble plot
+  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+                        gene_plot,
+                        ncol = 1, heights = c(1, plot.height)
+  )
+}
+
+
+
+theme_gene_plot <- function(plot.start=plot.region.start, plot.end=plot.region.end, gene_lim=gene_limits) {
+  list(
+    ggplot2::scale_x_continuous(expand = c(0,0)),
+    ggplot2::coord_cartesian(xlim = c(plot.start, plot.end)),
+    ggplot2::labs(y = "Gene"),
+    ggplot2::scale_y_continuous(limits = gene_lim,
+                                position = "right"),
+    ggplot2::theme_classic(),
     ggplot2::theme(
       axis.line.y = ggplot2::element_blank(),
       axis.text.y = ggplot2::element_blank(),
@@ -115,10 +130,6 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
       axis.ticks.x = ggplot2::element_blank(),
       panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
       plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
-  )
-  # assemble plot
-  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                        gene_plot,
-                        ncol = 1, heights = c(1, plot.height)
+    )
   )
 }
