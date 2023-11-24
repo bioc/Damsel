@@ -92,7 +92,7 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
     ggplot2::scale_x_continuous(expand = c(0,0)) +
     ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
     ggplot2::scale_y_continuous(limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
-                       expand = c(0, 0), position = "right") +
+                       expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right") +
     ggplot2::theme_classic() +
     ggplot2::theme(
       axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
