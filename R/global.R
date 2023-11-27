@@ -9,6 +9,9 @@
   utils::globalVariables("n_regions_not_dm")
   utils::globalVariables("dm_options")
   utils::globalVariables("logFC_match")
+  utils::globalVariables("plot.region.start")
+  utils::globalVariables("plot.region.end")
+  utils::globalVariables("gene_limits")
 
   invisible()
 }
