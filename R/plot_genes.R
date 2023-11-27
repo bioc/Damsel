@@ -85,12 +85,14 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
 
   df <- df[,c(1:3,5:ncol(df))]
   df_og <- df_og %>%
-    dplyr::filter(ensembl_gene_id %in% df$ensembl_gene_id)
+    dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
 
   #check for exons
   exons <- GenomicFeatures::exons(txdb) %>%
     data.frame() %>%
-    dplyr::filter(seqnames == plot.chr, start >= plot.region.start, end <= plot.region.end)
+    dplyr::filter(.data$seqnames == plot.chr,
+                  .data$start >= plot.region.start,
+                  .data$end <= plot.region.end)
   if(nrow(exons) == 0) {
     gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot +
       theme_gene_plot(plot.start=plot.region.start, plot.end=plot.region.end, gene_lim=gene_limits)
