@@ -275,7 +275,7 @@ Given that we know that Dam can methylate up to 5kb away, and most significantly
 
 ```{r}
 peaks <- aggregate_peaks(dm_results)
-knitr::kable(head(peaks))
+knitr::kable(head(peaks), format = "html", table.attr = "style='width:30%;'")
 nrow(peaks)
 ```
 
