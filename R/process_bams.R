@@ -22,9 +22,13 @@
 #' head(counts.df)
 #' # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
 #' head(counts.df[,c(1:6,9,7,10,8)])
-
+#' @export
 #rename to processBams
 process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthreads=2, ...) {
+  if(!requireNamespace("Rsubread", quietly = TRUE)) {
+    stop("Package \"Rubsread\" must be installed to use this function.",
+         call. = FALSE)
+  }
   if(!is.character(path_to_bams)) {
     stop("Path to bams must be a character vector")
   }
