@@ -14,6 +14,7 @@ Suggests:
     BSgenome.Dmelanogaster.UCSC.dm6,
     knitr,
     rmarkdown,
+    Rsubread,
     testthat (>= 3.0.0),
     TxDb.Dmelanogaster.UCSC.dm6.ensGene
 Config/testthat/edition: 3
@@ -25,6 +26,7 @@ Imports:
     Biostrings,
     dplyr,
     edgeR,
+    exomeCopy,
     GenomeInfoDb,
     GenomicFeatures,
     ggbio,
@@ -39,7 +41,6 @@ Imports:
     reshape2,
     rlang,
     Rsamtools,
-    Rsubread,
     stats,
     stringr,
     tidyr,
