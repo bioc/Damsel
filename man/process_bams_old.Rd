@@ -15,7 +15,7 @@ process_bams_old(
 
 \item{regions}{A data.frame of GATC regions. If not specified, will use default data file `regions_gatc_drosophila_dm6`. The GATC regions can be made with `gatc_track()`.}
 
-\item{nthreads}{The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
+\item{cores}{The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
 * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
 * The number of available cores can be checked using [parallel::detectCores()]}
 

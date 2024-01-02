@@ -103,7 +103,7 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthr
 #'
 #' @param path_to_bams A character string input vector. This must identify the directory containing the BAM files.
 #' @param regions A data.frame of GATC regions. If not specified, will use default data file `regions_gatc_drosophila_dm6`. The GATC regions can be made with `gatc_track()`.
-#' @param nthreads The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
+#' @param cores The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
 #' * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
 #' * The number of available cores can be checked using [parallel::detectCores()]
 #' @param ... Other arguments passed onto `Rsubread::featureCounts()`
@@ -161,7 +161,7 @@ process_bams_old <- function(path_to_bams, regions=regions_gatc_drosophila_dm6,
     df$seqnames <- paste0("chr", df$seqnames)
     one_count <- parallel::mclapply(list_files, function(x) {exomeCopy::countBamInGRanges(x, plyranges::as_granges(df))}, mc.cores = cores) %>%
       data.frame()
-    colnames(one_count) <- files
+    colnames(one_count) <- list_files
   }
 
   df2 <- cbind(df, one_count)
