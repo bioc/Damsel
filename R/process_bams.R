@@ -106,7 +106,6 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthr
 #' @param cores The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
 #' * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
 #' * The number of available cores can be checked using [parallel::detectCores()]
-#' @param ... Other arguments passed onto `Rsubread::featureCounts()`
 #'
 #' @return A `data.frame` containing the GATC region information in the form in the columns: seqnames (chromosome), start, end, width, and strand. The count information for the BAM files is in the subsequent columns, named by the name of the BAM file.
 #' * The ".bam" extension is retained in the sample name as an identifier for the sample columns
