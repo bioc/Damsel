@@ -44,7 +44,7 @@ gatc_region_fn <- function(object) {
                   end = as.numeric(.data$end),
                   width = as.numeric(.data$width))
 
-  for(i in 1:length_names) {
+  for(i in seq_len(length_names)) {
     df <- rbind(df, dplyr::mutate(data.frame(Biostrings::matchPattern("GATC", fasta[[i]])),
                                   seqnames = sub(" .*", "", names_fasta[[i]])))
   }

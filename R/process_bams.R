@@ -60,7 +60,7 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthr
   list_files <- paste0(path_to_bams, list_files)
 
   scan_result <- list()
-  for (i in 1:length(list_files)) {
+  for (i in seq_len(length(list_files))) {
     scan_result <- list(scan_result, Rsamtools::testPairedEndBam(list_files[i]))
   }
   scan_result <- unlist(scan_result)
@@ -73,11 +73,11 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthr
 
   if(same_name == TRUE) {
     if(unique(unlist(scan_result)) == TRUE) {
-      for (i in 1:length(list_files)) {
+      for (i in seq_len(length(list_files))) {
         counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, isPairedEnd = TRUE, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
       }
     } else {
-      for (i in 1:length(list_files)) {
+      for (i in seq_len(length(list_files))) {
         counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
       }
     }
@@ -85,11 +85,11 @@ process_bams <- function(path_to_bams, regions=regions_gatc_drosophila_dm6, nthr
   } else {
     counts_feature$seqnames <- paste0("chr", counts_feature$seqnames)
     if(unique(unlist(scan_result)) == TRUE) {
-      for (i in 1:length(list_files)) {
+      for (i in seq_len(length(list_files))) {
         counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, isPairedEnd = TRUE, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
       }
     } else {
-      for (i in 1:length(list_files)) {
+      for (i in seq_len(length(list_files))) {
         counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
       }
     }

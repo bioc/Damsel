@@ -11,7 +11,7 @@ random_regions <- function(size=50) {
   df <- list(start = 50, end = 85, width = 36) %>% data.frame()
   size_n <- size - 1
   random_width <- floor(stats::runif(size_n, 5, 1000))
-  for(i in 1:size_n) {
+  for(i in seq_len(size_n)) {
     new_start <- df[i, "end"] + 1
     df[nrow(df) + 1,] <- list(start = new_start, end = (new_start + random_width[i] - 1), width = random_width[i])
   }
@@ -51,7 +51,7 @@ random_counts <- function(size=50) {
 random_edgeR_results <- function(size=50) {
   results <- random_regions(size)
   results$seqnames <- paste0("chr", results$seqnames)
-  results$number <- 1:size
+  results$number <- seq_len(size)
   dm_options <- c(0, 1, NA, -1)
   peak <- rep(1, each = 4)
   zero <- rep(0, each = 2)

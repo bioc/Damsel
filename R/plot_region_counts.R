@@ -60,11 +60,11 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
   if(nrow(df) == 0) {
     stop("No data available for provided region, make the region larger")
   }
-  df <- df %>% dplyr::mutate(number = 1:dplyr::n()) %>%
+  df <- df %>% dplyr::mutate(number = seq_len(dplyr::n())) %>%
       .[rep(seq_len(nrow(.)), times = 4),] %>%
       .[order(.$number),] %>%
       dplyr::group_by(.data$number) %>%
-      dplyr::mutate(num = 1:dplyr::n()) %>%
+      dplyr::mutate(num = seq_len(dplyr::n())) %>%
       dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
                                                 .data$num == 2 ~ .data$start,
                                                 .data$num == 3 ~ .data$end,
@@ -92,6 +92,7 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     plot <- df %>%
       ggplot2::ggplot() +
       ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts, fill = as.factor(.data$dam_num)), alpha = 0.5) +
+      ggplot2::scale_fill_brewer() +
       ggplot2::scale_x_continuous(expand = c(0,0)) +
       ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
       ggplot2::facet_wrap(~ .data$dam, ncol = n_col) +

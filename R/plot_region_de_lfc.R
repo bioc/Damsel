@@ -58,11 +58,11 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
                                                 .data$start >= plot.region.start,
                                                 .data$end <= plot.region.end)
   df_colour <- df_regions %>%
-    dplyr::mutate(number = 1:dplyr::n()) %>%
+    dplyr::mutate(number = seq_len(dplyr::n())) %>%
     .[rep(seq_len(nrow(.)), times = 4),] %>%
     .[order(.$number),] %>%
     dplyr::group_by(.data$number) %>%
-    dplyr::mutate(num = 1:dplyr::n()) %>%
+    dplyr::mutate(num = seq_len(dplyr::n())) %>%
     dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
                                               .data$num == 2 ~ .data$start,
                                               .data$num == 3 ~ .data$end,
