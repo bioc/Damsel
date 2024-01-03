@@ -31,7 +31,7 @@ edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, keep_a=0.5, 
   matrix <- as.matrix(counts.df[,grepl("bam", colnames(counts.df))]) # can I be sure they would have "bam" in it?
   rownames(matrix) <- counts.df$Position
 
-  n_samples <- seq(1:(ncol(matrix)/2))
+  n_samples <- seq_len(ncol(matrix)/2)
 
   group <- rep(c("Dam", "Fusion"), times = length(n_samples)) #specify that this order is required
 
@@ -42,18 +42,18 @@ edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, keep_a=0.5, 
 
   dge <- edgeR::calcNormFactors(dge)
 
-  design_df <- seq(1:ncol(matrix)) %>%
+  design_df <- seq_len(ncol(matrix)) %>%
                  data.frame() %>%
                  stats::setNames("group")
   zero_vec <- rep(0, times = length(n_samples))
   #need to replace the 1:length with seq along or something
-  for(i in 1:length(n_samples)) {
+  for(i in n_samples) {
     design <- replace(zero_vec, i, 1)
     design <- rep(design, each = 2)
     design_df[,ncol(design_df) + 1] <- design
 
   }
-  design <- stats::model.matrix(~., data = design_df[, 1:ncol(design_df) - 1])
+  design <- stats::model.matrix(~., data = design_df[, seq_len(ncol(design_df)) - 1])
 
   dge <- edgeR::estimateDisp(dge, robust = T, design = design)
 
@@ -193,7 +193,7 @@ add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   }
   results <- dm_results
   df <- regions %>%
-    dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = 1:nrow(.))
+    dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = seq_len(nrow(.)))
   df$dm <- results[match(df$Position, row.names(results)), "dm"]
   df$logFC <- results[match(df$Position, row.names(results)), "logFC"]
   df$PValue <- results[match(df$Position, row.names(results)), "PValue"]

@@ -130,7 +130,7 @@ plot_wrap <- function(peak_id = NULL, gene_id=NULL,
     return(plot)
   }
   list_plots <- list()
-  for (i in 1:length(start_region)) {
+  for (i in seq_len(length_start)) {
     plot <- plot_counts_all_bams(counts.df, seqnames = chr[i],
                                  start_region = start_region[i],
                                  end_region = end_region[i],

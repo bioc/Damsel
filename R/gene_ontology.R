@@ -61,7 +61,7 @@ goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, ext
   enriched.GO <- GO.wall$category[stats::p.adjust(GO.wall$over_represented_pvalue, method = "BH")<.05]
   utils::head(enriched.GO)
 
-  list <- list(for(go in enriched.GO[1:10]){
+  list <- list(for(go in enriched.GO[seq_len(10)]){
     print(GO.db::GOTERM[[go]])
     cat("--------------------------------------\n")
   }, utils::head(pwf), plot1, plot2)

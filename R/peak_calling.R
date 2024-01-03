@@ -21,7 +21,7 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
     stop("Must have data frame of differential_testing results from `edgeR_results")
   }
   df_aa <- dm_results
-  df_a <- df_aa %>% dplyr::mutate(number = 1:dplyr::n(),
+  df_a <- df_aa %>% dplyr::mutate(number = seq_len(dplyr::n()),
                                   trial = unsplit(lapply(split(.[,"meth_status"], .data$seqnames), function(x) {sequence(rle(x)$lengths)}), .data$seqnames),
                                   trial = ifelse(dplyr::lead(.data$trial) == .data$trial, 0, .data$trial),
                                   multiple = ifelse(.data$trial == 0, FALSE, TRUE))
@@ -51,7 +51,7 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
                   #.data$n_regions_dm != 2,
                   .data$meth_status == "Upreg") %>%
     .[order(.$FDR),] %>%
-    dplyr::mutate(rank_p = 1:dplyr::n()) %>%
+    dplyr::mutate(rank_p = seq_len(dplyr::n())) %>%
     .[order(.$peak_id),] %>%
     stats::setNames(c(colnames(.[1]), "start", "end", colnames(.[4:9]))) %>%
     plyranges::as_granges() %>%
@@ -59,7 +59,7 @@ aggregate_peaks <- function(dm_results, gap_size=150) {
     dplyr::group_by(.data$seqnames) %>%
     dplyr::mutate(gap = dplyr::lead(.data$start) - .data$end) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(number = 1:nrow(.)) %>%
+    dplyr::mutate(number = seq_len(nrow(.))) %>%
     data.frame()
 
   gaps <- gaps_fn_new(peaks, gap_size)
@@ -151,7 +151,7 @@ gaps_fn_new <- function(df, gap_size=150) {
   }
 
   i <- 1
-  number <- c(1:nrow(gaps))
+  number <- c(seq_len(nrow(gaps)))
   j <- i
   for(i in number) {
     if(gaps[i,]$gap <= gap_size && gaps[i,]$width < 10000) {
@@ -173,7 +173,7 @@ gaps_fn_new <- function(df, gap_size=150) {
   }
   gaps_work <- gaps_work[2:nrow(gaps_work),] %>%
     dplyr::group_by(.data$end) %>%
-    dplyr::mutate(number = 1:dplyr::n(),
+    dplyr::mutate(number = seq_len(dplyr::n()),
                   start = as.numeric(.data$start),
                   end = as.numeric(.data$end)) %>%
     dplyr::filter(.data$number == 1) %>%
@@ -199,7 +199,7 @@ peak_helper <- function(df_a, multiple, meth_status) {
                   swap = dplyr::coalesce(.data$swap, 1)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by(.data$swap) %>%
-    dplyr::mutate(seq = ifelse(.data$swap == 1, 1:nrow(.), 0),
+    dplyr::mutate(seq = ifelse(.data$swap == 1, seq_len(nrow(.)), 0),
                   seq = ifelse(.data$seq == 0, NA, .data$seq)) %>%
     dplyr::ungroup() %>%
     dplyr::group_by({{meth_status}}) %>%
@@ -212,7 +212,7 @@ peak_helper <- function(df_a, multiple, meth_status) {
 order_peaks <- function(peaks) {
   peaks_new <- peaks %>%
     .[order(.$FDR),] %>%
-    dplyr::mutate(rank_p = 1:nrow(.)) %>%
+    dplyr::mutate(rank_p = seq_len(nrow(.))) %>%
     .[,c(6,1:5,12,7:11)] %>%
     dplyr::mutate(peak_id = ifelse(is.na(.data$multiple_peaks), paste0("PS_", .data$peak_id), paste0("PM_", .data$peak_id)))
   row.names(peaks_new) <- NULL
