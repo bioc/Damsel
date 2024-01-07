@@ -55,7 +55,7 @@ edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, keep_a=0.5, 
   }
   design <- stats::model.matrix(~., data = design_df[, seq_len(ncol(design_df)) - 1])
 
-  dge <- edgeR::estimateDisp(dge, robust = T, design = design)
+  dge <- edgeR::estimateDisp(dge, robust = TRUE, design = design)
 
   dge
 }
