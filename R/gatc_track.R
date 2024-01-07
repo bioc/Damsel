@@ -27,41 +27,34 @@ gatc_region_fn <- function(object) {
   if(class(object) %in% "BSgenome") {
     fasta <- object
     names_fasta <- GenomeInfoDb::seqnames(object)
-    length_names <- stringr::str_detect(names_fasta, "M")
   } else if(class(object) %in% "character") {
     fasta <- Biostrings::readDNAStringSet(object)
     names_fasta <- names(fasta)
-    length_names <- stringr::str_detect(names_fasta, "mito")
   }
 
-  length_names <- length_names %>%
-    grep("TRUE", .) %>%
-    .[1] - 1
-  i <- 1
-  df <- cbind(start = 1, end = 1, width = 1, seq = "GATC", seqnames = "chr0") %>%
-    data.frame() %>%
-    dplyr::mutate(start = as.numeric(.data$start),
-                  end = as.numeric(.data$end),
-                  width = as.numeric(.data$width))
+  length_names <- stringr::str_detect(names_fasta, "Y") %>%
+    grep("TRUE", .,) %>%
+    .[1]
+  seq_names <- names_fasta[seq_len(length_names)]
 
-  for(i in seq_len(length_names)) {
-    df <- rbind(df, dplyr::mutate(data.frame(Biostrings::matchPattern("GATC", fasta[[i]])),
-                                  seqnames = sub(" .*", "", names_fasta[[i]])))
-  }
+  df <- lapply(seq_names, function(x) cbind(data.frame(Biostrings::matchPattern("GATC", fasta[[x]])),
+                                 seqnames = x)) %>%
+    dplyr::bind_rows()
 
-  df <- df[2:nrow(df), c("seqnames", "start", "end", "width")]
-  df$strand <- as.factor("*")
-  rownames(df) <- NULL
-  df$start <- df$start - 1
-  df$width <- 5
+  df <- df[,c("seqnames", "start", "end", "width")]
+  df$seqnames <- gsub("chr", "", as.character(df$seqnames))
+  df$strand <- "*"
 
   regions <- df %>%
     dplyr::group_by(.data$seqnames) %>%
-    dplyr::mutate(start = .data$start + 3,
-                  end = dplyr::lead(.data$start) - 1) %>%
+    dplyr::mutate(start = .data$start + 1,
+                  end = dplyr::lead(.data$start)) %>%
     dplyr::filter(!is.na(.data$end)) %>%
     dplyr::mutate(width = .data$end - .data$start + 1) %>%
-    dplyr::ungroup()
+    dplyr::ungroup() %>%
+    dplyr::mutate(Position = paste0("chr", seqnames, "-", start))
+  regions <- regions[,c("Position", "seqnames", "start", "end", "width", "strand")]
 
   list(regions = regions, sites = df)
+
 }
