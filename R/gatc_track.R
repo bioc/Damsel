@@ -39,21 +39,22 @@ gatc_region_fn <- function(object) {
 
   df <- lapply(seq_names, function(x) cbind(data.frame(Biostrings::matchPattern("GATC", fasta[[x]])),
                                  seqnames = x)) %>%
-    dplyr::bind_rows()
+    dplyr::bind_rows() %>%
+    dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames)),
+                  Position = paste0(seqnames, "-", "start"))
 
-  df <- df[,c("seqnames", "start", "end", "width")]
-  df$seqnames <- gsub("chr", "", as.character(df$seqnames))
+  df <- df[,c("Position", "seqnames", "start", "end", "width")]
   df$strand <- "*"
 
   regions <- df %>%
     dplyr::group_by(.data$seqnames) %>%
-    dplyr::mutate(start = .data$start + 1,
-                  end = dplyr::lead(.data$start)) %>%
+    dplyr::mutate(start = .data$start + 2,
+                  end = dplyr::lead(.data$start - 1)) %>%
     dplyr::filter(!is.na(.data$end)) %>%
     dplyr::mutate(width = .data$end - .data$start + 1) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Position = paste0("chr", seqnames, "-", start))
-  regions <- regions[,c("Position", "seqnames", "start", "end", "width", "strand")]
+    dplyr::mutate(Position = paste0(seqnames, "-", start),
+                  seqnames = gsub("chr", "", seqnames))
 
   list(regions = regions, sites = df)
 
