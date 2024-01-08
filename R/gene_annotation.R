@@ -96,10 +96,10 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #' annotate_genes(peaks, genes, example_regions, max_distance = NULL)
 annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
   if(!is.data.frame(peaks)) {
-    stop("Require data.frame of peaks as outputted from `aggregate_peaks")
+    stop("Require data.frame of peaks as outputted from `aggregate_peaks`")
   }
   if(!is.data.frame(genes)) {
-    stop("Requires data.frame of genes as outputted from `get_biomart_genes")
+    stop("Requires data.frame of genes as outputted from `get_biomart_genes`")
   }
   if(!is.data.frame(regions)) {
     stop("Requires data.frame of regions")
@@ -147,24 +147,14 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
   combo <- combo %>%
     .[order(.$peak_order),]
 
-  combo <- combo %>%
-    dplyr::group_by(.data$peak_id, .data$ensembl_gene_id) %>%
-    dplyr::mutate(count = dplyr::n(),
-                  from = ifelse(.data$count == 1, .data$from, "both")) %>%
-    dplyr::ungroup() %>%
-    dplyr::distinct(.)
+  combo <- if_overlap(combo, "both")
 
   combo <- combo[,colnames(overlaps)]
   combo <- rbind(combo, overlaps) %>%
     data.frame() %>%
     .[order(.$peak_order),]
 
-  combo <- combo %>%
-    dplyr::group_by(.data$peak_id, .data$ensembl_gene_id) %>%
-    dplyr::mutate(count = dplyr::n(),
-                  from = ifelse(.data$count == 1, .data$from, "overlap")) %>%
-    dplyr::ungroup() %>%
-    dplyr::distinct(.) %>%
+  combo <- if_overlap(combo, "overlap") %>%
     .[,1:24] %>%
     dplyr::mutate(seqnames = .data$gene_seqnames,
                   start = ifelse(.data$gene_start < .data$peak_start, .data$gene_start, .data$peak_start),
@@ -178,24 +168,7 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
     dplyr::mutate(n_genes = dplyr::n()) %>%
     dplyr::ungroup()
 
-  combo <- combo %>%
-    dplyr::mutate(gap_ups = .data$gene_start - .data$peak_end,
-                  gap_dow = .data$peak_start - .data$gene_end,
-                  gap_st = .data$gene_start - .data$peak_start,
-                  gap_en = .data$peak_end - .data$gene_end) %>%
-    dplyr::mutate(position = dplyr::case_when(.data$gap_ups > 0 & .data$gap_ups <= .data$gap_st & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_upstream",
-                                       .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow > 0 & .data$gap_dow <= .data$gap_en ~ "Peak_downstream",
-                                       .data$gap_ups < 0 & .data$gap_st > 0 & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_overlap_upstream",
-                                       .data$gap_ups < 0 & .data$gap_st > 0 & .data$gap_dow < 0 & .data$gap_en > 0 ~ "Peak_encompass_gene",
-                                       .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow < 0 & .data$gap_en > 0 ~ "Peak_overlap_downstream",
-                                       .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_within_gene"),
-                  min_distance = dplyr::case_when(.data$position == "Peak_upstream" ~ .data$gap_ups,
-                                                  .data$position == "Peak_downstream" ~ .data$gap_dow,
-                                                  .data$position == "Peak_overlap_upstream" ~ .data$gap_st,
-                                                  .data$position == "Peak_overlap_downstream" ~ .data$gap_en,
-                                                  TRUE ~ 0)) %>%
-    .[,!(colnames(.) %in% c("gap_ups", "gap_dow", "gap_st", "gap_en"))]
-
+  combo <- peak_relative_position(combo)
   combo <- combo %>%
     dplyr::mutate(num = seq_len(dplyr::n()))
 
@@ -232,7 +205,52 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
                   peak_position = paste0(.data$peak_seqnames, ":", .data$peak_start, "-", .data$peak_end)) %>%
     .[,col_order]
 
-  combo_list <- combo %>%
+  combo_list <- annotate_top_5(combo)
+
+  cols_start <- which(colnames(combo) %in% c("seqnames", "start", "end", "width"))
+  combo <- combo[,c(cols_start, ncol(combo),
+                      seq_len((utils::head(cols_start, 1)-1)),
+                      (utils::tail(cols_start, 1)+1):(ncol(combo)-1))] %>%
+      .[,!(colnames(.) %in% c("from", "peak_order", "abs_TSS", "count", "num"))]
+
+  list_results <- list(closest = closest, top_five = combo_list, all = combo)
+  list_results
+}
+
+
+if_overlap <- function(combo, is_overlap) {
+  df <- combo %>%
+    dplyr::group_by(.data$peak_id, .data$ensembl_gene_id) %>%
+    dplyr::mutate(count = dplyr::n(),
+                  from = ifelse(.data$count == 1, .data$from, is_overlap)) %>%
+    dplyr::ungroup() %>%
+    dplyr::distinct(.)
+  df
+}
+
+peak_relative_position <- function(combo) {
+  df <- combo %>%
+    dplyr::mutate(gap_ups = .data$gene_start - .data$peak_end,
+                  gap_dow = .data$peak_start - .data$gene_end,
+                  gap_st = .data$gene_start - .data$peak_start,
+                  gap_en = .data$peak_end - .data$gene_end) %>%
+    dplyr::mutate(position = dplyr::case_when(.data$gap_ups > 0 & .data$gap_ups <= .data$gap_st & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_upstream",
+                                              .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow > 0 & .data$gap_dow <= .data$gap_en ~ "Peak_downstream",
+                                              .data$gap_ups < 0 & .data$gap_st > 0 & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_overlap_upstream",
+                                              .data$gap_ups < 0 & .data$gap_st > 0 & .data$gap_dow < 0 & .data$gap_en > 0 ~ "Peak_encompass_gene",
+                                              .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow < 0 & .data$gap_en > 0 ~ "Peak_overlap_downstream",
+                                              .data$gap_ups < 0 & .data$gap_st < 0 & .data$gap_dow < 0 & .data$gap_en < 0 ~ "Peak_within_gene"),
+                  min_distance = dplyr::case_when(.data$position == "Peak_upstream" ~ .data$gap_ups,
+                                                  .data$position == "Peak_downstream" ~ .data$gap_dow,
+                                                  .data$position == "Peak_overlap_upstream" ~ .data$gap_st,
+                                                  .data$position == "Peak_overlap_downstream" ~ .data$gap_en,
+                                                  TRUE ~ 0)) %>%
+    .[,!(colnames(.) %in% c("gap_ups", "gap_dow", "gap_st", "gap_en"))]
+  df
+}
+
+annotate_top_5 <- function(combo) {
+  df <- combo %>%
     dplyr::filter(.data$count <= 5) %>%
     dplyr::group_by(.data$peak_id) %>%
     dplyr::mutate(start_region = min(.data$gene_start),
@@ -247,17 +265,5 @@ annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, ma
                      distance_TSS = toString(.data$distance_TSS),
                      min_distance = toString(.data$min_distance)) %>%
     dplyr::ungroup()
-    cols_start <- which(colnames(combo) %in% c("seqnames", "start", "end", "width"))
-
-    combo <- combo[,c(cols_start, ncol(combo),
-                      seq_len((utils::head(cols_start, 1)-1)),
-                      (utils::tail(cols_start, 1)+1):(ncol(combo)-1))] %>%
-      .[,!(colnames(.) %in% c("from", "peak_order", "abs_TSS", "count", "num"))]
-
-  list_results <- list(closest = closest, top_five = combo_list, all = combo)
-  list_results
+  df
 }
-
-
-
-
