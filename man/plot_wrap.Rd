@@ -5,8 +5,7 @@
 \title{Wrapper function for plotting}
 \usage{
 plot_wrap(
-  peak_id = NULL,
-  gene_id = NULL,
+  id = NULL,
   seqnames = NULL,
   start_region = NULL,
   end_region = NULL,
@@ -21,9 +20,7 @@ plot_wrap(
 )
 }
 \arguments{
-\item{peak_id}{A character vector of a peak identifier(s) if wish to plot in peak centric manner. Default is NULL.}
-
-\item{gene_id}{A character vector of ensembl gene id(s) if want to plot in gene centric manner. Default is NULL.}
+\item{id}{A character vector of peak OR gene identifier(s) if wish to plot in peak/gene centric manner. Default is NULL.}
 
 \item{seqnames}{A chromosome. Default is NULL.}
 
@@ -71,7 +68,7 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
   txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 
 ## plot using a peak_id
-  plot_wrap(peak_id = peaks[1,]$peak_id,
+  plot_wrap(id = peaks[1,]$peak_id,
             counts.df = counts.df,
             dm_results.df = dm_results,
             peaks.df = peaks,
@@ -79,7 +76,7 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
             genes.df = genes, txdb = txdb)
 
 ## plot using a gene id
-   plot_wrap(gene_id = genes[1,]$ensembl_gene_id,
+   plot_wrap(id = genes[1,]$ensembl_gene_id,
             counts.df = counts.df,
             dm_results.df = dm_results,
             peaks.df = peaks,
@@ -95,7 +92,7 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
             genes.df = genes, txdb = txdb)
 
 ## plot multiple peaks or genes by providing a vector of id's
-   plot_wrap(peak_id = peaks[1:2,]$peak_id,
+   plot_wrap(id = peaks[1:2,]$peak_id,
             counts.df = counts.df,
             dm_results.df = dm_results,
             peaks.df = peaks,

@@ -57,26 +57,9 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
   df_regions <- dm_results.df %>% dplyr::filter(.data$seqnames == plot.chr,
                                                 .data$start >= plot.region.start,
                                                 .data$end <= plot.region.end)
-  df_colour <- df_regions %>%
-    dplyr::mutate(number = seq_len(dplyr::n())) %>%
-    .[rep(seq_len(nrow(.)), times = 4),] %>%
-    .[order(.$number),] %>%
-    dplyr::group_by(.data$number) %>%
-    dplyr::mutate(num = seq_len(dplyr::n())) %>%
-    dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
-                                              .data$num == 2 ~ .data$start,
-                                              .data$num == 3 ~ .data$end,
-                                              TRUE ~ .data$end),
-                  y_axis_2 = dplyr::case_when(.data$num == 1 ~ 0,
-                                              .data$num == 2 ~ .data$logFC,
-                                              .data$num == 3 ~ .data$logFC,
-                                              TRUE ~ 0))
+  df_colour <- dm_reshape(df_regions)
 
-  df_fc <- df_regions %>%
-    dplyr::summarise(abs_max = max(.data$logFC),
-                     abs_min = abs(min(.data$logFC))) %>%
-    dplyr::mutate(abs_fc = ifelse(.data$abs_max >= .data$abs_min, .data$abs_max, .data$abs_min),
-                  abs_fc = round(.data$abs_fc))
+  df_fc <- dm_max(df_regions)
 
   colours <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
 
@@ -93,19 +76,51 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
     ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
     ggplot2::scale_y_continuous(limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
                        expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right") +
-    ggplot2::theme_classic() +
-    ggplot2::theme(
-      axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
-      axis.text.x = ggplot2::element_blank(),
-      axis.title.x = ggplot2::element_blank(),
-      axis.ticks.x = ggplot2::element_blank(),
-      panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
-      plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
-    )
+    dm_theme()
 
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                         dm_res.plot,
                         ncol = 1, heights = c(1, plot.height)
+  )
+}
+
+dm_reshape <- function(df_regions) {
+  df <- df_regions %>%
+    dplyr::mutate(number = seq_len(dplyr::n())) %>%
+    .[rep(seq_len(nrow(.)), times = 4),] %>%
+    .[order(.$number),] %>%
+    dplyr::group_by(.data$number) %>%
+    dplyr::mutate(num = seq_len(dplyr::n())) %>%
+    dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
+                                              .data$num == 2 ~ .data$start,
+                                              .data$num == 3 ~ .data$end,
+                                              TRUE ~ .data$end),
+                  y_axis_2 = dplyr::case_when(.data$num == 1 ~ 0,
+                                              .data$num == 2 ~ .data$logFC,
+                                              .data$num == 3 ~ .data$logFC,
+                                              TRUE ~ 0))
+  df
+}
+
+dm_max <- function(df_regions) {
+  df <- df_regions %>%
+    dplyr::summarise(abs_max = max(.data$logFC),
+                     abs_min = abs(min(.data$logFC))) %>%
+    dplyr::mutate(abs_fc = pmax(.data$abs_max, .data$abs_min),
+                  abs_fc = round(.data$abs_fc))
+  df
+}
+
+dm_theme <- function() {
+  list(ggplot2::theme_classic(),
+         ggplot2::theme(
+           axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
+           axis.text.x = ggplot2::element_blank(),
+           axis.title.x = ggplot2::element_blank(),
+           axis.ticks.x = ggplot2::element_blank(),
+           panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
+           plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+         )
   )
 }
