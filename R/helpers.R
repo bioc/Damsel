@@ -7,6 +7,8 @@
 #'
 #' @return example data.frame with output similar to `gatc_track()$regions`
 #' @export
+#' @examples
+#' random_regions(size=50)
 random_regions <- function(size=50) {
   df <- list(start = 50, end = 85, width = 36) %>% data.frame()
   size_n <- size - 1
@@ -30,6 +32,8 @@ random_regions <- function(size=50) {
 #'
 #' @return example data.frame of counts similar to `process_bams()`
 #' @export
+#' @examples
+#' random_counts(size=50)
 random_counts <- function(size=50) {
   counts <- random_regions(size)
   size <- nrow(counts)
@@ -48,6 +52,8 @@ random_counts <- function(size=50) {
 #'
 #' @return example data.frame of edgeR results, output similar to `edgeR_results()`
 #' @export
+#' @examples
+#' random_edgeR_results(size=50)
 random_edgeR_results <- function(size=50) {
   results <- random_regions(size)
   results$seqnames <- paste0("chr", results$seqnames)

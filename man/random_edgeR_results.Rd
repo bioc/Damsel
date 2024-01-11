@@ -15,3 +15,6 @@ example data.frame of edgeR results, output similar to `edgeR_results()`
 \description{
 Create example edgeR results
 }
+\examples{
+random_edgeR_results(size=50)
+}
