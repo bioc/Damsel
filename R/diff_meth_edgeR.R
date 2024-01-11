@@ -183,7 +183,6 @@ edgeR_results_plot <- function(dge, p.value=0.01, lfc=1) {
 #' * logFC: 0 if dm is NA ;
 #' * adjust.p: 1 if dm is NA :
 #' * meth_status: Upreg, No_sig, Downreg, Not_included
-#' @export
 add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential testing results from `edgeR_results")
