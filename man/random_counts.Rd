@@ -15,3 +15,6 @@ example data.frame of counts similar to `process_bams()`
 \description{
 Create example counts
 }
+\examples{
+random_counts(size=50)
+}
