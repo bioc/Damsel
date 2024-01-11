@@ -78,40 +78,26 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
 
   # get valid bed
   valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
+
   if(nrow(valid.bed) == 0) {
     message("No peak data available for this region")
     peak.plot <- ggplot2::ggplot() +
-      ggplot2::geom_blank() +
-      ggplot2::labs(y = "Peak") +
-      theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
-    return(patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                          peak.plot,
-                          ncol = 1, heights = c(1, plot.height)))
-  }
-
-  if(peak.label == FALSE) {
-    peak.plot <- ggplot2::ggplot() +
-      ggplot2::geom_segment(
-        data = valid.bed,
-        mapping = ggplot2::aes(x = .data$start, y = 1,
-                               xend = .data$end, yend = 1),
-        linewidth = peak.size,
-        color = peak.color
-      ) +
-      ggplot2::labs(y = "Peak")
+      ggplot2::geom_blank()
   } else {
-    peak.plot <- valid.bed %>%
-      ggplot2::ggplot(ggplot2::aes(x = .data$start, y = 1)) +
-      ggplot2::geom_segment(mapping = ggplot2::aes(x = .data$start, y = 1,
-                                          xend = .data$end, yend = 1),
-                            size = peak.size, color = peak.color) +
-      ggplot2::geom_label(ggplot2::aes(x = (.data$start + .data$end)/2,
-                                       label = .data$peak_id), colour = "black", size = 3, vjust = "bottom", nudge_y = 0.02) +
-      ggplot2::labs(y = "Peak")
-  }
 
-  # add theme
-  peak.plot <- peak.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+  peak.plot <- valid.bed %>%
+    ggplot2::ggplot(ggplot2::aes(x = .data$start, y = 1)) +
+    ggplot2::geom_segment(mapping = ggplot2::aes(x = .data$start, y = 1,
+                                                 xend = .data$end, yend = 1),
+                          size = peak.size, color = peak.color) +
+    if(peak.label == TRUE) {
+      peak.plot <- peak.plot +
+        ggplot2::geom_label(ggplot2::aes(x = (.data$start + .data$end)/2,
+                                         label = .data$peak_id), colour = "black", size = 3, vjust = "bottom", nudge_y = 0.02)
+    }
+  }
+  peak.plot <- peak.plot + ggplot2::labs(y = "Peak") +
+    theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
                         peak.plot,

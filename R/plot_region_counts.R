@@ -54,28 +54,13 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     stop("end_region must be greater than start_region")
   }
   df <- counts.df
-  #colnames(df) <- chartr("-", "_", colnames(df))
   df <- df %>% dplyr::filter(.data$seqnames == {{seqnames}}) %>%
     dplyr::filter(.data$start >= start_region, .data$end <= end_region)
   if(nrow(df) == 0) {
     stop("No data available for provided region, make the region larger")
   }
-  df <- df %>% dplyr::mutate(number = seq_len(dplyr::n())) %>%
-      .[rep(seq_len(nrow(.)), times = 4),] %>%
-      .[order(.$number),] %>%
-      dplyr::group_by(.data$number) %>%
-      dplyr::mutate(num = seq_len(dplyr::n())) %>%
-      dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
-                                                .data$num == 2 ~ .data$start,
-                                                .data$num == 3 ~ .data$end,
-                                                TRUE ~ .data$end))
-  df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam")), ~ dplyr::case_when(.data$num == 1 ~ 0,
-                                                                                   .data$num == 2 ~ .,
-                                                                                   .data$num == 3 ~ .,
-                                                                                   TRUE ~ 0))
-  df <- df %>% tidyr::gather(key = "bam",
-                             value = "raw_counts",
-                             colnames(.[, grepl(".bam", names(.))]))
+  df <- plot_counts_reshape(df)
+
   if(log2_scale == TRUE) {
     df$raw_counts <- log2(df$raw_counts)
   }
@@ -84,30 +69,17 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
   }
   if(layout == "stacked") {
     df <- df %>%
-      dplyr::mutate(dam = ifelse(grepl("Dam", .data$bam), "Dam", "Fusion")) %>%
       dplyr::group_by(.data$dam) %>%
       dplyr::mutate(dam_num = as.integer(factor(.data$bam))) %>%
       dplyr::ungroup() %>%
       dplyr::mutate(dam_2 = paste0(.data$dam, "_", .data$dam_num))
-    plot <- df %>%
-      ggplot2::ggplot() +
-      ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts, fill = as.factor(.data$dam_num)), alpha = 0.5) +
-      ggplot2::scale_fill_brewer() +
-      ggplot2::scale_x_continuous(expand = c(0,0)) +
-      ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
-      ggplot2::facet_wrap(~ .data$dam, ncol = n_col) +
-      ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region),
-                    fill = "Replicate") +
-      ggplot2::theme_classic()
+
+    plot <- counts_ggplot(df, start_region, end_region, "dam", seqnames, labs_fill = "Replicate", n_col=n_col, alpha = 0.5)
   } else if(layout == "spread") {
-    plot <- df %>%
-      ggplot2::ggplot() +
-      ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts)) +
-      ggplot2::scale_x_continuous(expand = c(0,0)) +
-      ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
-      ggplot2::facet_wrap(~ bam, ncol = n_col) +
-      ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region)) +
-      ggplot2::theme_classic()
+
+    plot <- counts_ggplot(df, start_region, end_region, "bam", seqnames, labs_fill = NULL, n_col=n_col) +
+      ggplot2::scale_fill_discrete() +
+      ggplot2::theme(legend.position = "none")
   }
 
   if(log2_scale == TRUE) {
@@ -116,3 +88,44 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
   }
   plot
 }
+
+plot_counts_reshape <- function(counts) {
+  df <- counts %>% dplyr::mutate(number = seq_len(dplyr::n())) %>%
+    .[rep(seq_len(nrow(.)), times = 4),] %>%
+    .[order(.$number),] %>%
+    dplyr::group_by(.data$number) %>%
+    dplyr::mutate(num = seq_len(dplyr::n())) %>%
+    dplyr::mutate(Position = dplyr::case_when(.data$num == 1 ~ .data$start,
+                                              .data$num == 2 ~ .data$start,
+                                              .data$num == 3 ~ .data$end,
+                                              TRUE ~ .data$end))
+  df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam")), ~ dplyr::case_when(.data$num == 1 ~ 0,
+                                                                                          .data$num == 2 ~ .,
+                                                                                          .data$num == 3 ~ .,
+                                                                                          TRUE ~ 0))
+  df <- df %>% tidyr::gather(key = "bam",
+                             value = "raw_counts",
+                             colnames(.[, grepl(".bam", names(.))])) %>%
+    dplyr::mutate(dam = ifelse(grepl("Dam", .data$bam), "Dam", "Fusion")) %>%
+    .[order(.$dam, decreasing = TRUE),]
+  df
+}
+
+counts_ggplot <- function(df, start_region, end_region, group, seqnames, labs_fill, n_col=n_col, ...) {
+  if(!("dam_num" %in% colnames(df))) {
+    df$dam_num <- 5
+  }
+  plot <- df %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts, fill = as.factor(.data$dam_num), ...), ...) +
+    ggplot2::scale_fill_brewer() +
+    ggplot2::scale_x_continuous(expand = c(0,0)) +
+    ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
+    ggplot2::facet_wrap(~ .data[[group]], ncol = n_col) +
+    ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region), fill = labs_fill, ...) +
+    ggplot2::theme_classic()
+  plot
+}
+
+
+

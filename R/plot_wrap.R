@@ -2,8 +2,7 @@
 #'
 #' `plot_wrap` plots all the available plots at once
 #'
-#' @param peak_id A character vector of a peak identifier(s) if wish to plot in peak centric manner. Default is NULL.
-#' @param gene_id A character vector of ensembl gene id(s) if want to plot in gene centric manner. Default is NULL.
+#' @param id A character vector of peak OR gene identifier(s) if wish to plot in peak/gene centric manner. Default is NULL.
 #' @param seqnames A chromosome. Default is NULL.
 #' @param start_region A number providing the start of region to plot. Default is NULL.
 #' @param end_region A number providing the end of region to plot. Default is NULL.
@@ -37,7 +36,7 @@
 #'   txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #'
 #' ## plot using a peak_id
-#'   plot_wrap(peak_id = peaks[1,]$peak_id,
+#'   plot_wrap(id = peaks[1,]$peak_id,
 #'             counts.df = counts.df,
 #'             dm_results.df = dm_results,
 #'             peaks.df = peaks,
@@ -45,7 +44,7 @@
 #'             genes.df = genes, txdb = txdb)
 #'
 #' ## plot using a gene id
-#'    plot_wrap(gene_id = genes[1,]$ensembl_gene_id,
+#'    plot_wrap(id = genes[1,]$ensembl_gene_id,
 #'             counts.df = counts.df,
 #'             dm_results.df = dm_results,
 #'             peaks.df = peaks,
@@ -61,74 +60,49 @@
 #'             genes.df = genes, txdb = txdb)
 #'
 #' ## plot multiple peaks or genes by providing a vector of id's
-#'    plot_wrap(peak_id = peaks[1:2,]$peak_id,
+#'    plot_wrap(id = peaks[1:2,]$peak_id,
 #'             counts.df = counts.df,
 #'             dm_results.df = dm_results,
 #'             peaks.df = peaks,
 #'             gatc_sites.df = gatc_sites,
 #'             genes.df = genes, txdb = txdb)
 #' }
-plot_wrap <- function(peak_id = NULL, gene_id=NULL,
+plot_wrap <- function(id = NULL,
                       seqnames = NULL, start_region = NULL, end_region=NULL,
                       counts.df = NULL, dm_results.df = NULL, peaks.df = NULL,
                       genes.df = NULL, txdb = NULL, gatc_sites.df = NULL, extend_by=250, ...) {
-  if(is.null(peak_id) & is.null(gene_id) &
+  if(is.null(id) &
      is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
-    stop("Please provide a peak id, gene id, or a region to plot (seqnames, start_region, end_region)")
+    stop("Please provide an id (peak or ensembl_gene_id), or a region to plot (seqnames, start_region, end_region)")
   }
   if(is.null(counts.df) | is.null(dm_results.df) |
      is.null(peaks.df) | is.null(genes.df) | is.null(gatc_sites.df)) {
     stop("All data.frames must be inputted (counts.df, dm_results.df, peaks.df, genes.df, gatc_sites.df)")
   }
-  if(!is.null(peak_id)) {
-    if(is.numeric(peak_id)) {
-      if(!(peak_id %in% peaks.df$consec_dm)) {
-        stop("Peak_id is not in provided peaks data.frame")
-      }
-      peaks_select <- dplyr::filter(peaks.df, .data$consec_dm %in% peak_id)
-    } else if(is.character(peak_id)) {
-      if(!(unique(peak_id %in% peaks.df$peak_id))) {
-        stop("Peak_id is not in provided peaks data.frame")
-      }
-      peaks_select <- dplyr::filter(peaks.df, .data$peak_id %in% {{peak_id}})
+  if(!is.null(id)) {
+    if(!((id %in% peaks.df$peak_id) | id %in% genes.df$ensembl_gene_id)) {
+      stop("Id is not in provided peaks or genes")
     }
-    chr <- as.character(peaks_select$seqnames)
-    start_region <- as.numeric(peaks_select$start) - extend_by
-    start_region[start_region < 0] <- 0
-    end_region <- as.numeric(peaks_select$end) + extend_by
-  }
-  if(!is.null(gene_id)) {
-    if(!(gene_id %in% genes.df$ensembl_gene_id)) {
-      stop("Gene_id is not in provided genes data.frame")
+    if(id %in% peaks.df$peak_id) {
+      df <- dplyr::filter(peaks.df, .data$peak_id %in% id)
+    } else {
+      df <- dplyr::filter(genes.df, .data$ensembl_gene_id %in% id)
     }
-    genes_select <- dplyr::filter(genes.df, .data$ensembl_gene_id %in% gene_id)
-
-    chr <- as.character(genes_select$seqnames)
-    start_region <- as.numeric(genes_select$start) - extend_by
-    start_region[start_region < 0] <- 0
-    end_region <- as.numeric(genes_select$end) + extend_by
+    chr <- as.character(df$seqnames)
+    start_region <- as.numeric(df$start) - extend_by
+    end_region <- as.numeric(df$end) + extend_by
   }
 
   if(!is.null(seqnames) && !is.null(start_region) && !is.null(end_region)) {
     chr <- as.character(seqnames)
     start_region <- as.numeric(start_region) - extend_by
-    start_region[start_region < 0] <- 0
     end_region <- as.numeric(end_region) + extend_by
   }
 
+  start_region[start_region < 0] <- 0
+
   length_start <- length(start_region)
 
-  if(length_start == 1) {
-    plot <- plot_counts_all_bams(counts.df, seqnames = chr,
-                                 start_region = start_region,
-                                 end_region = end_region,
-                                 n_col = 1) +
-      geom_dm.res.lfc(dm_results.df) +
-      geom_peak.new(peaks.df) +
-      geom_gatc(gatc_sites.df) +
-      geom_genes.me(genes.df, txdb, ...)
-    return(plot)
-  }
   list_plots <- list()
   for (i in seq_len(length_start)) {
     plot <- plot_counts_all_bams(counts.df, seqnames = chr[i],
