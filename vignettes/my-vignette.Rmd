@@ -42,12 +42,8 @@ As a DamID analysis tool, Damsel requires a GATC region file for analysis. These
 
 ## 2.1 Introducing the GATC region file
 
-The GATC region file for Drosophila melanogaster v6 is available to you.
-```{r}
-knitr::kable(head(regions_gatc_drosophila_dm6))
-```
 
-It can also be generated with `gatc_region_fn()` using a `BSGenome` object or a FASTA file.
+It can be generated with `gatc_region_fn()` using a `BSGenome` object or a FASTA file.
 
 
 It is a `data.frame` with the consecutive GATC regions across the genome - representing the region (or the length) between GATC sites.
@@ -56,7 +52,9 @@ If you have another species of DamID data or would prefer to make your own regio
 
 ```{r}
 library(BSgenome.Dmelanogaster.UCSC.dm6)
-knitr::kable(head(gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6)$regions))
+regions_and_sites <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6)
+regions <- regions_and_sites$regions
+knitr::kable(head(regions))
 ```
 If you already have your own GATC region file, ensure that it has the same format as `regions_gatc_drosophila_dm6` with 6 columns: 
 
@@ -70,7 +68,7 @@ The GATC regions are not evenly distributed across the genome, and vary greatly 
 This can be explored in more detail via boxplots 
 
 ```{r region boxplot, fig.height=5, fig.width=5}
-ggplot2::ggplot(regions_gatc_drosophila_dm6, 
+ggplot2::ggplot(regions, 
                 ggplot2::aes(x = seqnames, y = log(width))) +
   ggplot2::geom_boxplot()
 ```
@@ -87,7 +85,7 @@ Provided the path to a folder of BAM files (and their .bai files) and the approp
 ```{r}
 path_to_bams <- system.file("extdata", package = "Damsel")
 counts.df <- process_bams(path_to_bams, 
-                          regions = regions_gatc_drosophila_dm6)
+                          regions = regions)
 knitr::kable(head(counts.df))
 ```
 
@@ -212,7 +210,7 @@ These results are incorporated with the region data, providing a result for ever
 
 
 ```{r}
-dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1)
+dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = regions)
 knitr::kable(head(dm_results))
 ```
 
@@ -242,10 +240,7 @@ Only regions that are fully contained within the provided boundaries will be plo
 * Add GATC sites
 
 ```{r}
-gatc_sites <- dplyr::mutate(regions_gatc_drosophila_dm6, 
-                            seqnames = paste0("chr", seqnames), 
-                            start = start - 3, 
-                            end = start + 4)
+gatc_sites <- regions_and_sites$sites
 knitr::kable(head(gatc_sites))
 ```
 
@@ -326,7 +321,7 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 ```{r}
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", 
                            version = 109, 
-                           regions = regions_gatc_drosophila_dm6)
+                           regions = regions)
 knitr::kable(head(genes))
 ```
 
@@ -338,10 +333,10 @@ As stated above, Damsel associates genes with peaks if they are within 5 kb upst
 To respect that some species have genes with more overlap than others, `annotate_genes` outputs a list of data frames. The first, closest, outputs information for every peak and it's closest gene. The second data frame, top_five, outputs a string of the top five genes (if available) and their distances from each peak. The final data frame, all, provides the raw results and all possible gene and peak associations, as well as all available statistical results.
 
 ```{r}
-annotation <- annotate_genes(peaks, genes, regions = regions_gatc_drosophila_dm6, max_distance = 5000)
-knitr::kable(head(annotation$closest))
-knitr::kable(head(annotation$top_five))
-knitr::kable(str(annotation$all))
+#annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
+#knitr::kable(head(annotation$closest))
+#knitr::kable(head(annotation$top_five))
+#knitr::kable(str(annotation$all))
 ```
 
 
@@ -349,8 +344,8 @@ knitr::kable(str(annotation$all))
 ## 5.4 Interpreting results/Plotting
 
 Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. This plot requires the gene positions as a guide for a `Txdb` or `EnsDb` object, building off the autoplot generic built by `ggbio`.
-
-```{r, fig.height=9, fig.width=10}
+r, fig.height=9, fig.width=10
+{r, fig.height=9, fig.width=10}
 library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 
@@ -362,28 +357,27 @@ plot_counts_all_bams(counts.df,
   geom_peak.new(peaks) +
   geom_gatc(gatc_sites) +
   geom_genes.me(genes, txdb)
-```
+
 
 * If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
 
 `plot_wrap()` acts as a wrapper to create all the above layers at once, and allows for a region, a peak(s) or a gene(s) to be provided as an input. 
-```{r, fig.height=9, fig.width=10}
-plot_wrap(peak_id = peaks[1,]$peak_id, 
+{r, fig.height=9, fig.width=10}
+plot_wrap(id = peaks[1,]$peak_id, 
           counts.df = counts.df, 
           dm_results.df = dm_results, 
           peaks.df = peaks, 
           gatc_sites.df = gatc_sites, 
           genes.df = genes, txdb = txdb)
-```
 
-```{r, fig.height=9, fig.width=10}
-plot_wrap(gene_id = genes[1,]$ensembl_gene_id, 
+{r, fig.height=9, fig.width=10}
+plot_wrap(id = genes[1,]$ensembl_gene_id, 
           counts.df = counts.df, 
           dm_results.df = dm_results, 
           peaks.df = peaks, 
           gatc_sites.df = gatc_sites, 
           genes.df = genes, txdb = txdb)
-```
+
 
 
 # 6. Gene ontology 

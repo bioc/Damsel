@@ -4,20 +4,14 @@
 \alias{goseq_fn}
 \title{Gene ontology analysis}
 \usage{
-goseq_fn(
-  annotation,
-  genes,
-  regions = regions_gatc_drosophila_dm6,
-  extend_by = 2000,
-  bias = NULL
-)
+goseq_fn(annotation, genes, regions, extend_by = 2000, bias = NULL)
 }
 \arguments{
 \item{annotation}{A data.frame of annotated genes and peaks as `annotate_peaks()$all`}
 
 \item{genes}{A data.frame of gene data as outputted from `get_biomart_genes()`}
 
-\item{regions}{A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`}
+\item{regions}{A data.frame of GATC regions.}
 
 \item{extend_by}{A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 * This is done to incorporate the acceptable distance of a peak to a gene.

@@ -4,12 +4,7 @@
 \alias{edgeR_results}
 \title{Differential testing}
 \usage{
-edgeR_results(
-  dge,
-  p.value = 0.01,
-  lfc = 1,
-  regions = regions_gatc_drosophila_dm6
-)
+edgeR_results(dge, p.value = 0.01, lfc = 1, regions)
 }
 \arguments{
 \item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
@@ -36,6 +31,6 @@ example_regions <- random_regions()
 counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
-dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, example_regions)
+dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = example_regions)
 head(dm_results)
 }

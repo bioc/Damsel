@@ -6,6 +6,6 @@
 \alias{Damsel-package}
 \title{Damsel: Damsel: an end to end analysis of DamID}
 \description{
-More about what it does (maybe more than one line) Use four spaces when indenting paragraphs within the Description.
+Damsel provides an end to end analysis of DamID data. Damsel takes bam files from Dam-only control and fusion samples and counts the reads matching to each GATC region. edgeR is utilised to identify regions of enrichment in the fusion relative to the control. Enriched regions are combined into peaks, and are associated with nearby genes. Damsel allows for IGV style plots to be built as the results build, inspired by ggcoverage, and using the functionality and layering ability of ggplot2. Damsel also conducts gene ontology testing with bias correction through goseq, and future versions of Damsel will also incorporate motif enrichment analysis. Overall, Damsel is the first package allowing for an end to end analysis with visual capabilities. The goal of Damsel was to bring all the analysis into one place, and allow for exploratory analysis within R. Use four spaces when indenting paragraphs within the Description.
 }
 \keyword{internal}
