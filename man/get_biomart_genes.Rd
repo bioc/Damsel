@@ -4,18 +4,14 @@
 \alias{get_biomart_genes}
 \title{Extract gene information from Ensembl using biomaRt}
 \usage{
-get_biomart_genes(
-  species,
-  version = 109,
-  regions = regions_gatc_drosophila_dm6
-)
+get_biomart_genes(species, version = 109, regions)
 }
 \arguments{
 \item{species}{The species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl}
 
 \item{version}{The Ensembl version of the genome. If not specified, default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)}
 
-\item{regions}{A data frame of GATC regions. If not specified, default is GATC regions from Drosophila melanogaster - dm6.}
+\item{regions}{A data frame of GATC regions.}
 }
 \value{
 A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
@@ -25,8 +21,9 @@ A data.frame of information about the genes. Columns include: seqnames, start, e
 * Also identifies the number of GATC regions matching to each gene.
 }
 \examples{
+example_regions <- random_regions()
 genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
                            version = 109,
-                           regions = regions_gatc_drosophila_dm6)
+                           regions = example_regions)
 head(genes)
 }

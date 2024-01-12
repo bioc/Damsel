@@ -4,16 +4,12 @@
 \alias{process_bams_old}
 \title{Old: process_bams}
 \usage{
-process_bams_old(
-  path_to_bams,
-  regions = regions_gatc_drosophila_dm6,
-  cores = 2
-)
+process_bams_old(path_to_bams, regions, cores = 2)
 }
 \arguments{
 \item{path_to_bams}{A character string input vector. This must identify the directory containing the BAM files.}
 
-\item{regions}{A data.frame of GATC regions. If not specified, will use default data file `regions_gatc_drosophila_dm6`. The GATC regions can be made with `gatc_track()`.}
+\item{regions}{A data.frame of GATC regions. The GATC regions can be made with `gatc_track()`.}
 
 \item{cores}{The number of computer cores to be used to parallelise the function and decrease it's run time. If not specified, will use default (2 cores).
 * If computer is being used for multiple tasks at once, we recommend reducing the number of cores - or leave it at the default setting.
@@ -30,8 +26,9 @@ A `data.frame` containing the GATC region information in the form in the columns
 }
 \examples{
 path_to_bams <- system.file("extdata", package = "Damsel")
+regions <- random_regions()
 counts.df <- process_bams_old(path_to_bams,
-                          regions = regions_gatc_drosophila_dm6,
+                          regions = regions,
                           cores=2)
 head(counts.df)
 # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2

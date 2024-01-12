@@ -4,7 +4,7 @@
 \alias{add_de}
 \title{Add dm_results to GATC regions}
 \usage{
-add_de(dm_results, regions = regions_gatc_drosophila_dm6)
+add_de(dm_results, regions)
 }
 \arguments{
 \item{dm_results}{A data.frame as outputted from [edgeR_results()]}

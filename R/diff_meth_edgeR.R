@@ -104,11 +104,11 @@ edgeR_plot_mds <- function(dge) {
 #' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
-#' dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, example_regions)
+#' dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = example_regions)
 #' head(dm_results)
 #dmResults
 #also need to update this fn - adjusted p val
-edgeR_results <- function(dge, p.value=0.01, lfc=1, regions=regions_gatc_drosophila_dm6) {
+edgeR_results <- function(dge, p.value=0.01, lfc=1, regions) {
   if(!is.numeric(p.value) | length(p.value) > 1) {
     stop("p.value must be 1 number, recommend using default value")
   }
@@ -116,7 +116,7 @@ edgeR_results <- function(dge, p.value=0.01, lfc=1, regions=regions_gatc_drosoph
     stop("lfc must be 1 number, recommend using default value")
   }
   if(missing(regions)) {
-    message("regions missing, default `regions_gatc_drosophila_dm6` used instead")
+    message("GATC region data.frame required")
   }
   group <- dge$samples$group %>% as.character()
   design <- dge$design
@@ -183,7 +183,7 @@ edgeR_results_plot <- function(dge, p.value=0.01, lfc=1) {
 #' * logFC: 0 if dm is NA ;
 #' * adjust.p: 1 if dm is NA :
 #' * meth_status: Upreg, No_sig, Downreg, Not_included
-add_de <- function(dm_results, regions=regions_gatc_drosophila_dm6) {
+add_de <- function(dm_results, regions) {
   if(!is.data.frame(dm_results)) {
     stop("Must have data frame of differential testing results from `edgeR_results")
   }

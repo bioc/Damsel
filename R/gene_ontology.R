@@ -4,7 +4,7 @@
 #'
 #' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`
 #' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`
-#' @param regions A data.frame of GATC regions. If missing, default is `regions_gatc_drosophila_dm6`
+#' @param regions A data.frame of GATC regions.
 #' @param extend_by A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 #' * This is done to incorporate the acceptable distance of a peak to a gene.
 #' * This also allows for consistency across significant and non-significant genes
@@ -26,7 +26,7 @@
 #'
 #'  goseq_fn(annotation, genes, example_regions)
 #geneOntology?
-goseq_fn <- function(annotation, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000, bias=NULL) {
+goseq_fn <- function(annotation, genes, regions, extend_by=2000, bias=NULL) {
   dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
   goseq_data <- genes
   goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{extend_by}})

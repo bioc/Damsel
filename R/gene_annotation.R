@@ -7,18 +7,19 @@
 #'
 #' @param species The species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl
 #' @param version The Ensembl version of the genome. If not specified, default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
-#' @param regions A data frame of GATC regions. If not specified, default is GATC regions from Drosophila melanogaster - dm6.
+#' @param regions A data frame of GATC regions.
 #'
 #' @return A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
 #' @export
 #'
 #' @examples
+#' example_regions <- random_regions()
 #' genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
 #'                            version = 109,
-#'                            regions = regions_gatc_drosophila_dm6)
+#'                            regions = example_regions)
 #' head(genes)
 #getGenes
-get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosophila_dm6) {
+get_biomart_genes <- function(species, version=109, regions) {
   if(!is.character(species)) {
     stop("Species must be a character vector")
   }
@@ -28,9 +29,7 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
   if(missing(version)) {
     message("Default version 109 used")
   }
-  if(missing(regions)) {
-    message("Default of drosophila dm6 regions used")
-  }
+
   ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
   BM.info <- biomaRt::getBM(attributes = c("ensembl_gene_id", "ensembl_transcript_id", "transcript_is_canonical"),
                             filters = "chromosome_name",
@@ -72,7 +71,7 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #'
 #' @param peaks A data.frame of peaks as outputted from [aggregate_peaks()]
 #' @param genes A data.frame of genes as outputted from [get_biomart_genes()]
-#' @param regions A data.frame of GATC regions. If not specified, default is [regions_gatc_drosophila_dm6]
+#' @param regions A data.frame of GATC regions.
 #' @param max_distance A number providing the limit for the minimum distance from peak to gene.
 #' * Default is 5000. If set to `NULL`, will output all available combinations.
 #'
@@ -94,18 +93,9 @@ get_biomart_genes <- function(species, version=109, regions=regions_gatc_drosoph
 #' annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 #' #view all combinations
 #' annotate_genes(peaks, genes, example_regions, max_distance = NULL)
-annotate_genes <- function(peaks, genes, regions=regions_gatc_drosophila_dm6, max_distance=5000) {
-  if(!is.data.frame(peaks)) {
-    stop("Require data.frame of peaks as outputted from `aggregate_peaks`")
-  }
-  if(!is.data.frame(genes)) {
-    stop("Requires data.frame of genes as outputted from `get_biomart_genes`")
-  }
-  if(!is.data.frame(regions)) {
-    stop("Requires data.frame of regions")
-  }
-  if(missing(regions)) {
-    message("No regions provided, default regions_gatc_drosophila_dm6 used instead")
+annotate_genes <- function(peaks, genes, regions, max_distance=5000) {
+  if(!is.data.frame(peaks) | !is.data.frame(genes) | !is.data.frame(regions)) {
+    stop("Require data.frame of peaks as outputted from `aggregate_peaks`, genes, and regions")
   }
   genes_gr <- plyranges::as_granges(genes)
   peaks_gr <- plyranges::as_granges(peaks)

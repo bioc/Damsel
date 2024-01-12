@@ -4,19 +4,14 @@
 \alias{annotate_genes}
 \title{New: annotation of peaks and genes}
 \usage{
-annotate_genes(
-  peaks,
-  genes,
-  regions = regions_gatc_drosophila_dm6,
-  max_distance = 5000
-)
+annotate_genes(peaks, genes, regions, max_distance = 5000)
 }
 \arguments{
 \item{peaks}{A data.frame of peaks as outputted from [aggregate_peaks()]}
 
 \item{genes}{A data.frame of genes as outputted from [get_biomart_genes()]}
 
-\item{regions}{A data.frame of GATC regions. If not specified, default is [regions_gatc_drosophila_dm6]}
+\item{regions}{A data.frame of GATC regions.}
 
 \item{max_distance}{A number providing the limit for the minimum distance from peak to gene.
 * Default is 5000. If set to `NULL`, will output all available combinations.}

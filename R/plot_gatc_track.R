@@ -3,7 +3,7 @@
 #' `geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
-#' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`
+#' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`
 #' @param gatc.color Specify colour of lines. Default is red
 #' @param gatc.size Specify size of the line. Default is 5
 #' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.2
@@ -63,40 +63,13 @@ ggplot_add.gatc <- function(object, plot, object_name) {
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  bed.info <- gatc_sites.df
-  bed.info <- bed.info[,c("seqnames", "start", "end")]
-  # convert to 1-based
-  bed.info$start <- as.numeric(bed.info$start) + 1
+  valid.bed <- GetRegion_hack(df = gatc_sites.df, columns = c("seqnames", "start", "end"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
 
-  # get valid bed
-  valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
-  if(nrow(valid.bed) == 0) {
-    message("No GATC site data available for this region")
-    gatc.plot <- ggplot2::ggplot() +
-      ggplot2::geom_blank() +
+  gatc.plot <- plot_peak(valid.bed = valid.bed, plot.size = gatc.size, plot.color = gatc.color, peak.label = FALSE)
+
+  gatc.plot <- gatc.plot +
       ggplot2::labs(y = "GATC") +
       theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
-    patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                          gatc.plot,
-                          ncol = 1, heights = c(1, plot.height))
-  }
-
-  gatc.plot <- ggplot2::ggplot() +
-    ggplot2::geom_segment(
-      data = valid.bed,
-      mapping = ggplot2::aes(
-        x = .data$start,
-        y = 1,
-        xend = .data$end,
-        yend = 1
-      ),
-      linewidth = gatc.size,
-      color = gatc.color
-    ) +
-    ggplot2::labs(y = "GATC")
-
-  # add theme
-  gatc.plot <- gatc.plot + theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
 
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),

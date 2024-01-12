@@ -13,7 +13,7 @@ geom_gatc(
 )
 }
 \arguments{
-\item{gatc_sites.df}{A data.frame of positions of GATC sites - can be made from GATC region file or from `gatc_track()$sites`}
+\item{gatc_sites.df}{A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`}
 
 \item{gatc.color}{Specify colour of lines. Default is red}
 
