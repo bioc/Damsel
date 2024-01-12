@@ -61,7 +61,7 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
 
   df_fc <- dm_max(df_regions)
 
-  colours <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
+  colours_list <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
 
   dm_res.plot <- df_regions %>%
     ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$logFC, colour = .data$meth_status)) +
@@ -70,13 +70,9 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
     ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$logFC, yend = 0)) +
     ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$logFC, yend = .data$logFC)) +
     ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = 0, yend = 0)) +
-    ggplot2::scale_colour_manual(values = colours) +
-    ggplot2::scale_fill_manual(values = colours) +
-    ggplot2::scale_x_continuous(expand = c(0,0)) +
-    ggplot2::coord_cartesian(xlim = c(plot.region.start, plot.region.end)) +
+    dm_theme(colours = colours_list, x.range = c(plot.region.start, plot.region.end))
     ggplot2::scale_y_continuous(limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
-                       expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right") +
-    dm_theme()
+                       expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right")
 
   # assemble plot
   patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
@@ -112,7 +108,7 @@ dm_max <- function(df_regions) {
   df
 }
 
-dm_theme <- function() {
+dm_theme <- function(colours, x.range) {
   list(ggplot2::theme_classic(),
          ggplot2::theme(
            axis.title.y.right = ggplot2::element_text(color = "black", angle = 90, vjust = 0.5),
@@ -121,6 +117,10 @@ dm_theme <- function() {
            axis.ticks.x = ggplot2::element_blank(),
            panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
            plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
-         )
+         ),
+       ggplot2::scale_colour_manual(values = colours),
+      ggplot2::scale_fill_manual(values = colours),
+      ggplot2::scale_x_continuous(expand = c(0,0)),
+      ggplot2::coord_cartesian(xlim = x.range)
   )
 }

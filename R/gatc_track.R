@@ -40,8 +40,9 @@ gatc_region_fn <- function(object) {
   df <- lapply(seq_names, function(x) cbind(data.frame(Biostrings::matchPattern("GATC", fasta[[x]])),
                                  seqnames = x)) %>%
     dplyr::bind_rows() %>%
-    dplyr::mutate(seqnames = ifelse(stringr::str_detect(seqnames, "chr"), seqnames, paste0("chr", seqnames)),
-                  Position = paste0(seqnames, "-", "start"))
+    dplyr::mutate(seqnames = ifelse(stringr::str_detect(.data$seqnames, "chr"),
+                                    .data$seqnames, paste0("chr", .data$seqnames)),
+                  Position = paste0(.data$seqnames, "-", "start"))
 
   df <- df[,c("Position", "seqnames", "start", "end", "width")]
   df$strand <- "*"
@@ -53,8 +54,8 @@ gatc_region_fn <- function(object) {
     dplyr::filter(!is.na(.data$end)) %>%
     dplyr::mutate(width = .data$end - .data$start + 1) %>%
     dplyr::ungroup() %>%
-    dplyr::mutate(Position = paste0(seqnames, "-", start),
-                  seqnames = gsub("chr", "", seqnames))
+    dplyr::mutate(Position = paste0(.data$seqnames, "-", .data$start),
+                  seqnames = gsub("chr", "", .data$seqnames))
 
   list(regions = regions, sites = df)
 
