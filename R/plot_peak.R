@@ -56,7 +56,6 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   plot.data <- plot2$labels$title
   plot.data <- stringr::str_split_1(plot.data, ":")
   # prepare plot range
-  # the plot region are not normal, so start is minimum value
   plot.chr <- plot.data[1]
   plot.data <- stringr::str_split_1(plot.data[2], "-")
   plot.region.start <- plot.data[1] %>% as.numeric()
@@ -70,32 +69,10 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
   plot.space <- object$plot.space
   plot.height <- object$plot.height
 
-  bed.info <- peaks.df
-  bed.info <- bed.info[,c("seqnames", "start", "end", "peak_id")]
+  valid.bed <- GetRegion_hack(df = peaks.df, columns = c("seqnames", "start", "end", "peak_id"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
 
-  # convert to 1-based
-  bed.info$start <- as.numeric(bed.info$start) + 1
+  peak.plot <- plot_peak(valid.bed = valid.bed, plot.size = peak.size, plot.color = peak.color, peak.label = peak.label)
 
-  # get valid bed
-  valid.bed <- GetRegion_hack(chr = plot.chr, df = bed.info, start = plot.region.start, end = plot.region.end)
-
-  if(nrow(valid.bed) == 0) {
-    message("No peak data available for this region")
-    peak.plot <- ggplot2::ggplot() +
-      ggplot2::geom_blank()
-  } else {
-
-  peak.plot <- valid.bed %>%
-    ggplot2::ggplot(ggplot2::aes(x = .data$start, y = 1)) +
-    ggplot2::geom_segment(mapping = ggplot2::aes(x = .data$start, y = 1,
-                                                 xend = .data$end, yend = 1),
-                          size = peak.size, color = peak.color) +
-    if(peak.label == TRUE) {
-      peak.plot <- peak.plot +
-        ggplot2::geom_label(ggplot2::aes(x = (.data$start + .data$end)/2,
-                                         label = .data$peak_id), colour = "black", size = 3, vjust = "bottom", nudge_y = 0.02)
-    }
-  }
   peak.plot <- peak.plot + ggplot2::labs(y = "Peak") +
     theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
   # assemble plot
@@ -104,4 +81,5 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
                         ncol = 1, heights = c(1, plot.height)
   )
 }
+
 
