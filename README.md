@@ -23,3 +23,6 @@ library(Damsel)
 ## basic example code
 ```
 
+## Citation
+
+
