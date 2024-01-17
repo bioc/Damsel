@@ -1,3 +1,8 @@
+# Damsel 0.5.0
+## Removed features
+* regions_gatc_drosophila_dm6 is no longer available as a data file upon loading. 
+Can be made with `gatc_region_fn()`
+
 # Damsel 0.4.0
 ## New features
 * process_bams() new count method using `Rsubread::featureCounts()` allowing for fractional counts and differentiating between single and paired end BAM files
