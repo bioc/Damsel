@@ -30,9 +30,10 @@ A `data.frame` containing the GATC region information in the form in the columns
 path_to_bams <- system.file("extdata", package = "Damsel")
 example_regions <- random_regions()
 counts.df <- process_bams(path_to_bams,
-                          regions = example_regions,
-                          nthreads=2)
+    regions = example_regions,
+    nthreads = 2
+)
 head(counts.df)
 # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
-head(counts.df[,c(1:6,9,7,10,8)])
+head(counts.df[, c(1:6, 9, 7, 10, 8)])
 }
