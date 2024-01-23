@@ -1,3 +1,7 @@
+# Damsel 0.6.0
+## Removed features
+* removed process_bams_old as dependency `exomeCopy` has been deprecated.
+
 # Damsel 0.5.0
 ## Removed features
 * regions_gatc_drosophila_dm6 is no longer available as a data file upon loading. 
