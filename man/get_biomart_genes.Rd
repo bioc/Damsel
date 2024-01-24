@@ -22,8 +22,10 @@ A data.frame of information about the genes. Columns include: seqnames, start, e
 }
 \examples{
 example_regions <- random_regions()
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = example_regions)
+genes <- get_biomart_genes(
+    species = "dmelanogaster_gene_ensembl",
+    version = 109,
+    regions = example_regions
+)
 head(genes)
 }

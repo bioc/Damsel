@@ -16,5 +16,5 @@ example data.frame with output similar to `gatc_track()$regions`
 Create example regions
 }
 \examples{
-random_regions(size=50)
+random_regions(size = 50)
 }

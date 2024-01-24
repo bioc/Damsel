@@ -35,14 +35,16 @@ set.seed(123)
 example_regions <- random_regions()
 counts.df <- random_counts()
 gatc_sites <- dplyr::mutate(example_regions,
-                            seqnames = paste0("chr", seqnames),
-                            start = start - 3, end = start + 4)
+    seqnames = paste0("chr", seqnames),
+    start = start - 3, end = start + 4
+)
 
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1) +
-  geom_gatc(gatc_sites)
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_gatc(gatc_sites)
 # The plots can be layered -------------------------------------------------
 }

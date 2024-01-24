@@ -34,20 +34,23 @@ A `ggplot_add` object.
 }
 \examples{
 if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
-  set.seed(123)
-  example_regions <- random_regions()
-  counts.df <- random_counts()
-  genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                             version = 109,
-                             regions = example_regions)
+    set.seed(123)
+    example_regions <- random_regions()
+    counts.df <- random_counts()
+    genes <- get_biomart_genes(
+        species = "dmelanogaster_gene_ensembl",
+        version = 109,
+        regions = example_regions
+    )
 
-  txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 
-  plot_counts_all_bams(counts.df,
-                       seqnames = "chr2L",
-                       start_region = 1,
-                       end_region = 40000,
-                       n_col = 1) +
-    geom_genes.me(genes, txdb)
+    plot_counts_all_bams(counts.df,
+        seqnames = "chr2L",
+        start_region = 1,
+        end_region = 40000,
+        n_col = 1
+    ) +
+        geom_genes.me(genes, txdb)
 }
 }

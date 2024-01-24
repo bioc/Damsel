@@ -40,23 +40,26 @@ A `ggplot` object.
 set.seed(123)
 counts.df <- random_counts()
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1,
-                     layout = "stacked")
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "stacked"
+)
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1,
-                     layout = "spread")
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "spread"
+)
 # Can use this plot to layer other plots -----------------------------
 dm_results <- random_edgeR_results()
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1) +
-  geom_dm.res.lfc(dm_results)
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_dm.res.lfc(dm_results)
 }

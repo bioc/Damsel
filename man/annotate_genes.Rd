@@ -34,11 +34,13 @@ example_regions <- random_regions()
 dm_results <- random_edgeR_results()
 peaks <- aggregate_peaks(dm_results)
 
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = example_regions)
+genes <- get_biomart_genes(
+    species = "dmelanogaster_gene_ensembl",
+    version = 109,
+    regions = example_regions
+)
 
 annotate_genes(peaks, genes, example_regions, max_distance = 5000)
-#view all combinations
+# view all combinations
 annotate_genes(peaks, genes, example_regions, max_distance = NULL)
 }
