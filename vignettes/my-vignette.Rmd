@@ -9,10 +9,10 @@ vignette: >
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.height = 7,
-  fig.width = 12
+    collapse = TRUE,
+    comment = "#>",
+    fig.height = 7,
+    fig.width = 12
 )
 ```
 
@@ -30,8 +30,9 @@ Utilising the power of edgeR for differential analysis and goseq for gene ontolo
 
 # Installation
 ```{r eval=FALSE}
-devtools::install_github("Oshlack/Damsel", 
-                         auth_token = "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")
+devtools::install_github("Oshlack/Damsel",
+    auth_token = "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"
+)
 library(Damsel)
 ```
 
@@ -68,9 +69,11 @@ The GATC regions are not evenly distributed across the genome, and vary greatly 
 This can be explored in more detail via boxplots 
 
 ```{r region boxplot, fig.height=5, fig.width=5}
-ggplot2::ggplot(regions, 
-                ggplot2::aes(x = seqnames, y = log(width))) +
-  ggplot2::geom_boxplot()
+ggplot2::ggplot(
+    regions,
+    ggplot2::aes(x = seqnames, y = log(width))
+) +
+    ggplot2::geom_boxplot()
 ```
 
 
@@ -84,15 +87,16 @@ Provided the path to a folder of BAM files (and their .bai files) and the approp
 
 ```{r}
 path_to_bams <- system.file("extdata", package = "Damsel")
-counts.df <- process_bams(path_to_bams, 
-                          regions = regions)
+counts.df <- process_bams(path_to_bams,
+    regions = regions
+)
 knitr::kable(head(counts.df))
 ```
 
 * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
 
 ```{r}
-counts.df <- counts.df[,c(1:6,9,7,10,8)]
+counts.df <- counts.df[, c(1:6, 9, 7, 10, 8)]
 knitr::kable(head(counts.df))
 ```
 
@@ -120,43 +124,47 @@ Two specific samples can also be compared using `ggscatter` which plots a scatte
 A specific region can be selected to view the counts across samples.
 
 ```{r coverage, fig.height=7, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1,
-                     layout = "stacked")
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "stacked"
+)
 ```
 
 
 ```{r coverage2, fig.height=7, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1,
-                     layout = "stacked",
-                     log2_scale = FALSE)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "stacked",
+    log2_scale = FALSE
+)
 ```
 
 ```{r coverage3, fig.height=7, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1,
-                     layout = "spread")
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "spread"
+)
 ```
 
 
 ```{r coverage4, fig.height=7, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1,
-                     layout = "spread",
-                     log2_scale = FALSE)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1,
+    layout = "spread",
+    log2_scale = FALSE
+)
 ```
 
 # 3. Differential methylation analysis
@@ -227,12 +235,13 @@ edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 The edgeR results can be plotted alongside the counts as well.
 
 ```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1) +
-  geom_dm.res.lfc(dm_results.df = dm_results)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_dm.res.lfc(dm_results.df = dm_results)
 ```
 
 Only regions that are fully contained within the provided boundaries will be plotted.
@@ -245,13 +254,14 @@ knitr::kable(head(gatc_sites))
 ```
 
 ```{r, fig.height=9, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, 
-                     n_col = 1) +
-  geom_dm.res.lfc(dm_results) +
-  geom_gatc(gatc_sites)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_dm.res.lfc(dm_results) +
+    geom_gatc(gatc_sites)
 ```
 
 
@@ -279,23 +289,25 @@ nrow(peaks)
 A peak plot layer can be added to our graph
 
 ```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, n_col = 1) +
-  geom_dm.res.lfc(dm_results) +
-  geom_peak.new(peaks) +
-  geom_gatc(gatc_sites)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000, n_col = 1
+) +
+    geom_dm.res.lfc(dm_results) +
+    geom_peak.new(peaks) +
+    geom_gatc(gatc_sites)
 ```
 
 ```{r, fig.height=8, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L", 
-                     start_region = 1, 
-                     end_region = 40000, n_col = 1) +
-  geom_dm.res.lfc(dm_results) +
-  geom_peak.new(peaks, peak.label = TRUE) +
-  geom_gatc(gatc_sites)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000, n_col = 1
+) +
+    geom_dm.res.lfc(dm_results) +
+    geom_peak.new(peaks, peak.label = TRUE) +
+    geom_gatc(gatc_sites)
 ```
 
 # 5. Identifying genes associated with peaks
@@ -319,9 +331,11 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 * identifies the number of GATC regions that overlap with each gene
 
 ```{r}
-genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl", 
-                           version = 109, 
-                           regions = regions)
+genes <- get_biomart_genes(
+    species = "dmelanogaster_gene_ensembl",
+    version = 109,
+    regions = regions
+)
 knitr::kable(head(genes))
 ```
 
@@ -333,10 +347,10 @@ As stated above, Damsel associates genes with peaks if they are within 5 kb upst
 To respect that some species have genes with more overlap than others, `annotate_genes` outputs a list of data frames. The first, closest, outputs information for every peak and it's closest gene. The second data frame, top_five, outputs a string of the top five genes (if available) and their distances from each peak. The final data frame, all, provides the raw results and all possible gene and peak associations, as well as all available statistical results.
 
 ```{r}
-#annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
-#knitr::kable(head(annotation$closest))
-#knitr::kable(head(annotation$top_five))
-#knitr::kable(str(annotation$all))
+# annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
+# knitr::kable(head(annotation$closest))
+# knitr::kable(head(annotation$top_five))
+# knitr::kable(str(annotation$all))
 ```
 
 
@@ -393,7 +407,7 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-#goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
+# goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
 ```
 
 ## 6.2 KEGG??? 

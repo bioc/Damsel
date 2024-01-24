@@ -15,118 +15,135 @@
 #' @export
 #' @examples
 #' if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
-#'   set.seed(123)
-#'   example_regions <- random_regions()
-#'   counts.df <- random_counts()
-#'   genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-#'                              version = 109,
-#'                              regions = example_regions)
+#'     set.seed(123)
+#'     example_regions <- random_regions()
+#'     counts.df <- random_counts()
+#'     genes <- get_biomart_genes(
+#'         species = "dmelanogaster_gene_ensembl",
+#'         version = 109,
+#'         regions = example_regions
+#'     )
 #'
-#'   txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #'
-#'   plot_counts_all_bams(counts.df,
-#'                        seqnames = "chr2L",
-#'                        start_region = 1,
-#'                        end_region = 40000,
-#'                        n_col = 1) +
-#'     geom_genes.me(genes, txdb)
+#'     plot_counts_all_bams(counts.df,
+#'         seqnames = "chr2L",
+#'         start_region = 1,
+#'         end_region = 40000,
+#'         n_col = 1
+#'     ) +
+#'         geom_genes.me(genes, txdb)
 #' }
-geom_genes.me <- function(genes.df, txdb, gene_limits=NULL,
+geom_genes.me <- function(genes.df, txdb, gene_limits = NULL,
                           plot.space = 0.1, plot.height = 0.3) {
-  structure(list(
-    genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,
-    plot.space = plot.space, plot.height = plot.height
-  ),
-  class = "genes.me"
-  )
+    structure(
+        list(
+            genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,
+            plot.space = plot.space, plot.height = plot.height
+        ),
+        class = "genes.me"
+    )
 }
 
 
 #' @export
 ggplot_add.genes.me <- function(object, plot, object_name) {
-  if(!is.data.frame(object$genes.df)) {
-    stop("data.frame of genes is required")
-  }
-  if(is.null(object$gene_limits)) {
-    message("If gene is disproportional to the plot, use gene_limits = c(y1,y2). If gene is too large, recommend setting to c(0,2) and adjusting the plot.height accordingly.")
-  }
-  plot2 <- plot
-  while("patchwork" %in% class(plot2)) {
-    plot2 <- plot2[[1]]
-  }
-  plot.data <- plot2$labels$title
-  plot.data <- stringr::str_split_1(plot.data, ":")
-  plot.chr <- plot.data[1]
-  plot.data <- stringr::str_split_1(plot.data[2], "-")
-  plot.region.start <- plot.data[1] %>% as.numeric()
-  plot.region.end <- plot.data[2] %>% as.numeric()
+    if (!is.data.frame(object$genes.df)) {
+        stop("data.frame of genes is required")
+    }
+    if (is.null(object$gene_limits)) {
+        message("If gene is disproportional to the plot, use gene_limits = c(y1,y2). If gene is too large, recommend setting to c(0,2) and adjusting the plot.height accordingly.")
+    }
+    plot2 <- plot
+    while ("patchwork" %in% class(plot2)) {
+        plot2 <- plot2[[1]]
+    }
+    plot.data <- plot2$labels$title
+    plot.data <- stringr::str_split_1(plot.data, ":")
+    plot.chr <- plot.data[1]
+    plot.data <- stringr::str_split_1(plot.data[2], "-")
+    plot.region.start <- plot.data[1] %>% as.numeric()
+    plot.region.end <- plot.data[2] %>% as.numeric()
 
-  # get parameters
-  df_og <- object$genes.df
-  txdb <- object$txdb
-  gene_limits <- object$gene_limits
-  plot.space <- object$plot.space
-  plot.height <- object$plot.height
+    # get parameters
+    df_og <- object$genes.df
+    txdb <- object$txdb
+    gene_limits <- object$gene_limits
+    plot.space <- object$plot.space
+    plot.height <- object$plot.height
 
-  df <- GetRegion_hack(df = df_og, columns = c("seqnames", "start", "end", "strand", "ensembl_gene_id"),
-                       chr = plot.chr, start = plot.region.start,
-                       end = plot.region.end)
+    df <- GetRegion_hack(
+        df = df_og, columns = c("seqnames", "start", "end", "strand", "ensembl_gene_id"),
+        chr = plot.chr, start = plot.region.start,
+        end = plot.region.end
+    )
 
-  if(nrow(df) == 0) {
-    message("No gene data available for this region")
-    gene_plot <- ggplot2::ggplot() +
-      ggplot2::geom_blank()
-  }
+    if (nrow(df) == 0) {
+        message("No gene data available for this region")
+        gene_plot <- ggplot2::ggplot() +
+            ggplot2::geom_blank()
+    }
 
-  df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
+    df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
 
-  exons <- exon_check(txdb, plot.chr, plot.region.start, plot.region.end)
+    exons <- exon_check(txdb, plot.chr, plot.region.start, plot.region.end)
 
-  if(nrow(exons) == 0) {
-    gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot
-  } else {
-    gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot
-  }
+    if (nrow(exons) == 0) {
+        gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot
+    } else {
+        gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot
+    }
 
-  gene_plot <- gene_plot +
-    theme_gene_plot(plot.start=plot.region.start, plot.end=plot.region.end,
-                    gene_lim=gene_limits)
+    gene_plot <- gene_plot +
+        theme_gene_plot(
+            plot.start = plot.region.start, plot.end = plot.region.end,
+            gene_lim = gene_limits
+        )
 
-  # assemble plot
-  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                        gene_plot,
-                        ncol = 1, heights = c(1, plot.height))
+    # assemble plot
+    patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+        gene_plot,
+        ncol = 1, heights = c(1, plot.height)
+    )
 }
 
 exon_check <- function(txdb, plot.chr, plot.region.start, plot.region.end) {
-  df <- GenomicFeatures::exons(txdb) %>%
-    data.frame() %>%
-    dplyr::filter(.data$seqnames == plot.chr,
-                  .data$start >= plot.region.start,
-                  .data$end <= plot.region.end)
+    df <- GenomicFeatures::exons(txdb) %>%
+        data.frame() %>%
+        dplyr::filter(
+            .data$seqnames == plot.chr,
+            .data$start >= plot.region.start,
+            .data$end <= plot.region.end
+        )
 }
 
-theme_gene_plot <- function(plot.start=plot.region.start,
-                            plot.end=plot.region.end, gene_lim=gene_limits) {
-  list(
-    ggplot2::scale_x_continuous(expand = c(0,0)),
-    ggplot2::coord_cartesian(xlim = c(plot.start, plot.end)),
-    ggplot2::labs(y = "Gene"),
-    ggplot2::scale_y_continuous(limits = gene_lim,
-                                position = "right"),
-    ggplot2::theme_classic(),
-    ggplot2::theme(
-      axis.line.y = ggplot2::element_blank(),
-      axis.text.y = ggplot2::element_blank(),
-      axis.title.y.right = ggplot2::element_text(color = "black",
-                                                 angle = 90, vjust = 0.5),
-      axis.ticks.y = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_blank(),
-      axis.title.x = ggplot2::element_blank(),
-      axis.ticks.x = ggplot2::element_blank(),
-      panel.border = ggplot2::element_rect(colour = "black",
-                                           fill = NA, linewidth = 1),
-      plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+theme_gene_plot <- function(plot.start = plot.region.start,
+                            plot.end = plot.region.end, gene_lim = gene_limits) {
+    list(
+        ggplot2::scale_x_continuous(expand = c(0, 0)),
+        ggplot2::coord_cartesian(xlim = c(plot.start, plot.end)),
+        ggplot2::labs(y = "Gene"),
+        ggplot2::scale_y_continuous(
+            limits = gene_lim,
+            position = "right"
+        ),
+        ggplot2::theme_classic(),
+        ggplot2::theme(
+            axis.line.y = ggplot2::element_blank(),
+            axis.text.y = ggplot2::element_blank(),
+            axis.title.y.right = ggplot2::element_text(
+                color = "black",
+                angle = 90, vjust = 0.5
+            ),
+            axis.ticks.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_blank(),
+            axis.title.x = ggplot2::element_blank(),
+            axis.ticks.x = ggplot2::element_blank(),
+            panel.border = ggplot2::element_rect(
+                colour = "black",
+                fill = NA, linewidth = 1
+            ),
+            plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+        )
     )
-  )
 }
