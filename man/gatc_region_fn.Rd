@@ -19,10 +19,10 @@ The first; "regions" provides the GATC regions used in downstream analysis. The 
 }
 \examples{
 if (require("BSgenome.Dmelanogaster.UCSC.dm6")) {
-  gatc <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
+    gatc <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
 
-  head(gatc$regions)
+    head(gatc$regions)
 
-  head(gatc$sites)
+    head(gatc$sites)
 }
 }

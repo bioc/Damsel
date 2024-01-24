@@ -39,17 +39,19 @@ counts.df <- random_counts()
 dm_results <- random_edgeR_results()
 peaks <- aggregate_peaks(dm_results)
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1) +
-  geom_peak.new(peaks)
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_peak.new(peaks)
 
 plot_counts_all_bams(counts.df,
-                     seqnames = "chr2L",
-                     start_region = 1,
-                     end_region = 40000,
-                     n_col = 1) +
-   geom_peak.new(peaks, peak.label = TRUE)
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    n_col = 1
+) +
+    geom_peak.new(peaks, peak.label = TRUE)
 # The plots can be layered -------------------------------------------------
 }

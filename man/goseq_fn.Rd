@@ -25,17 +25,20 @@ goseq_fn(annotation, genes, regions, extend_by = 2000, bias = NULL)
  * Plot of goodness of fit of model
  * Plot of sample data
  * Plot of sample data without bias correction (should be messy)
- @examples
- set.seed(123)
- example_regions <- random_regions()
- peaks <- aggregate_peaks(random_edgeR_results())
- genes <- get_biomart_genes(species = "dmelanogaster_gene_ensembl",
-                           version = 109,
-                           regions = example_regions)
- annotation <- annotate_genes(peaks, genes, example_regions)$all
-
- goseq_fn(annotation, genes, example_regions)
 }
 \description{
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+}
+\examples{
+set.seed(123)
+example_regions <- random_regions()
+peaks <- aggregate_peaks(random_edgeR_results())
+genes <- get_biomart_genes(
+    species = "dmelanogaster_gene_ensembl",
+    version = 109,
+    regions = example_regions
+)
+annotation <- annotate_genes(peaks, genes, example_regions)$all
+
+goseq_fn(annotation, genes, example_regions)
 }
