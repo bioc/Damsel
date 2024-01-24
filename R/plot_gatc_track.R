@@ -17,65 +17,65 @@
 #' example_regions <- random_regions()
 #' counts.df <- random_counts()
 #' gatc_sites <- dplyr::mutate(example_regions,
-#'                             seqnames = paste0("chr", seqnames),
-#'                             start = start - 3, end = start + 4)
+#'     seqnames = paste0("chr", seqnames),
+#'     start = start - 3, end = start + 4
+#' )
 #'
 #' plot_counts_all_bams(counts.df,
-#'                      seqnames = "chr2L",
-#'                      start_region = 1,
-#'                      end_region = 40000,
-#'                      n_col = 1) +
-#'   geom_gatc(gatc_sites)
+#'     seqnames = "chr2L",
+#'     start_region = 1,
+#'     end_region = 40000,
+#'     n_col = 1
+#' ) +
+#'     geom_gatc(gatc_sites)
 #' # The plots can be layered -------------------------------------------------
 geom_gatc <- function(gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
                       plot.space = 0.2, plot.height = 0.05) {
-  structure(list(
-    gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,
-    plot.space = plot.space, plot.height = plot.height
-  ),
-  class = "gatc"
-  )
+    structure(
+        list(
+            gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,
+            plot.space = plot.space, plot.height = plot.height
+        ),
+        class = "gatc"
+    )
 }
 
 
 #' @export
 ggplot_add.gatc <- function(object, plot, object_name) {
-  if(!is.data.frame(object$gatc_sites.df)) {
-    stop("data.frame of GATC sites is required")
-  }
-  plot2 <- plot
-  while("patchwork" %in% class(plot2)) {
-    plot2 <- plot2[[1]]
-  }
-  plot.data <- plot2$labels$title
-  plot.data <- stringr::str_split_1(plot.data, ":")
-  # prepare plot range
-  # the plot region are not normal, so start is minimum value
-  plot.chr <- plot.data[1]
-  plot.data <- stringr::str_split_1(plot.data[2], "-")
-  plot.region.start <- plot.data[1] %>% as.numeric()
-  plot.region.end <- plot.data[2] %>% as.numeric()
+    if (!is.data.frame(object$gatc_sites.df)) {
+        stop("data.frame of GATC sites is required")
+    }
+    plot2 <- plot
+    while ("patchwork" %in% class(plot2)) {
+        plot2 <- plot2[[1]]
+    }
+    plot.data <- plot2$labels$title
+    plot.data <- stringr::str_split_1(plot.data, ":")
 
-  # get parameters
-  gatc_sites.df <- object$gatc_sites.df
-  gatc.color <- object$gatc.color
-  gatc.size <- object$gatc.size
-  plot.space <- object$plot.space
-  plot.height <- object$plot.height
+    plot.chr <- plot.data[1]
+    plot.data <- stringr::str_split_1(plot.data[2], "-")
+    plot.region.start <- plot.data[1] %>% as.numeric()
+    plot.region.end <- plot.data[2] %>% as.numeric()
 
-  valid.bed <- GetRegion_hack(df = gatc_sites.df, columns = c("seqnames", "start", "end"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
+    # get parameters
+    gatc_sites.df <- object$gatc_sites.df
+    gatc.color <- object$gatc.color
+    gatc.size <- object$gatc.size
+    plot.space <- object$plot.space
+    plot.height <- object$plot.height
 
-  gatc.plot <- plot_peak(valid.bed = valid.bed, plot.size = gatc.size, plot.color = gatc.color, peak.label = FALSE)
+    valid.bed <- GetRegion_hack(df = gatc_sites.df, columns = c("seqnames", "start", "end"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
 
-  gatc.plot <- gatc.plot +
-      ggplot2::labs(y = "GATC") +
-      theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+    gatc.plot <- plot_peak(valid.bed = valid.bed, plot.size = gatc.size, plot.color = gatc.color, peak.label = FALSE)
 
-  # assemble plot
-  patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
-                        gatc.plot,
-                        ncol = 1, heights = c(1, plot.height)
-  )
+    gatc.plot <- gatc.plot +
+        ggplot2::labs(y = "GATC") +
+        theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+
+    # assemble plot
+    patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
+        gatc.plot,
+        ncol = 1, heights = c(1, plot.height)
+    )
 }
-
-
