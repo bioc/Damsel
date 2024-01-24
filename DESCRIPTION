@@ -3,7 +3,7 @@ Type: Package
 Title: Damsel: an end to end analysis of DamID
 Version: 0.6.0
 Author: Caitlin Page
-Maintainer: The package maintainer <yourself@somewhere.net>
+Maintainer: Caitlin Page <caitlin.page@petermac.org>
 Description: Damsel provides an end to end analysis of DamID data.
     Damsel takes bam files from Dam-only control and fusion samples and counts the reads matching to each GATC region. edgeR is utilised to identify regions of enrichment in the fusion relative to the control. Enriched regions are combined into peaks, and are associated with nearby genes.
     Damsel allows for IGV style plots to be built as the results build, inspired by ggcoverage, and using the functionality and layering ability of ggplot2.
@@ -17,7 +17,6 @@ Suggests:
     BSgenome.Dmelanogaster.UCSC.dm6,
     knitr,
     rmarkdown,
-    Rsubread,
     testthat (>= 3.0.0),
     TxDb.Dmelanogaster.UCSC.dm6.ensGene
 Config/testthat/edition: 3
@@ -43,8 +42,10 @@ Imports:
     reshape2,
     rlang,
     Rsamtools,
+    Rsubread,
     stats,
     stringr,
     tidyr,
     utils
+biocViews: DifferentialMethylation, PeakDetection, GenePrediction, GeneSetEnrichment
 VignetteBuilder: knitr
