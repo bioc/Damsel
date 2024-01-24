@@ -12,6 +12,7 @@ You can install the development version of Damsel like so:
 
 ``` r
 # FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+#BiocManager::install("Oshlack/Damsel", auth_token = "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")
 ```
 
 ## Example
