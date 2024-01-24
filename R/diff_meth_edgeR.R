@@ -129,8 +129,8 @@ edgeR_results <- function(dge, p.value = 0.01, lfc = 1, regions) {
             .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0
         )
     )
-    lrt_table <- add_de(lrt_table, regions) %>% data.frame()
-    lrt_table
+    lrt_table <- add_de(lrt_table, regions)
+    data.frame(lrt_table)
 }
 
 
