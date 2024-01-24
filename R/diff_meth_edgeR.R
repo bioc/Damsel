@@ -130,7 +130,8 @@ edgeR_results <- function(dge, p.value = 0.01, lfc = 1, regions) {
         )
     )
     lrt_table <- add_de(lrt_table, regions)
-    data.frame(lrt_table)
+    lrt_table <- data.frame(lrt_table)
+    lrt_table
 }
 
 
