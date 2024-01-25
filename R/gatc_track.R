@@ -64,7 +64,8 @@ gatc_region_fn <- function(object) {
         dplyr::mutate(
             Position = paste0(.data$seqnames, "-", .data$start),
             seqnames = gsub("chr", "", .data$seqnames)
-        )
+        ) %>%
+      data.frame()
 
     list(regions = regions, sites = df)
 }

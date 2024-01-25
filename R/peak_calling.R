@@ -1,5 +1,5 @@
 new_fn_peaks <- function(dm_results, gap_size = 150) {
-    df <- dm_results
+    df <- data.frame(dm_results)
     peaks <- df %>%
         dplyr::mutate(
             number = seq_len(nrow(.)),
@@ -192,7 +192,7 @@ aggregate_peaks <- function(dm_results, gap_size = 150) {
     if (!is.data.frame(dm_results)) {
         stop("Must have data frame of differential_testing results from `edgeR_results")
     }
-    df_aa <- dm_results
+    df_aa <- data.frame(dm_results)
     df_a <- df_aa %>% dplyr::mutate(
         number = seq_len(dplyr::n()),
         trial = unsplit(lapply(split(.[, "meth_status"], .data$seqnames), function(x) {
