@@ -105,7 +105,7 @@ plot_counts_reshape <- function(counts) {
             .data$num == 3 ~ .data$end,
             TRUE ~ .data$end
         ))
-    df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam")), ~ dplyr::case_when(
+    df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam", ignore.case = TRUE)), ~ dplyr::case_when(
         .data$num == 1 ~ 0,
         .data$num == 2 ~ .,
         .data$num == 3 ~ .,
@@ -115,9 +115,9 @@ plot_counts_reshape <- function(counts) {
         tidyr::gather(
             key = "bam",
             value = "raw_counts",
-            colnames(.[, grepl(".bam", names(.))])
+            colnames(.[, grepl(".bam", names(.), ignore.case = TRUE)])
         ) %>%
-        dplyr::mutate(dam = ifelse(grepl("Dam", .data$bam), "Dam", "Fusion")) %>%
+        dplyr::mutate(dam = ifelse(grepl("Dam", .data$bam, ignore.case = TRUE), "Dam", "Fusion")) %>%
         .[order(.$dam, decreasing = TRUE), ]
     df
 }

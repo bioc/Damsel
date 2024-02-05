@@ -28,7 +28,7 @@ edgeR_set_up <- function(counts.df, max.width = 10000, lib.size = NULL, keep_a =
     }
 
     counts.df <- counts.df %>% dplyr::filter(.data$width <= max.width)
-    matrix <- as.matrix(counts.df[, grepl("bam", colnames(counts.df))]) # can I be sure they would have "bam" in it?
+    matrix <- as.matrix(counts.df[, grepl("bam", colnames(counts.df), ignore.case = TRUE)]) # can I be sure they would have "bam" in it?
     rownames(matrix) <- counts.df$Position
 
     n_samples <- seq_len(ncol(matrix) / 2)

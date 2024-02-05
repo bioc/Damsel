@@ -24,7 +24,7 @@ corr_heatmap <- function(df, method = "spearman") {
         message("default spearman's method is used")
     }
 
-    corr_res <- stats::cor(df[, grepl("bam", colnames(df))], method = method)
+    corr_res <- stats::cor(df[, grepl("bam", colnames(df), ignore.case = TRUE)], method = method)
     median_corr <- round(stats::median(corr_res), 1)
     min_corr <- floor(min(corr_res) * 10) / 10
     corr_res <- round(corr_res, 2)
