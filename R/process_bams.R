@@ -60,6 +60,8 @@ process_bams <- function(path_to_bams, regions, nthreads = 2, ...) {
     list_files <- paste0(path_to_bams, list_files)
 
     scan_result <- check_paired(list_files)
+    paired_samples <- list_files[grep(TRUE, scan_result)]
+    single_samples <- list_files[grep(FALSE, scan_result)]
 
     counts_feature <- regions
     names_chrom <- names(Rsamtools::scanBamHeader(list_files[1])[[1]][[1]])
@@ -68,13 +70,14 @@ process_bams <- function(path_to_bams, regions, nthreads = 2, ...) {
     if (same_name == FALSE) {
         counts_feature$seqnames <- paste0("chr", counts_feature$seqnames)
     }
-    if (unique(unlist(scan_result)) == TRUE) {
-        for (i in seq_len(length(list_files))) {
-            counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, isPairedEnd = TRUE, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
+    if (length(paired_samples) != 0) {
+        for (i in seq_len(length(paired_samples))) {
+            counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(paired_samples[i], annot.ext = regions_feat, isPairedEnd = TRUE, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
         }
-    } else {
-        for (i in seq_len(length(list_files))) {
-            counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(list_files[i], annot.ext = regions_feat, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
+    }
+    if (length(single_samples) != 0) {
+        for (i in seq_len(length(single_samples))) {
+            counts_feature <- cbind(counts_feature, data.frame(Rsubread::featureCounts(single_samples[i], annot.ext = regions_feat, allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads, ...)$counts))
         }
     }
     if (same_name == TRUE) {
@@ -88,10 +91,6 @@ check_paired <- function(list_files) {
     scan_result <- list()
     for (i in seq_len(length(list_files))) {
         scan_result <- list(scan_result, Rsamtools::testPairedEndBam(list_files[i]))
-    }
-    scan_result <- unlist(scan_result)
-    if (length(unique(scan_result)) > 1) {
-        return(scan_result)
     }
     scan_result
 }
