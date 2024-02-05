@@ -47,7 +47,7 @@ process_bams <- function(path_to_bams, regions, nthreads = 2, ...) {
     regions_feat$Start <- as.integer(regions_feat$Start)
     regions_feat$End <- as.integer(regions_feat$End)
 
-    list_files <- list.files(path_to_bams, pattern = ".bam")
+    list_files <- list.files(path_to_bams, pattern = ".bam", ignore.case = TRUE)
     # check
     if (length(list_files) == 0) {
         stop("No bam files present in path")
