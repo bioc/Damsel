@@ -1,4 +1,19 @@
-new_fn_peaks <- function(dm_results, gap_size = 150) {
+
+#' New peaks function
+#'
+#' @param dm_results results from differential testing
+#' @param gap_size maximum gap in bp between dm regions
+#'
+#' @return df of peaks ranked by p-value
+#' @export
+#'
+#' @examples
+#' set.seed(123)
+#' counts.df <- random_counts()
+#' dm_results <- random_edgeR_results()
+#' peaks <- new_fn_peaks(dm_results)
+#' peaks
+new_peaks_fn <- function(dm_results, gap_size = 150) {
     df <- data.frame(dm_results)
     peaks <- df %>%
         dplyr::mutate(
@@ -22,11 +37,14 @@ new_fn_peaks <- function(dm_results, gap_size = 150) {
             ),
             gap_width = ifelse(is.na(.data$gap_regions), NA,
                 dplyr::lead(.data$start) - .data$end
-            )
+            ),
+            gap_regions = replace(gap_regions, dplyr::n(), 0),
+            gap_width = replace(gap_width, dplyr::n(), 0)
         ) %>%
         dplyr::mutate(
             new_one = ifelse(dplyr::lead(.data$a) < .data$a, "break", NA),
-            new_one = ifelse(dplyr::lead(.data$a) == .data$a, "single", .data$new_one)
+            new_one = ifelse(dplyr::lead(.data$a) == .data$a, "single", .data$new_one),
+            new_one = replace(new_one, dplyr::n(), "break")
         ) %>%
         dplyr::group_by(.data$new_one) %>%
         dplyr::mutate(seq = ifelse(.data$new_one == "break", seq_len(nrow(.)), 0)) %>%
@@ -35,7 +53,7 @@ new_fn_peaks <- function(dm_results, gap_size = 150) {
 
     peaks <- simplify_peaks(peaks)
 
-    gaps <- new_fn_gaps(peaks, {{ gap_size }})
+    gaps <- gaps_new(df = peaks, dm_results = df, gap_size = {{ gap_size }})
 
     combo <- new_fn_p_combine(peaks, gaps)
     combo <- data.frame(combo)
@@ -70,68 +88,121 @@ simplify_peaks <- function(peaks) {
         dplyr::ungroup() %>%
         dplyr::mutate(
             peak_id = seq_len(nrow(.)),
-            multiple_peaks = NA
         ) %>%
         .[, c(
             "peak_id", "Position", "seqnames", "start", "end", "width",
-            "strand", "logFC_match", "FDR", "multiple_peaks",
+            "strand", "logFC_match", "FDR",
             "n_regions_dm", "region_pos", "gap_regions", "gap_width"
         )]
     df
 }
 
-new_fn_gaps <- function(peaks, gap_size = 150) {
-    df <- peaks
-    df <- df %>%
-        dplyr::mutate(
-            gap_width = ifelse(.data$gap_width < 0, 1e6, .data$gap_width),
-            less_gap = ifelse(.data$gap_width <= gap_size, "Yes", "No"),
-            a = sequence(rle(.data$less_gap)$lengths),
-            b = ifelse(dplyr::lead(.data$a) == .data$a, 0, .data$a),
-            multiple = ifelse(.data$b == 0, FALSE, TRUE)
-        ) %>%
-        dplyr::mutate(
-            end = ifelse(.data$multiple == FALSE & .data$less_gap == "Yes",
-                dplyr::lead(.data$end), NA
-            ),
-            n_regions_dm = ifelse(.data$multiple == FALSE & .data$less_gap == "Yes",
-            .data$n_regions_dm + dplyr::lead(.data$n_regions_dm), NA
-            ),
-            n_regions_not_dm = ifelse(.data$multiple == FALSE &
-                .data$less_gap == "Yes", .data$gap_regions, NA
-            ),
-            id_list = ifelse(.data$multiple == FALSE & .data$less_gap == "Yes",
-                paste0(.data$peak_id, ",", dplyr::lead(.data$peak_id)), NA
-            ),
-            id_list = as.character(id_list)
-        ) %>%
-        dplyr::mutate(
-            min_p_combo = ifelse(.data$multiple == FALSE & .data$less_gap == "Yes",
-                dplyr::lead(.data$FDR), NA
-            ),
-            min_p_combo = pmin(.data$FDR, .data$min_p_combo),
-            FDR = ifelse(.data$FDR == .data$min_p_combo, .data$FDR,
-                .data$min_p_combo
-            ),
-            logFC_match = ifelse(.data$FDR == .data$min_p_combo, .data$logFC_match,
-                dplyr::lead(.data$logFC_match)
-            ),
-            region_pos = ifelse(.data$FDR == .data$min_p_combo,
-                .data$region_pos, dplyr::lead(.data$region_pos)
-            )
-        ) %>%
-        dplyr::filter(!is.na(.data$end)) %>%
-        dplyr::mutate(
-            width = .data$end - .data$start + 1,
-            peak_id = paste0("PM_", .data$peak_id),
-            multiple_peaks = lengths(strsplit(id_list, ","))
-        ) %>%
-        .[, c(
-            "peak_id", "Position", "seqnames", "start", "end", "width",
-            "strand", "logFC_match", "FDR", "multiple_peaks",
-            "n_regions_dm", "n_regions_not_dm", "region_pos", "id_list"
-        )]
-    df
+gaps_new <- function(df, dm_results, gap_size = 150) {
+  gaps_work <- rbind(c(1, 1, 1, 1)) %>%
+    data.frame() %>%
+    stats::setNames(c("seqnames", "id_list", "start", "end")) %>%
+    dplyr::mutate(seqnames = as.character(.data$seqnames))
+  end <- c()
+  gaps <- df
+  gaps <- gaps %>%
+    dplyr::mutate(
+      gap_width = dplyr::coalesce(.data$gap_width, 100000),
+      gap_width = ifelse(.data$gap_width < 0, 10000, .data$gap_width)
+    ) %>%
+    dplyr::group_by(.data$seqnames) %>%
+    dplyr::mutate(total_peaks = dplyr::n()) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(gap_width = ifelse(.data$total_peaks == 1, -5, .data$gap_width)) %>%
+    dplyr::ungroup() %>%
+    dplyr::filter(.data$gap_width > 0) %>%
+    .[, !colnames(.) == "total_peaks"]
+  if (nrow(gaps) == 0) {
+    return(gaps)
+  }
+  gaps_check <- gaps %>%
+    dplyr::mutate(gap2 = ifelse(.data$gap_width <= 150 & .data$width <= 10000, TRUE, FALSE)) %>%
+    dplyr::filter(.data$gap2 != FALSE) %>%
+    .[, !colnames(.) == "gap2"]
+
+  if (nrow(gaps_check) == 0) {
+    return(gaps_check)
+  }
+
+  i <- 1
+  number <- c(seq_len(nrow(gaps)))
+  j <- i
+  for (i in number) {
+    if (gaps[i, ]$gap_width <= gap_size && gaps[i, ]$width < 10000) {
+      start <- gaps[i, ]$start
+      id_list <- gaps[i, ]$peak_id
+      n_regions_dm <- gaps[i, ]$n_regions_dm
+      n_regions_not_dm <- gaps[i, ]$gap_regions
+      for (j in (i + 1):nrow(gaps)) {
+        end <- c(end, gaps[j, ]$end)
+        id_list <- paste0(id_list, ",", gaps[j, ]$peak_id)
+        n_regions_dm <- n_regions_dm + gaps[j, ]$n_regions_dm
+        n_regions_not_dm <- n_regions_not_dm + gaps[j, ]$gap_regions
+        if (gaps[j, ]$gap_width > 150) {
+          break
+        }
+      }
+      gaps_work[nrow(gaps_work) + 1, ] <- c(gaps[utils::tail(i, 1), ]$seqnames, id_list, start, utils::tail(end, 1))
+      if (utils::tail(number, 1) == 100) {
+        break
+      }
+    }
+  }
+  gaps_work <- gaps_work[2:nrow(gaps_work), ] %>%
+    dplyr::group_by(.data$end) %>%
+    dplyr::mutate(
+      number = seq_len(dplyr::n()),
+      start = as.numeric(.data$start),
+      end = as.numeric(.data$end)
+    ) %>%
+    dplyr::filter(.data$number == 1) %>%
+    data.frame() %>%
+    .[, colnames(.) != "number"] %>%
+    dplyr::mutate(n_peaks = stringr::str_count(id_list, ",") + 1)
+  gaps_work <- gaps_work %>%
+    dplyr::mutate(
+      first = substr(id_list, 1, regexpr(",", id_list) - 1),
+      first = as.double(.data$first)
+    ) %>%
+    data.frame()
+  gaps_work$seqnames <- gaps[match(gaps_work$first, gaps$peak_id), "seqnames"]
+  gaps_work$width <- gaps_work$end - gaps_work$start + 1
+
+  overlap_gaps_peaks <- plyranges::find_overlaps(plyranges::as_granges(gaps_work), plyranges::as_granges(df)) %>%
+    data.frame() %>%
+    dplyr::mutate(peak_id = first, multiple_peaks = n_peaks,
+           Position = paste0(.data$seqnames, "-", .data$start),
+           peak_id = paste0("PM_", peak_id)) %>%
+    .[,c("peak_id", "Position", "seqnames", "start", "end", "width", "strand",
+         "logFC_match", "FDR", "multiple_peaks", "region_pos", "id_list")] %>%
+    dplyr::group_by(Position) %>%
+    dplyr::filter(FDR == min(FDR)) %>%
+    dplyr::ungroup()
+
+  overlap_gaps <- plyranges::find_overlaps(plyranges::as_granges(overlap_gaps_peaks), plyranges::as_granges(dm_results)) %>%
+    data.frame() %>%
+    dplyr::mutate(is_dm = ifelse(dm == 1, "Dm", NA)) %>%
+    dplyr::group_by(peak_id, is_dm) %>%
+    dplyr::mutate(n_regions_dm = n(), n_regions_not_dm = n(),
+                  n_regions_dm = ifelse(is.na(is_dm), NA, n_regions_dm),
+                  n_regions_not_dm = ifelse(is.na(is_dm), n_regions_not_dm, NA)) %>%
+    dplyr::ungroup() %>%
+    dplyr::group_by(peak_id) %>%
+    tidyr::fill(n_regions_dm, .direction = "downup") %>%
+    tidyr::fill(n_regions_not_dm, .direction = "updown") %>%
+    dplyr::filter(dplyr::row_number() == 1) %>%
+    dplyr::ungroup()
+  names(overlap_gaps) <- names(overlap_gaps) %>% gsub(".x", "", .)
+  overlap_gaps <- overlap_gaps[,c("peak_id", "Position", "seqnames", "start",
+                                  "end", "width", "strand", "logFC_match", "FDR",
+                                  "multiple_peaks", "n_regions_dm",
+                                  "n_regions_not_dm", "region_pos", "id_list")]
+
+  overlap_gaps
 }
 
 new_fn_p_combine <- function(peaks, gaps) {
@@ -141,15 +212,16 @@ new_fn_p_combine <- function(peaks, gaps) {
     peaks.df <- peaks.df %>%
         dplyr::filter(!.data$peak_id %in% unlist(strsplit(gaps.df$id_list, ",")))
 
-    peaks.df <- peaks.df[, c(
+    peaks.df <- peaks.df %>%
+      dplyr::mutate(
+        multiple_peaks = 1,
+        n_regions_not_dm = 0,
+        peak_id = paste0("PS_", .data$peak_id)
+      ) %>% .[, c(
         "peak_id", "seqnames", "start", "end", "width",
         "strand", "logFC_match", "FDR",
-        "multiple_peaks", "region_pos", "n_regions_dm"
-    )] %>%
-        dplyr::mutate(
-            n_regions_not_dm = NA,
-            peak_id = paste0("PS_", .data$peak_id)
-        )
+        "multiple_peaks", "region_pos", "n_regions_dm", "n_regions_not_dm"
+    )]
     gaps.df <- gaps.df[, c(
         "peak_id", "seqnames", "start", "end", "width",
         "strand", "logFC_match", "FDR", "multiple_peaks", "region_pos",
@@ -159,12 +231,13 @@ new_fn_p_combine <- function(peaks, gaps) {
     df <- rbind(peaks.df, gaps.df)
     df <- df %>%
         dplyr::filter(n_regions_dm > 2) %>%
+        .[order(.$logFC_match, decreasing = TRUE),] %>%
         .[order(.$FDR), ] %>%
         dplyr::mutate(rank_p = seq_len(nrow(.)))
 
     df <- df[, c(
         "peak_id", "seqnames", "start", "end", "width", "strand",
-        "rank_p", "logFC_match", "FDR", "multiple_peaks", # "region_pos",
+        "rank_p", "logFC_match", "FDR", "multiple_peaks", "region_pos",
         "n_regions_dm", "n_regions_not_dm"
     )]
     df
@@ -188,6 +261,12 @@ new_fn_p_combine <- function(peaks, gaps) {
 #' @param gap_size The maximum gap length to include in a peak that separates two significantly enriched regions (peaks). Default is 150, based on an average sequencing of 75bp.
 #' @return A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier, used internally - PS indicates a single peak, PM indicates the peak was combined), seqnames, start, end, width, strand, rank_p, logFC_match, FDR, multiple_peaks (number of peaks, NA if 1), n_regions_dm, n_regions_not_dm
 #' @export
+#' @examples
+#' set.seed(123)
+#' counts.df <- random_counts()
+#' dm_results <- random_edgeR_results()
+#' peaks <- aggregate_peaks(dm_results)
+#' peaks
 aggregate_peaks <- function(dm_results, gap_size = 150) {
     if (!is.data.frame(dm_results)) {
         stop("Must have data frame of differential_testing results from `edgeR_results")
@@ -416,7 +495,11 @@ peak_helper <- function(df_a, multiple, meth_status) {
 
 order_peaks <- function(peaks) {
     peaks_new <- peaks %>%
+        dplyr::group_by(peak_id) %>%
+        .[order(.$logFC_match, decreasing = TRUE),] %>%
         .[order(.$FDR), ] %>%
+        dplyr::filter(dplyr::row_number() == 1) %>%
+        dplyr::ungroup() %>%
         dplyr::mutate(rank_p = seq_len(nrow(.))) %>%
       .[, c("peak_id", "seqnames", "start", "end", "width", "strand", "rank_p",
             "logFC_match", "FDR", "multiple_peaks", "n_regions_dm", "n_regions_not_dm")] %>%
