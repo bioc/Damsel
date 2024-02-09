@@ -20,3 +20,10 @@ A `data.frame` of peaks. Columns are as follows: peak_id (Unique peak identifier
 Peaks are ranked using the theory behind `csaw::getBestTest()`. For each peak, the region with the lowest adjusted p-value is used as the FDR for the peak, and the corresponding logFC is used as the logFC. Using the logFC in this way is useful, as the average logFC may skew the actual data.
 Peaks with a gap between them of <= 150 bp are combined into 1 peak, accounting for many of the small regions having little data.
 }
+\examples{
+set.seed(123)
+counts.df <- random_counts()
+dm_results <- random_edgeR_results()
+peaks <- aggregate_peaks(dm_results)
+peaks
+}
