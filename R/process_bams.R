@@ -92,6 +92,7 @@ check_paired <- function(list_files) {
     for (i in seq_len(length(list_files))) {
         scan_result <- list(scan_result, Rsamtools::testPairedEndBam(list_files[i]))
     }
+    scan_result <- unlist(scan_result)
     scan_result
 }
 
