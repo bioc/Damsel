@@ -90,13 +90,13 @@ plot_wrap <- function(id = NULL,
         stop("All data.frames must be inputted (counts.df, dm_results.df, peaks.df, genes.df, gatc_sites.df)")
     }
     if (!is.null(id)) {
-        if (!((id %in% peaks.df$peak_id) | id %in% genes.df$ensembl_gene_id)) {
-            stop("Id is not in provided peaks or genes")
-        }
-        if (id %in% peaks.df$peak_id) {
-            df <- dplyr::filter(peaks.df, .data$peak_id %in% id)
-        } else {
+        #id <- id[!is.na(id)]
+        df <- dplyr::filter(peaks.df, .data$peak_id %in% id)
+        if(nrow(df) == 0) {
             df <- dplyr::filter(genes.df, .data$ensembl_gene_id %in% id)
+        }
+        if(nrow(df) == 0) {
+          stop("Id is not in provided peaks or genes")
         }
         chr <- as.character(df$seqnames)
         start_region <- as.numeric(df$start) - extend_by
@@ -119,7 +119,7 @@ plot_wrap <- function(id = NULL,
             seqnames = chr[i],
             start_region = start_region[i],
             end_region = end_region[i],
-            n_col = 1
+            ...
         ) +
             geom_dm.res.lfc(dm_results.df) +
             geom_peak.new(peaks.df) +
@@ -130,3 +130,6 @@ plot_wrap <- function(id = NULL,
     }
     list_plots
 }
+
+
+
