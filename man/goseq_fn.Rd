@@ -23,8 +23,8 @@ goseq_fn(annotation, genes, regions, extend_by = 2000, bias = NULL)
 4 objects
  * List of top 10 over-represented GO terms across the 3 GO categories
  * Plot of goodness of fit of model
- * Plot of sample data
- * Plot of sample data without bias correction (should be messy)
+ * Data frame of significant GO category results
+ * Probability weights for each gene
 }
 \description{
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
@@ -40,5 +40,7 @@ genes <- get_biomart_genes(
 )
 annotation <- annotate_genes(peaks, genes, example_regions)$all
 
-goseq_fn(annotation, genes, example_regions)
+ontology <- goseq_fn(annotation, genes, example_regions)
+ontology$signif_results
+ontology$prob_weights
 }
