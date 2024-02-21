@@ -43,7 +43,7 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1
+    log2_scale = FALSE
 ) +
     geom_gatc(gatc_sites)
 # The plots can be layered -------------------------------------------------

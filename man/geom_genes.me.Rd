@@ -49,7 +49,7 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
         seqnames = "chr2L",
         start_region = 1,
         end_region = 40000,
-        n_col = 1
+        log2_scale = FALSE
     ) +
         geom_genes.me(genes, txdb)
 }

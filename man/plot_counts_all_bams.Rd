@@ -9,9 +9,10 @@ plot_counts_all_bams(
   seqnames,
   start_region = NULL,
   end_region = NULL,
-  n_col = 1,
   layout = c("stacked", "spread"),
-  log2_scale = TRUE
+  log2_scale = FALSE,
+  colours = NULL,
+  ...
 )
 }
 \arguments{
@@ -23,11 +24,13 @@ plot_counts_all_bams(
 
 \item{end_region}{A number providing the end of region to plot}
 
-\item{n_col}{The number of columns to facet the graph by. Default is 1}
-
 \item{layout}{Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".}
 
-\item{log2_scale}{Determines whether or not to display the counts on a log2 scale. Default is TRUE.}
+\item{log2_scale}{Determines whether or not to display the counts on a log2 scale. Default is FALSE.}
+
+\item{colours}{Specify colours for the replicates.}
+
+\item{...}{Arguments passed to ggplot2}
 }
 \value{
 A `ggplot` object.
@@ -43,15 +46,15 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
-    layout = "stacked"
+    layout = "stacked",
+    log2_scale = FALSE
 )
 plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
-    layout = "spread"
+    layout = "spread",
+    log2_scale = FALSE
 )
 # Can use this plot to layer other plots -----------------------------
 dm_results <- random_edgeR_results()
@@ -59,7 +62,7 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1
+    log2_scale = FALSE
 ) +
     geom_dm.res.lfc(dm_results)
 }
