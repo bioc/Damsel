@@ -30,7 +30,7 @@
 #'         seqnames = "chr2L",
 #'         start_region = 1,
 #'         end_region = 40000,
-#'         n_col = 1
+#'         log2_scale = FALSE
 #'     ) +
 #'         geom_genes.me(genes, txdb)
 #' }
@@ -82,7 +82,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
         message("No gene data available for this region")
         gene_plot <- ggplot2::ggplot() +
             ggplot2::geom_blank()
-    }
+    } else {
 
     df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
 
@@ -93,7 +93,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     } else {
         gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot
     }
-
+    }
     gene_plot <- gene_plot +
         theme_gene_plot(
             plot.start = plot.region.start, plot.end = plot.region.end,
