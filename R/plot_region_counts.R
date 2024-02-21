@@ -7,9 +7,10 @@
 #' @param seqnames A character string of the chromosome of interest
 #' @param start_region A number providing the start of region to plot
 #' @param end_region A number providing the end of region to plot
-#' @param n_col The number of columns to facet the graph by. Default is 1
 #' @param layout Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".
-#' @param log2_scale Determines whether or not to display the counts on a log2 scale. Default is TRUE.
+#' @param log2_scale Determines whether or not to display the counts on a log2 scale. Default is FALSE.
+#' @param colours Specify colours for the replicates.
+#' @param ... Arguments passed to ggplot2
 #'
 #' @return A `ggplot` object.
 #' @export
@@ -21,15 +22,15 @@
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
-#'     n_col = 1,
-#'     layout = "stacked"
+#'     layout = "stacked",
+#'     log2_scale = FALSE
 #' )
 #' plot_counts_all_bams(counts.df,
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
-#'     n_col = 1,
-#'     layout = "spread"
+#'     layout = "spread",
+#'     log2_scale = FALSE
 #' )
 #' # Can use this plot to layer other plots -----------------------------
 #' dm_results <- random_edgeR_results()
@@ -37,10 +38,10 @@
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
-#'     n_col = 1
+#'     log2_scale = FALSE
 #' ) +
 #'     geom_dm.res.lfc(dm_results)
-plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, n_col = 1, layout = c("stacked", "spread"), log2_scale = TRUE) {
+plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, layout = c("stacked", "spread"), log2_scale = FALSE, colours = NULL, ...) {
     if (!is.data.frame(counts.df)) {
         stop("data.frame of counts is required")
     }
@@ -65,6 +66,14 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     }
     df <- plot_counts_reshape(df)
 
+    if(missing(colours)) {
+      n_samples <- df %>% dplyr::ungroup() %>% dplyr::filter(.data$dam == "Dam") %>% dplyr::distinct(.data$bam) %>% nrow()
+      if(n_samples == 2) {
+        colours <- c("darkblue", "lightblue")
+      } else if (n_samples == 3) {
+        colours <- c("darkblue", "blue", "lightblue")
+      }
+    }
     if (log2_scale == TRUE) {
         df$raw_counts <- log2(df$raw_counts)
     }
@@ -78,9 +87,9 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
             dplyr::ungroup() %>%
             dplyr::mutate(dam_2 = paste0(.data$dam, "_", .data$dam_num))
 
-        plot <- counts_ggplot(df, start_region, end_region, "dam", seqnames, labs_fill = "Replicate", n_col = n_col, alpha = 0.5)
+        plot <- counts_ggplot(df, start_region, end_region, colours, "dam", seqnames, labs_fill = "Replicate", alpha = 0.5)
     } else if (layout == "spread") {
-        plot <- counts_ggplot(df, start_region, end_region, "bam", seqnames, labs_fill = NULL, n_col = n_col) +
+        plot <- counts_ggplot(df, start_region, end_region, colours, "bam", seqnames, labs_fill = NULL, alpha = 1) +
             ggplot2::scale_fill_discrete() +
             ggplot2::theme(legend.position = "none")
     }
@@ -122,17 +131,17 @@ plot_counts_reshape <- function(counts) {
     df
 }
 
-counts_ggplot <- function(df, start_region, end_region, group, seqnames, labs_fill, n_col = n_col, ...) {
+counts_ggplot <- function(df, start_region, end_region, colours, group, seqnames, labs_fill, alpha, ...) {
     if (!("dam_num" %in% colnames(df))) {
         df$dam_num <- 5
     }
     plot <- df %>%
         ggplot2::ggplot() +
-        ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts, fill = as.factor(.data$dam_num), ...), ...) +
-        ggplot2::scale_fill_brewer() +
+        ggplot2::geom_polygon(ggplot2::aes(x = .data$Position, y = .data$raw_counts, fill = as.factor(.data$dam_num)), alpha = alpha, ...) +
+        ggplot2::scale_fill_manual(values = colours, ...) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
-        ggplot2::facet_wrap(~ .data[[group]], ncol = n_col) +
+        ggplot2::facet_wrap(~ factor(.data[[group]], levels = c("Fusion", "Dam")), ncol = 1) +
         ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region), fill = labs_fill, ...) +
         ggplot2::theme_classic()
     plot
