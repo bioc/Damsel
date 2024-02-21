@@ -16,5 +16,5 @@ example data.frame of counts similar to `process_bams()`
 Create example counts
 }
 \examples{
-random_counts(size = 50)
+head(random_counts(size = 50))
 }
