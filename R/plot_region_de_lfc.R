@@ -20,7 +20,7 @@
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
-#'     n_col = 1
+#'     log2_scale = FALSE
 #' ) +
 #'     geom_dm.res.lfc(dm_results)
 geom_dm.res.lfc <- function(dm_results.df,
@@ -61,15 +61,18 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
         .data$start >= plot.region.start,
         .data$end <= plot.region.end
     )
+    df_regions <- df_regions %>%
+      dplyr::mutate(dm = ifelse(dm == -1, 0, dm),
+                    meth_status = ifelse(dm == -1, "No_sig", meth_status))
     df_colour <- dm_reshape(df_regions)
 
     df_fc <- dm_max(df_regions)
 
-    colours_list <- c("Upreg" = "red", "Downreg" = "blue", "Not_included" = "grey", "No_sig" = "black")
+    colours_list <- c("Upreg" = "red", "Not_included" = "grey", "No_sig" = "black")
 
     dm_res.plot <- df_regions %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$logFC, colour = .data$meth_status)) +
-        ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = .data$Position, y = .data$y_axis_2, fill = .data$meth_status)) +
+        ggplot2::ggplot(ggplot2::aes(x = .data$start, y = .data$logFC, colour = factor(.data$meth_status, levels = c("Upreg", "No_sig", "Not_included")))) +
+        ggplot2::geom_polygon(data = df_colour, ggplot2::aes(x = .data$Position, y = .data$y_axis_2, fill = factor(.data$meth_status, levels = c("Upreg", "No_sig", "Not_included")))) +
         ggplot2::geom_segment(ggplot2::aes(xend = .data$start, yend = 0)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$logFC, yend = 0)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$logFC, yend = .data$logFC)) +
@@ -135,8 +138,8 @@ dm_theme <- function(colours, x.range) {
             panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
             plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
         ),
-        ggplot2::scale_colour_manual(values = colours),
-        ggplot2::scale_fill_manual(values = colours),
+        ggplot2::scale_colour_manual(values = colours, name = "dm_result"),
+        ggplot2::scale_fill_manual(values = colours, name = "dm_result"),
         ggplot2::scale_x_continuous(expand = c(0, 0)),
         ggplot2::coord_cartesian(xlim = x.range)
     )
