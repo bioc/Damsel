@@ -123,12 +123,11 @@ edgeR_results <- function(dge, p.value = 0.01, lfc = 1, regions) {
     lrt_table <- qlf$table
     lrt_table <- lrt_table %>% dplyr::mutate(
         adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-        dm = dplyr::case_when(
-            .data$logFC < lfc & .data$adjust.p < p.value ~ -1,
-            abs(.data$logFC) < lfc ~ 0,
-            .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0
-        )
-    )
+        #dm = dplyr::case_when(
+            #.data$logFC < lfc & .data$adjust.p < p.value ~ -1,
+            #abs(.data$logFC) < lfc ~ 0,
+            #.data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0
+        dm = ifelse(.data$logFC > lfc & .data$adjust.p < p.value, 1, 0))
     lrt_table <- add_de(lrt_table, regions)
     lrt_table <- data.frame(lrt_table)
     lrt_table
@@ -208,7 +207,7 @@ add_de <- function(dm_results, regions) {
         dplyr::mutate(meth_status = dplyr::case_when(
             is.na(.data$dm) ~ "Not_included",
             .data$dm == 1 ~ "Upreg",
-            .data$dm == -1 ~ "Downreg",
+            #.data$dm == -1 ~ "Downreg",
             TRUE ~ "No_sig"
         ))
     df <- df %>%
