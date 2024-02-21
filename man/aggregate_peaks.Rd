@@ -2,7 +2,7 @@
 % Please edit documentation in R/peak_calling.R
 \name{aggregate_peaks}
 \alias{aggregate_peaks}
-\title{New: identify peaks from dm results}
+\title{Identify peaks from dm results}
 \usage{
 aggregate_peaks(dm_results, gap_size = 150)
 }
