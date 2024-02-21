@@ -12,6 +12,13 @@
     utils::globalVariables("plot.region.start")
     utils::globalVariables("plot.region.end")
     utils::globalVariables("gene_limits")
+    utils::globalVariables("region_pos")
+    utils::globalVariables("gap_regions")
+    utils::globalVariables("gap_width")
+    utils::globalVariables("numDEInCat")
+    utils::globalVariables("numInCat")
+    utils::globalVariables("FDR")
+    utils::globalVariables("category")
 
     invisible()
 }
