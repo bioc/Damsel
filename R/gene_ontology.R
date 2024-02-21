@@ -13,8 +13,8 @@
 #' @return 4 objects
 #'  * List of top 10 over-represented GO terms across the 3 GO categories
 #'  * Plot of goodness of fit of model
-#'  * Plot of sample data
-#'  * Plot of sample data without bias correction (should be messy)
+#'  * Data frame of significant GO category results
+#'  * Probability weights for each gene
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -26,7 +26,9 @@
 #' )
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
-#' goseq_fn(annotation, genes, example_regions)
+#' ontology <- goseq_fn(annotation, genes, example_regions)
+#' ontology$signif_results
+#' ontology$prob_weights
 # geneOntology?
 goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
@@ -46,32 +48,20 @@ goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) 
 
     GO.wall <- goseq::goseq(pwf, "dm6", "ensGene")
 
-    GO.samp <- goseq::goseq(pwf, "dm6", "ensGene", method = "Sampling", repcnt = 1000)
+    GO.wall <- GO.wall %>% dplyr::mutate(FDR = stats::p.adjust(.data$over_represented_pvalue, method = "BH"))
+    GO.wall <- GO.wall %>% dplyr::filter(.data$FDR < 0.05)
 
-    plot1 <- plot(log10(GO.wall[, 2]), log10(GO.samp[match(GO.wall[, 1], GO.samp[, 1]), 2]),
-        xlab = "log10(Wallenius p-values)", ylab = "log10(Sampling p-values)",
-        xlim = c(-3, 0)
-    )
-    graphics::abline(0, 1, col = 3, lty = 2)
+   # go_terms <- character()
+  #  for (go in GO.wall$category[seq_len(10)]) {
+   #   go_terms <- c(go_terms, print(GO.db::GOTERM[[go]]))
+    #}
 
-    GO.nobias <- goseq::goseq(pwf, "dm6", "ensGene", method = "Hypergeometric")
-
-    plot2 <- plot(log10(GO.wall[, 2]), log10(GO.nobias[match(GO.wall[, 1], GO.nobias[, 1]), 2]),
-        xlab = "log10(Wallenius p-values)", ylab = "log10(Hypergeometric p-values)",
-        xlim = c(-3, 0), ylim = c(-3, 0)
-    )
-    graphics::abline(0, 1, col = 3, lty = 2)
-
-    enriched.GO <- GO.wall$category[stats::p.adjust(GO.wall$over_represented_pvalue, method = "BH") < .05]
-    utils::head(enriched.GO)
-
-    list <- list(for (go in enriched.GO[seq_len(10)]) {
-        print(GO.db::GOTERM[[go]])
-        cat("--------------------------------------\n")
-    }, utils::head(pwf), plot1, plot2)
+    list <- list(#top_go = go_terms,
+      signif_results=GO.wall, prob_weights = pwf)
 
     list
 }
+
 
 gene_mod_extend <- function(genes, regions, extend_by = 2000) {
     genes_mod <- genes
@@ -96,4 +86,57 @@ gene_mod_extend <- function(genes, regions, extend_by = 2000) {
     genes_mod <- genes_mod %>%
         dplyr::mutate(n_regions = dplyr::coalesce(.data$n_regions, 0))
     genes_mod
+}
+
+#' Plot gene ontology results
+#'
+#' @param signif_results results as outputted from goseq_fn()$signif_results. Selects the top 20 GO terms as default
+#' @param plot_type Plot results as a bar or a dot plot. Bar is default method
+#' @param bar_x Select x axis for bar plot method= c(gene_ratio, gene_count, -log10FDR). Default is gene_ratio
+#'
+#' @return A ggplot2 object
+#' @export
+#'
+#' @examples
+#' set.seed(123)
+#' example_regions <- random_regions()
+#' peaks <- aggregate_peaks(random_edgeR_results())
+#' genes <- get_biomart_genes(
+#'     species = "dmelanogaster_gene_ensembl",
+#'     version = 109,
+#'     regions = example_regions
+#' )
+#' annotation <- annotate_genes(peaks, genes, example_regions)$all
+#'
+#' ontology <- goseq_fn(annotation, genes, example_regions)$signif_results
+#' plot_gene_ontology(ontology, plot_type = "bar", bar_x = "gene_ratio")
+#' plot_gene_ontology(ontology, plot_type = "dot")
+#'
+plot_gene_ontology <- function(signif_results, plot_type = c("bar", "dot"), bar_x = c("gene_ratio", "gene_count", "-log10FDR")) {
+  df <- signif_results[1:20,]
+  df <- df %>% dplyr::filter(!is.na(.data$category))
+  if("bar" %in% plot_type) {
+    if("gene_ratio" %in% bar_x) {
+      plot <- df %>%
+        ggplot2::ggplot(ggplot2::aes(x = numDEInCat/numInCat, y = factor(category, levels = category), fill = FDR)) +
+        ggplot2::geom_bar(stat = "identity")
+    } else if (bar_x == "gene_count") {
+      plot <- df %>%
+        ggplot2::ggplot(ggplot2::aes(x = numDEInCat, y = factor(category, levels = category), fill = FDR)) +
+        ggplot2::geom_bar(stat = "identity")
+    } else if(bar_x == "-log10FDR") {
+      plot <- df %>%
+        ggplot2::ggplot(ggplot2::aes(x = -log10(FDR), y = factor(category, levels = category), fill = FDR)) +
+        ggplot2::geom_bar(stat = "identity")
+    }
+  } else if (plot_type == "dot") {
+    plot <- df %>%
+      .[order(.$numDEInCat/.$numInCat, decreasing = FALSE),] %>%
+      ggplot2::ggplot(ggplot2::aes(x = numDEInCat/numInCat, y = factor(category, levels = category), colour = FDR)) +
+      ggplot2::geom_point(ggplot2::aes(size = numDEInCat))
+  }
+
+  plot <- plot +
+    ggplot2::labs(y = "GO category")
+  plot
 }
