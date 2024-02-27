@@ -35,5 +35,5 @@ test_that("annotate_genes.new: Output is error", {
 
 test_that("annotate_genes.new: Output is no error", {
     expect_no_error(annotate_genes(readRDS(test_path("fixtures", "test_peaks_new.rds")), readRDS(test_path("fixtures", "test_genes.rds")), regions = readRDS(test_path("fixtures", "regions.rds"))))
-    expect_no_error(annotate_genes(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")))[, c(1:6, 9, 7, 10, 8)]), regions = readRDS(test_path("fixtures", "regions.rds")))), get_biomart_genes(species = "dmelanogaster_gene_ensembl", regions = readRDS(test_path("fixtures", "regions.rds"))), regions = readRDS(test_path("fixtures", "regions.rds"))))
+    expect_no_error(annotate_genes(aggregate_peaks(edgeR_results(edgeR_set_up(readRDS(test_path("fixtures", "test_counts_df.rds"))), regions = readRDS(test_path("fixtures", "regions.rds")))), get_biomart_genes(species = "dmelanogaster_gene_ensembl", regions = readRDS(test_path("fixtures", "regions.rds"))), regions = readRDS(test_path("fixtures", "regions.rds"))))
 })
