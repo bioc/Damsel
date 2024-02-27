@@ -1,6 +1,6 @@
 ## new peaks fn
 test_that("peaks_new:Output is a data.frame", {
-    expect_s3_class(aggregate_peaks(edgeR_results(edgeR_set_up(process_bams(system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")))[, c(1:6, 9, 7, 10, 8)]), regions = readRDS(test_path("fixtures", "regions.rds")))), "data.frame")
+    expect_s3_class(aggregate_peaks(edgeR_results(edgeR_set_up(readRDS(test_path("fixtures", "test_counts_df.rds"))), regions = readRDS(test_path("fixtures", "regions.rds")))), "data.frame")
 })
 
 test_that("peaks_new:Output is error", {
