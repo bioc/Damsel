@@ -1,3 +1,14 @@
+# Damsel 0.7.0
+## New features
+* updated gene ontology output of results
+* gene ontology plot fn `plot_gene_ontology()`
+* all functions operate case-insensitive - allow for .bam or .BAM and same with
+dam or Dam
+* replaced "Downreg" meth_status with "No_sig"
+* new peak function available
+* updates to plot functions - fixed wrap plot, set colours for count plot
+* added new gene fn that uses a TxDb object or biomaRt (get_genes_biomaRt has been deprecated and will be removed)
+
 # Damsel 0.6.0
 ## Removed features
 * removed process_bams_old as dependency `exomeCopy` has been deprecated.
