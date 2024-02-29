@@ -30,9 +30,7 @@ Utilising the power of edgeR for differential analysis and goseq for gene ontolo
 
 # Installation
 ```{r eval=FALSE}
-devtools::install_github("Oshlack/Damsel",
-    auth_token = "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"
-)
+BiocManager::install("Oshlack/Damsel", force = TRUE)
 library(Damsel)
 ```
 
@@ -85,19 +83,25 @@ Provided the path to a folder of BAM files (and their .bai files) and the approp
 
 * the function makes use of `[exomeCopy::countBaminGranges()]`
 
-```{r}
+```{r eval=FALSE}
 path_to_bams <- system.file("extdata", package = "Damsel")
 counts.df <- process_bams(path_to_bams,
     regions = regions
 )
-knitr::kable(head(counts.df))
+```
+```{r include=FALSE}
+data_env <- new.env(parent = emptyenv())
+data("dros_counts", envir = data_env, package = "Damsel")
+counts.df <- data_env[["dros_counts"]]
 ```
 
 * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
-
 ```{r}
-counts.df <- counts.df[, c(1:6, 9, 7, 10, 8)]
 knitr::kable(head(counts.df))
+```
+This is also available as a counts file through `data`.
+```{r eval=FALSE}
+data("dros_counts")
 ```
 
 * Do not remove the .bam extension on the column names as this is used as a check in later functions to ensure only the BAM files are selected from the data frame.
@@ -128,7 +132,7 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
+    log2_scale = FALSE,
     layout = "stacked"
 )
 ```
@@ -139,9 +143,8 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
     layout = "stacked",
-    log2_scale = FALSE
+    log2_scale = TRUE
 )
 ```
 
@@ -150,7 +153,6 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
     layout = "spread"
 )
 ```
@@ -161,9 +163,8 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1,
     layout = "spread",
-    log2_scale = FALSE
+    log2_scale = TRUE
 )
 ```
 
@@ -219,7 +220,9 @@ These results are incorporated with the region data, providing a result for ever
 
 ```{r}
 dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = regions)
-knitr::kable(head(dm_results))
+dm_results %>% dplyr::group_by(meth_status) %>% dplyr::summarise(n = dplyr::n())
+
+knitr::kable(head(dm_results), digits=32)
 ```
 
 
@@ -239,7 +242,7 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1
+    log2_scale = FALSE
 ) +
     geom_dm.res.lfc(dm_results.df = dm_results)
 ```
@@ -250,6 +253,7 @@ Only regions that are fully contained within the provided boundaries will be plo
 
 ```{r}
 gatc_sites <- regions_and_sites$sites
+
 knitr::kable(head(gatc_sites))
 ```
 
@@ -258,7 +262,7 @@ plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
-    n_col = 1
+    log2_scale = FALSE
 ) +
     geom_dm.res.lfc(dm_results) +
     geom_gatc(gatc_sites)
@@ -280,9 +284,30 @@ Given that we know that Dam can methylate up to 5kb away, and most significantly
 
 ```{r}
 peaks <- aggregate_peaks(dm_results)
-knitr::kable(head(peaks), format = "html", table.attr = "style='width:30%;'")
 nrow(peaks)
+
+knitr::kable(head(peaks), format = "html", table.attr = "style='width:30%;'", digits = 32)
 ```
+### A new peak function
+I've made a new peak function, this one is more stringent and identifies less peaks
+```{r}
+peaks2 <- new_peaks_fn(dm_results)
+nrow(peaks2)
+
+knitr::kable(head(peaks2), format = "html", table.attr = "style='width:30%;'", digits = 32)
+```
+### Comparison of the 2 approaches
+```{r}
+plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2))
+#number of distinct peaks (aggregate_peaks)
+plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>% 
+  data.frame() %>% dplyr::distinct(peak_id.x) %>% nrow()
+#number of distinct peaks (new_peaks_fn)
+plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>% 
+  data.frame() %>% dplyr::distinct(peak_id.y) %>% nrow()
+```
+The majority of the new peaks overlap with the original peak function: 1140/1165 (98% overlap)
+However, the original peak function does find a lot more 1145/1766 (65% overlap)
 
 ## Plotting
 
@@ -292,7 +317,7 @@ A peak plot layer can be added to our graph
 plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
-    end_region = 40000, n_col = 1
+    end_region = 40000
 ) +
     geom_dm.res.lfc(dm_results) +
     geom_peak.new(peaks) +
@@ -303,7 +328,7 @@ plot_counts_all_bams(counts.df,
 plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
-    end_region = 40000, n_col = 1
+    end_region = 40000
 ) +
     geom_dm.res.lfc(dm_results) +
     geom_peak.new(peaks, peak.label = TRUE) +
@@ -320,7 +345,7 @@ It must also be noted that the Drosophila melanogaster genome and transcription 
 
 In the Damsel methodology, peaks are considered to associate with genes if they are within 5kb upstream or downstream. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
 
-## 5.1 Extract genes from Ensembl using biomaRt
+## 5.1 Extract genes 
 
 Obtaining information about the genes is done through accessing Ensembl via biomaRt. As this can be a slow process, it has been provided for Drosophila melanogaster dm6 and can be loaded via `data`.
 
@@ -330,15 +355,41 @@ Functions to undertake this are also available (`get_biomart_genes`), and follow
 * accesses biomaRt a second time to obtain only the Ensembl canonical sequence information for each gene
 * identifies the number of GATC regions that overlap with each gene
 
-```{r}
+The below function has been deprecated
+```{r eval=FALSE}
 genes <- get_biomart_genes(
     species = "dmelanogaster_gene_ensembl",
     version = 109,
     regions = regions
 )
-knitr::kable(head(genes))
+```
+And has been replaced by the new function collateGenes
+This function removes the dependency on biomaRt, by allowing for a TxDb library of biomaRt query as input
+A TxDb package is available for most species and has information about the genes, exons, cds, promoters, etc - which can all be accessed using the GenomicFeatures package.
+This presentation has a lot of slides on how to use TxDb objects to access different data types: https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicFeatures_In_Bioconductor.html#10
+
+However, TxDb libraries contain only the Ensembl gene Ids and not the gene symbol or name. Instead we need to access an org.Db package to transfer them over. org.Db packages contain information about model organisms genome annotation, and can be used to extract various information about the gene name etc. More information can be found here
+https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicFeatures_In_Bioconductor.html#46
+```{r eval=FALSE}
+BiocManager::install("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+BiocManager::install("org.Dm.eg.db")
 ```
 
+```{r}
+library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+library("org.Dm.eg.db")
+genes <- collateGenes(genes=txdb, regions=regions, org.Db=org.Dm.eg.db)
+knitr::kable(head(genes))
+```
+Alternatively, the name of a species listed in biomaRt can be provided, and the version of the genome. A guide to understanding more about how biomaRt functions is here: https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html
+```{r eval=FALSE}
+BiocManager::install("biomaRt")
+```
+```{r}
+library(biomaRt)
+collateGenes(genes = "dmelanogaster_gene_ensembl", regions=regions, version = 109)
+```
 
 ## 5.2 Annotating genes to peaks
 
@@ -347,10 +398,11 @@ As stated above, Damsel associates genes with peaks if they are within 5 kb upst
 To respect that some species have genes with more overlap than others, `annotate_genes` outputs a list of data frames. The first, closest, outputs information for every peak and it's closest gene. The second data frame, top_five, outputs a string of the top five genes (if available) and their distances from each peak. The final data frame, all, provides the raw results and all possible gene and peak associations, as well as all available statistical results.
 
 ```{r}
-# annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
-# knitr::kable(head(annotation$closest))
-# knitr::kable(head(annotation$top_five))
-# knitr::kable(str(annotation$all))
+annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
+
+knitr::kable(head(annotation$closest), digits=32)
+knitr::kable(head(annotation$top_five), digits=32)
+knitr::kable(str(annotation$all), digits=32)
 ```
 
 
@@ -358,40 +410,38 @@ To respect that some species have genes with more overlap than others, `annotate
 ## 5.4 Interpreting results/Plotting
 
 Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. This plot requires the gene positions as a guide for a `Txdb` or `EnsDb` object, building off the autoplot generic built by `ggbio`.
-r, fig.height=9, fig.width=10
-{r, fig.height=9, fig.width=10}
-library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
-txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 
+```{r, fig.height=9, fig.width=10}
 plot_counts_all_bams(counts.df, 
                      seqnames = "chr2L",
                      start_region = 1, 
-                     end_region = 40000, n_col = 1) +
+                     end_region = 40000) +
   geom_dm.res.lfc(dm_results) +
   geom_peak.new(peaks) +
   geom_gatc(gatc_sites) +
   geom_genes.me(genes, txdb)
+```
 
 
 * If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
 
-`plot_wrap()` acts as a wrapper to create all the above layers at once, and allows for a region, a peak(s) or a gene(s) to be provided as an input. 
-{r, fig.height=9, fig.width=10}
+```{r, fig.height=9, fig.width=10}
 plot_wrap(id = peaks[1,]$peak_id, 
           counts.df = counts.df, 
           dm_results.df = dm_results, 
           peaks.df = peaks, 
           gatc_sites.df = gatc_sites, 
           genes.df = genes, txdb = txdb)
+```
 
-{r, fig.height=9, fig.width=10}
+```{r, fig.height=9, fig.width=10}
 plot_wrap(id = genes[1,]$ensembl_gene_id, 
           counts.df = counts.df, 
           dm_results.df = dm_results, 
           peaks.df = peaks, 
           gatc_sites.df = gatc_sites, 
           genes.df = genes, txdb = txdb)
-
+```
 
 
 # 6. Gene ontology 
@@ -407,13 +457,21 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-# goseq_fn(annotation$all, genes, regions=regions_gatc_drosophila_dm6, extend_by=2000)
+ontology <- goseq_fn(annotation$all, genes, regions=regions, extend_by=2000)
+
+knitr::kable(head(ontology$signif_results), digits=32)
+knitr::kable(head(ontology$prob_weights), digits=32)
 ```
 
-## 6.2 KEGG??? 
+
+```{r, fig.height=9, fig.width=10}
+plot_gene_ontology(ontology$signif_results, plot_type = "bar", bar_x = "gene_ratio")
+```
 
 
-# 7. Motif analysis?? - NOT CURRENTLY AVAILABLE
+```{r, fig.height=9, fig.width=10}
+plot_gene_ontology(ontology$signif_results, plot_type = "dot")
+```
 
 
 # Appendix
