@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{get_biomart_genes}
 \alias{get_biomart_genes}
-\title{Extract gene information from Ensembl using biomaRt}
+\title{Deprecated: Extract gene information from Ensembl using biomaRt}
 \usage{
 get_biomart_genes(species, version = 109, regions)
 }
@@ -17,15 +17,7 @@ get_biomart_genes(species, version = 109, regions)
 A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
 }
 \description{
+This function has been deprecated and replaced with `collateGenes`
 `get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
 * Also identifies the number of GATC regions matching to each gene.
-}
-\examples{
-example_regions <- random_regions()
-genes <- get_biomart_genes(
-    species = "dmelanogaster_gene_ensembl",
-    version = 109,
-    regions = example_regions
-)
-head(genes)
 }
