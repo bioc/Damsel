@@ -24,14 +24,13 @@ A ggplot2 object
 Plot gene ontology results
 }
 \examples{
+library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+library("org.Dm.eg.db")
 set.seed(123)
 example_regions <- random_regions()
 peaks <- aggregate_peaks(random_edgeR_results())
-genes <- get_biomart_genes(
-    species = "dmelanogaster_gene_ensembl",
-    version = 109,
-    regions = example_regions
-)
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
 annotation <- annotate_genes(peaks, genes, example_regions)$all
 
 ontology <- goseq_fn(annotation, genes, example_regions)$signif_results

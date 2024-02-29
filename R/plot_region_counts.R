@@ -87,10 +87,16 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
             dplyr::ungroup() %>%
             dplyr::mutate(dam_2 = paste0(.data$dam, "_", .data$dam_num))
 
-        plot <- counts_ggplot(df, start_region, end_region, colours, "dam", seqnames, labs_fill = "Replicate", alpha = 0.5)
+        plot <- counts_ggplot(df, start_region, end_region, colours, "dam", group_levels = c("Fusion", "Dam"),
+                              seqnames, labs_fill = "Replicate", alpha = 0.5)
+          #ggplot2::facet_wrap(~ factor(df$dam, levels = c("Fusion", "Dam")), ncol = 1)
     } else if (layout == "spread") {
-        plot <- counts_ggplot(df, start_region, end_region, colours, "bam", seqnames, labs_fill = NULL, alpha = 1) +
-            ggplot2::scale_fill_discrete() +
+      sample_order <- df$bam %>% unique()
+      colours <- c("#480871", "#E30AD0")
+      plot <- counts_ggplot(df, start_region, end_region, colours, "bam", group_levels = sample_order,
+                              seqnames, labs_fill = "Replicate", alpha = 1) +
+          # ggplot2::facet_wrap(~ df$bam, ncol = 1) +
+           # ggplot2::scale_fill_discrete() +
             ggplot2::theme(legend.position = "none")
     }
 
@@ -131,9 +137,10 @@ plot_counts_reshape <- function(counts) {
     df
 }
 
-counts_ggplot <- function(df, start_region, end_region, colours, group, seqnames, labs_fill, alpha, ...) {
+counts_ggplot <- function(df, start_region, end_region, colours, group, group_levels=NULL,
+                          seqnames, labs_fill, alpha, ...) {
     if (!("dam_num" %in% colnames(df))) {
-        df$dam_num <- 5
+        df$dam_num <- df$dam
     }
     plot <- df %>%
         ggplot2::ggplot() +
@@ -141,7 +148,7 @@ counts_ggplot <- function(df, start_region, end_region, colours, group, seqnames
         ggplot2::scale_fill_manual(values = colours, ...) +
         ggplot2::scale_x_continuous(expand = c(0, 0)) +
         ggplot2::coord_cartesian(xlim = c(start_region, end_region)) +
-        ggplot2::facet_wrap(~ factor(.data[[group]], levels = c("Fusion", "Dam")), ncol = 1) +
+        ggplot2::facet_wrap(~ factor(.data[[group]], levels = group_levels), ncol = 1) +
         ggplot2::labs(title = paste0(seqnames, ":", start_region, "-", end_region), fill = labs_fill, ...) +
         ggplot2::theme_classic()
     plot

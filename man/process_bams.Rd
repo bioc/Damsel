@@ -35,5 +35,4 @@ counts.df <- process_bams(path_to_bams,
 )
 head(counts.df)
 # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
-head(counts.df[, c(1:6, 9, 7, 10, 8)])
 }

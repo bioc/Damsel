@@ -52,7 +52,8 @@ A `ggplot` object - or list of plots if provided multiple peaks/genes
 `plot_wrap` plots all the available plots at once
 }
 \examples{
-if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+library("org.Dm.eg.db")
     set.seed(123)
     example_regions <- random_regions()
     gatc_sites <- dplyr::mutate(example_regions,
@@ -62,13 +63,9 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
     counts.df <- random_counts()
     dm_results <- random_edgeR_results()
     peaks <- aggregate_peaks(dm_results)
-    genes <- get_biomart_genes(
-        species = "dmelanogaster_gene_ensembl",
-        version = 109,
-        regions = example_regions
-    )
 
-    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    genes <- collateGenes(txdb, example_regions, org.Db=org.Dm.eg.db)
 
     ## plot using a peak_id
     plot_wrap(
@@ -109,5 +106,5 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
         gatc_sites.df = gatc_sites,
         genes.df = genes, txdb = txdb
     )
-}
+
 }

@@ -14,17 +14,14 @@
 #' @return A `ggplot_add` object.
 #' @export
 #' @examples
-#' if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+#' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+#' library(org.Dm.eg.db)
 #'     set.seed(123)
 #'     example_regions <- random_regions()
 #'     counts.df <- random_counts()
-#'     genes <- get_biomart_genes(
-#'         species = "dmelanogaster_gene_ensembl",
-#'         version = 109,
-#'         regions = example_regions
-#'     )
 #'
-#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#'     genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
 #'
 #'     plot_counts_all_bams(counts.df,
 #'         seqnames = "chr2L",
@@ -33,7 +30,7 @@
 #'         log2_scale = FALSE
 #'     ) +
 #'         geom_genes.me(genes, txdb)
-#' }
+#'
 geom_genes.me <- function(genes.df, txdb, gene_limits = NULL,
                           plot.space = 0.1, plot.height = 0.3) {
     structure(
@@ -48,7 +45,7 @@ geom_genes.me <- function(genes.df, txdb, gene_limits = NULL,
 
 #' @export
 ggplot_add.genes.me <- function(object, plot, object_name) {
-    if (!is.data.frame(object$genes.df)) {
+    if (!is.data.frame(object$genes.df) && !inherits(object$genes.df, "GRanges")) {
         stop("data.frame of genes is required")
     }
     if (is.null(object$gene_limits)) {
@@ -66,7 +63,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     plot.region.end <- plot.data[2] %>% as.numeric()
 
     # get parameters
-    df_og <- object$genes.df
+    df_og <- object$genes.df %>% data.frame()
     txdb <- object$txdb
     gene_limits <- object$gene_limits
     plot.space <- object$plot.space
