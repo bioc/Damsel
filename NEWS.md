@@ -8,6 +8,7 @@ dam or Dam
 * new peak function available
 * updates to plot functions - fixed wrap plot, set colours for count plot
 * added new gene fn that uses a TxDb object or biomaRt (get_genes_biomaRt has been deprecated and will be removed)
+* example count data available through data(dros_counts)
 
 # Damsel 0.6.0
 ## Removed features

@@ -12,9 +12,9 @@
 #' @return A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
 #' @export
 get_biomart_genes <- function(species, version = 109, regions) {
-  .Deprecated("collateGenes")
-  warning("This function has been deprecated in v0.7.0")
-  if (!is.character(species)) {
+    .Deprecated("collateGenes")
+    warning("This function has been deprecated in v0.7.0")
+    if (!is.character(species)) {
         stop("Species must be a character vector")
     }
     if (!is.data.frame(regions)) {
@@ -77,78 +77,80 @@ get_biomart_genes <- function(species, version = 109, regions) {
 #' set.seed(123)
 #' example_regions <- random_regions()
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-#' genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+#' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' head(genes)
 #'
-collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
-  regions <- regions
-  if(inherits(genes, "TxDb")) {
-    genes_ <- GenomicFeatures::genes(genes)
-    genes_$ensembl_gene_id <- names(genes_)
-    genes_ <- data.frame(genes_)[,c("seqnames", "start", "end", "width", "strand", "ensembl_gene_id")]
-    gene_names <- AnnotationDbi::select(org.Db, keys = AnnotationDbi::keys(genes), keytype = "ENSEMBL", columns = c("SYMBOL"))
-    genes_$gene_name <- gene_names[match(genes_$ensembl_gene_id, gene_names$ENSEMBL), "SYMBOL"]
-    genes_ <- genes_ %>% dplyr::mutate(TSS = ifelse(.data$strand == "+", .data$start, .data$end))
-    message("TSS taken as start of gene, taking strand into account")
-    genes_ <- plyranges::as_granges(genes_)
-    seq_chr <- GenomeInfoDb::seqlevels(genes_)[1] %>% grepl("chr", .)
-    if(seq_chr == TRUE) {
-      regions$seqnames <- paste0("chr", regions$seqnames)
+collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
+    regions <- regions
+    if (inherits(genes, "TxDb")) {
+        genes_ <- GenomicFeatures::genes(genes)
+        genes_$ensembl_gene_id <- names(genes_)
+        genes_ <- data.frame(genes_)[, c("seqnames", "start", "end", "width", "strand", "ensembl_gene_id")]
+        gene_names <- AnnotationDbi::select(org.Db, keys = AnnotationDbi::keys(genes), keytype = "ENSEMBL", columns = c("SYMBOL"))
+        genes_$gene_name <- gene_names[match(genes_$ensembl_gene_id, gene_names$ENSEMBL), "SYMBOL"]
+        genes_ <- genes_ %>% dplyr::mutate(TSS = ifelse(.data$strand == "+", .data$start, .data$end))
+        message("TSS taken as start of gene, taking strand into account")
+        genes_ <- plyranges::as_granges(genes_)
+        seq_chr <- GenomeInfoDb::seqlevels(genes_)[1] %>% grepl("chr", .)
+        if (seq_chr == TRUE) {
+            regions$seqnames <- paste0("chr", regions$seqnames)
+        }
+        # } else if (grep("gff", genes)) {
+        #  genes_ <- rtracklayer::import(genes)
+        #  genes_$ensembl_gene_id <- genes_$ID
+    } else if (grep("ensembl", genes)) {
+        genes_ <- access_biomart(species = genes, regions, version)
     }
- # } else if (grep("gff", genes)) {
-  #  genes_ <- rtracklayer::import(genes)
-  #  genes_$ensembl_gene_id <- genes_$ID
-  } else if (grep("ensembl", genes)) {
-    genes_ <- access_biomart(species=genes, regions, version)
-  }
-  genes_ <- annotate_gene_gatc(genes_, regions)
-  genes_
+    genes_ <- annotate_gene_gatc(genes_, regions)
+    genes_
 }
 
 access_biomart <- function(species, regions, version) {
-  if (!requireNamespace("biomaRt", quietly = TRUE)) {
-    stop("Package \"biomaRt\" must be installed to use this function.",
-         call. = FALSE
+    if (!requireNamespace("biomaRt", quietly = TRUE)) {
+        stop("Package \"biomaRt\" must be installed to use this function.",
+            call. = FALSE
+        )
+    }
+    ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
+    BM.info <- biomaRt::getBM(
+        attributes = c("ensembl_gene_id", "ensembl_transcript_id", "transcript_is_canonical"),
+        filters = "chromosome_name",
+        values = unique(regions$seqnames),
+        mart = ensembl
     )
-  }
-  ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
-  BM.info <- biomaRt::getBM(
-    attributes = c("ensembl_gene_id", "ensembl_transcript_id", "transcript_is_canonical"),
-    filters = "chromosome_name",
-    values = unique(regions$seqnames),
-    mart = ensembl
-  )
-  gene_features <- biomaRt::getBM(
-    attributes = c(
-      "ensembl_gene_id", "external_gene_name", "ensembl_transcript_id",
-      "chromosome_name", "start_position", "end_position", "strand",
-      "transcription_start_site"
-    ),
-    filters = "ensembl_transcript_id",
-    values = dplyr::filter(BM.info, .data$transcript_is_canonical == 1)$ensembl_transcript_id,
-    mart = ensembl
-  )
-  gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position), ]
-  colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
-  gene_features <- plyranges::as_granges(gene_features)
+    gene_features <- biomaRt::getBM(
+        attributes = c(
+            "ensembl_gene_id", "external_gene_name", "ensembl_transcript_id",
+            "chromosome_name", "start_position", "end_position", "strand",
+            "transcription_start_site"
+        ),
+        filters = "ensembl_transcript_id",
+        values = dplyr::filter(BM.info, .data$transcript_is_canonical == 1)$ensembl_transcript_id,
+        mart = ensembl
+    )
+    gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position), ]
+    colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
+    gene_features <- plyranges::as_granges(gene_features)
 }
 
 annotate_gene_gatc <- function(genes, regions) {
-  #regions$seqnames <- paste0("chr", regions$seqnames)
-  overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
-    data.frame() %>%
-    dplyr::group_by(.data$ensembl_gene_id) %>%
-    dplyr::summarise(n_regions = dplyr::n()) %>%
-    data.frame()
-  genes_ <- data.frame(genes)
-  genes_$n_regions <- overlap[match(genes_$ensembl_gene_id, overlap$ensembl_gene_id), "n_regions"]
-  genes_ <- genes_ %>%
-    dplyr::mutate(
-      n_regions = dplyr::coalesce(.data$n_regions, 0)
-     # seqnames = ifelse(grepl("chr", seqnames), seqnames, paste0("chr", seqnames))
-    ) %>% .[order(.$start),] %>%.[order(.$seqnames),]
-  genes_ <- plyranges::as_granges(genes_)
-  genes_
+    # regions$seqnames <- paste0("chr", regions$seqnames)
+    overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
+        data.frame() %>%
+        dplyr::group_by(.data$ensembl_gene_id) %>%
+        dplyr::summarise(n_regions = dplyr::n()) %>%
+        data.frame()
+    genes_ <- data.frame(genes)
+    genes_$n_regions <- overlap[match(genes_$ensembl_gene_id, overlap$ensembl_gene_id), "n_regions"]
+    genes_ <- genes_ %>%
+        dplyr::mutate(
+            n_regions = dplyr::coalesce(.data$n_regions, 0)
+            # seqnames = ifelse(grepl("chr", seqnames), seqnames, paste0("chr", seqnames))
+        ) %>%
+        .[order(.$start), ] %>%
+        .[order(.$seqnames), ]
+    genes_ <- plyranges::as_granges(genes_)
+    genes_
 }
 
 #' Annotation of peaks and genes
@@ -178,7 +180,7 @@ annotate_gene_gatc <- function(genes, regions) {
 #' dm_results <- random_edgeR_results()
 #' peaks <- aggregate_peaks(dm_results)
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-#' genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+#' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #'
 #' annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 #' # view all combinations

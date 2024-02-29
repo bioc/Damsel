@@ -62,8 +62,10 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
         .data$end <= plot.region.end
     )
     df_regions <- df_regions %>%
-      dplyr::mutate(dm = ifelse(.data$dm == -1, 0, .data$dm),
-                    meth_status = ifelse(.data$meth_status == "Downreg", "No_sig", .data$meth_status))
+        dplyr::mutate(
+            dm = ifelse(.data$dm == -1, 0, .data$dm),
+            meth_status = ifelse(.data$meth_status == "Downreg", "No_sig", .data$meth_status)
+        )
     df_colour <- dm_reshape(df_regions)
 
     df_fc <- dm_max(df_regions)

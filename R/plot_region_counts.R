@@ -66,13 +66,17 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     }
     df <- plot_counts_reshape(df)
 
-    if(missing(colours)) {
-      n_samples <- df %>% dplyr::ungroup() %>% dplyr::filter(.data$dam == "Dam") %>% dplyr::distinct(.data$bam) %>% nrow()
-      if(n_samples == 2) {
-        colours <- c("darkblue", "lightblue")
-      } else if (n_samples == 3) {
-        colours <- c("darkblue", "blue", "lightblue")
-      }
+    if (missing(colours)) {
+        n_samples <- df %>%
+            dplyr::ungroup() %>%
+            dplyr::filter(.data$dam == "Dam") %>%
+            dplyr::distinct(.data$bam) %>%
+            nrow()
+        if (n_samples == 2) {
+            colours <- c("darkblue", "lightblue")
+        } else if (n_samples == 3) {
+            colours <- c("darkblue", "blue", "lightblue")
+        }
     }
     if (log2_scale == TRUE) {
         df$raw_counts <- log2(df$raw_counts)
@@ -87,16 +91,20 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
             dplyr::ungroup() %>%
             dplyr::mutate(dam_2 = paste0(.data$dam, "_", .data$dam_num))
 
-        plot <- counts_ggplot(df, start_region, end_region, colours, "dam", group_levels = c("Fusion", "Dam"),
-                              seqnames, labs_fill = "Replicate", alpha = 0.5)
-          #ggplot2::facet_wrap(~ factor(df$dam, levels = c("Fusion", "Dam")), ncol = 1)
+        plot <- counts_ggplot(df, start_region, end_region, colours, "dam",
+            group_levels = c("Fusion", "Dam"),
+            seqnames, labs_fill = "Replicate", alpha = 0.5
+        )
+        # ggplot2::facet_wrap(~ factor(df$dam, levels = c("Fusion", "Dam")), ncol = 1)
     } else if (layout == "spread") {
-      sample_order <- df$bam %>% unique()
-      colours <- c("#480871", "#E30AD0")
-      plot <- counts_ggplot(df, start_region, end_region, colours, "bam", group_levels = sample_order,
-                              seqnames, labs_fill = "Replicate", alpha = 1) +
-          # ggplot2::facet_wrap(~ df$bam, ncol = 1) +
-           # ggplot2::scale_fill_discrete() +
+        sample_order <- df$bam %>% unique()
+        colours <- c("#480871", "#E30AD0")
+        plot <- counts_ggplot(df, start_region, end_region, colours, "bam",
+            group_levels = sample_order,
+            seqnames, labs_fill = "Replicate", alpha = 1
+        ) +
+            # ggplot2::facet_wrap(~ df$bam, ncol = 1) +
+            # ggplot2::scale_fill_discrete() +
             ggplot2::theme(legend.position = "none")
     }
 
@@ -137,8 +145,8 @@ plot_counts_reshape <- function(counts) {
     df
 }
 
-counts_ggplot <- function(df, start_region, end_region, colours, group, group_levels=NULL,
-                          seqnames, labs_fill, alpha, ...) {
+counts_ggplot <- function(df, start_region, end_region, colours, group, group_levels = NULL,
+    seqnames, labs_fill, alpha, ...) {
     if (!("dam_num" %in% colnames(df))) {
         df$dam_num <- df$dam
     }

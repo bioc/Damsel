@@ -47,6 +47,8 @@ Imports:
     stringr,
     tidyr,
     utils
+BugReports: https://github.com/Oshlack/Damsel
+URL: https://github.com/Oshlack/Damsel
 biocViews: DifferentialMethylation, PeakDetection, GenePrediction, GeneSetEnrichment
 VignetteBuilder: knitr
 LazyData: FALSE

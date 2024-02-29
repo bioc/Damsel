@@ -23,7 +23,7 @@
 #' peaks <- aggregate_peaks(random_edgeR_results())
 #'
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-#' genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+#' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
 #' ontology <- goseq_fn(annotation, genes, example_regions)
@@ -49,16 +49,18 @@ goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) 
     GO.wall <- goseq::goseq(pwf, "dm6", "ensGene")
 
     GO.wall <- GO.wall %>% dplyr::mutate(FDR = stats::p.adjust(.data$over_represented_pvalue, method = "BH"))
-    GO.wall <- GO.wall %>% dplyr::filter(.data$FDR < 0.05) %>%
-      .[order(.$FDR, decreasing = FALSE),]
+    GO.wall <- GO.wall %>%
+        dplyr::filter(.data$FDR < 0.05) %>%
+        .[order(.$FDR, decreasing = FALSE), ]
 
-   # go_terms <- character()
-  #  for (go in GO.wall$category[seq_len(10)]) {
-   #   go_terms <- c(go_terms, print(GO.db::GOTERM[[go]]))
-    #}
+    # go_terms <- character()
+    #  for (go in GO.wall$category[seq_len(10)]) {
+    #   go_terms <- c(go_terms, print(GO.db::GOTERM[[go]]))
+    # }
 
-    list <- list(#top_go = go_terms,
-      signif_results=GO.wall, prob_weights = pwf)
+    list <- list( # top_go = go_terms,
+        signif_results = GO.wall, prob_weights = pwf
+    )
 
     list
 }
@@ -105,7 +107,7 @@ gene_mod_extend <- function(genes, regions, extend_by = 2000) {
 #' example_regions <- random_regions()
 #' peaks <- aggregate_peaks(random_edgeR_results())
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-#' genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+#' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
 #' ontology <- goseq_fn(annotation, genes, example_regions)$signif_results
@@ -113,30 +115,30 @@ gene_mod_extend <- function(genes, regions, extend_by = 2000) {
 #' plot_gene_ontology(ontology, plot_type = "dot")
 #'
 plot_gene_ontology <- function(signif_results, plot_type = c("bar", "dot"), bar_x = c("gene_ratio", "gene_count", "-log10FDR")) {
-  df <- signif_results[seq_len(20),]
-  df <- df %>% dplyr::filter(!is.na(.data$category))
-  if("bar" %in% plot_type) {
-    if("gene_ratio" %in% bar_x) {
-      plot <- df %>%
-        ggplot2::ggplot(ggplot2::aes(x = numDEInCat/numInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
-        ggplot2::geom_bar(stat = "identity")
-    } else if (bar_x == "gene_count") {
-      plot <- df %>%
-        ggplot2::ggplot(ggplot2::aes(x = numDEInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
-        ggplot2::geom_bar(stat = "identity")
-    } else if(bar_x == "-log10FDR") {
-      plot <- df %>%
-        ggplot2::ggplot(ggplot2::aes(x = -log10(FDR), y = factor(category, levels = rev(category)), fill = FDR)) +
-        ggplot2::geom_bar(stat = "identity")
+    df <- signif_results[seq_len(20), ]
+    df <- df %>% dplyr::filter(!is.na(.data$category))
+    if ("bar" %in% plot_type) {
+        if ("gene_ratio" %in% bar_x) {
+            plot <- df %>%
+                ggplot2::ggplot(ggplot2::aes(x = numDEInCat / numInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
+                ggplot2::geom_bar(stat = "identity")
+        } else if (bar_x == "gene_count") {
+            plot <- df %>%
+                ggplot2::ggplot(ggplot2::aes(x = numDEInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
+                ggplot2::geom_bar(stat = "identity")
+        } else if (bar_x == "-log10FDR") {
+            plot <- df %>%
+                ggplot2::ggplot(ggplot2::aes(x = -log10(FDR), y = factor(category, levels = rev(category)), fill = FDR)) +
+                ggplot2::geom_bar(stat = "identity")
+        }
+    } else if (plot_type == "dot") {
+        plot <- df %>%
+            .[order(.$numDEInCat / .$numInCat, decreasing = FALSE), ] %>%
+            ggplot2::ggplot(ggplot2::aes(x = numDEInCat / numInCat, y = factor(category, levels = category), colour = FDR)) +
+            ggplot2::geom_point(ggplot2::aes(size = numDEInCat))
     }
-  } else if (plot_type == "dot") {
-    plot <- df %>%
-      .[order(.$numDEInCat/.$numInCat, decreasing = FALSE),] %>%
-      ggplot2::ggplot(ggplot2::aes(x = numDEInCat/numInCat, y = factor(category, levels = category), colour = FDR)) +
-      ggplot2::geom_point(ggplot2::aes(size = numDEInCat))
-  }
 
-  plot <- plot +
-    ggplot2::labs(y = "GO category")
-  plot
+    plot <- plot +
+        ggplot2::labs(y = "GO category")
+    plot
 }

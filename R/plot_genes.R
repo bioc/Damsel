@@ -16,23 +16,23 @@
 #' @examples
 #' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 #' library(org.Dm.eg.db)
-#'     set.seed(123)
-#'     example_regions <- random_regions()
-#'     counts.df <- random_counts()
+#' set.seed(123)
+#' example_regions <- random_regions()
+#' counts.df <- random_counts()
 #'
-#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-#'     genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
+#' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#' genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
 #'
-#'     plot_counts_all_bams(counts.df,
-#'         seqnames = "chr2L",
-#'         start_region = 1,
-#'         end_region = 40000,
-#'         log2_scale = FALSE
-#'     ) +
-#'         geom_genes.me(genes, txdb)
+#' plot_counts_all_bams(counts.df,
+#'     seqnames = "chr2L",
+#'     start_region = 1,
+#'     end_region = 40000,
+#'     log2_scale = FALSE
+#' ) +
+#'     geom_genes.me(genes, txdb)
 #'
 geom_genes.me <- function(genes.df, txdb, gene_limits = NULL,
-                          plot.space = 0.1, plot.height = 0.3) {
+    plot.space = 0.1, plot.height = 0.3) {
     structure(
         list(
             genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,
@@ -80,16 +80,15 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
         gene_plot <- ggplot2::ggplot() +
             ggplot2::geom_blank()
     } else {
+        df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
 
-    df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
+        exons <- exon_check(txdb, plot.chr, plot.region.start, plot.region.end)
 
-    exons <- exon_check(txdb, plot.chr, plot.region.start, plot.region.end)
-
-    if (nrow(exons) == 0) {
-        gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot
-    } else {
-        gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot
-    }
+        if (nrow(exons) == 0) {
+            gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot
+        } else {
+            gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df))@ggplot
+        }
     }
     gene_plot <- gene_plot +
         theme_gene_plot(

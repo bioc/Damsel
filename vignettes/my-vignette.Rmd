@@ -112,7 +112,7 @@ data("dros_counts")
 ## 2.3 Correlation analysis of samples
 
 At this stage, the similarities and differences between the samples can be analysed via correlation.
- `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
+`corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 The default for all Damsel correlation analysis is the non-parametric "spearman's" correlation.
 The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
 
@@ -220,9 +220,11 @@ These results are incorporated with the region data, providing a result for ever
 
 ```{r}
 dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = regions)
-dm_results %>% dplyr::group_by(meth_status) %>% dplyr::summarise(n = dplyr::n())
+dm_results %>%
+    dplyr::group_by(meth_status) %>%
+    dplyr::summarise(n = dplyr::n())
 
-knitr::kable(head(dm_results), digits=32)
+knitr::kable(head(dm_results), digits = 32)
 ```
 
 
@@ -299,12 +301,16 @@ knitr::kable(head(peaks2), format = "html", table.attr = "style='width:30%;'", d
 ### Comparison of the 2 approaches
 ```{r}
 plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2))
-#number of distinct peaks (aggregate_peaks)
-plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>% 
-  data.frame() %>% dplyr::distinct(peak_id.x) %>% nrow()
-#number of distinct peaks (new_peaks_fn)
-plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>% 
-  data.frame() %>% dplyr::distinct(peak_id.y) %>% nrow()
+# number of distinct peaks (aggregate_peaks)
+plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>%
+    data.frame() %>%
+    dplyr::distinct(peak_id.x) %>%
+    nrow()
+# number of distinct peaks (new_peaks_fn)
+plyranges::find_overlaps(plyranges::as_granges(peaks), plyranges::as_granges(peaks2)) %>%
+    data.frame() %>%
+    dplyr::distinct(peak_id.y) %>%
+    nrow()
 ```
 The majority of the new peaks overlap with the original peak function: 1140/1165 (98% overlap)
 However, the original peak function does find a lot more 1145/1766 (65% overlap)
@@ -379,7 +385,7 @@ BiocManager::install("org.Dm.eg.db")
 library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
 library("org.Dm.eg.db")
-genes <- collateGenes(genes=txdb, regions=regions, org.Db=org.Dm.eg.db)
+genes <- collateGenes(genes = txdb, regions = regions, org.Db = org.Dm.eg.db)
 knitr::kable(head(genes))
 ```
 Alternatively, the name of a species listed in biomaRt can be provided, and the version of the genome. A guide to understanding more about how biomaRt functions is here: https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html
@@ -388,7 +394,7 @@ BiocManager::install("biomaRt")
 ```
 ```{r}
 library(biomaRt)
-collateGenes(genes = "dmelanogaster_gene_ensembl", regions=regions, version = 109)
+collateGenes(genes = "dmelanogaster_gene_ensembl", regions = regions, version = 109)
 ```
 
 ## 5.2 Annotating genes to peaks
@@ -400,9 +406,9 @@ To respect that some species have genes with more overlap than others, `annotate
 ```{r}
 annotation <- annotate_genes(peaks, genes, regions = regions, max_distance = 5000)
 
-knitr::kable(head(annotation$closest), digits=32)
-knitr::kable(head(annotation$top_five), digits=32)
-knitr::kable(str(annotation$all), digits=32)
+knitr::kable(head(annotation$closest), digits = 32)
+knitr::kable(head(annotation$top_five), digits = 32)
+knitr::kable(str(annotation$all), digits = 32)
 ```
 
 
@@ -412,35 +418,40 @@ knitr::kable(str(annotation$all), digits=32)
 Now that we have the genes from `get_biomart_genes()`, this can be added as a layer to the previous plots. This plot requires the gene positions as a guide for a `Txdb` or `EnsDb` object, building off the autoplot generic built by `ggbio`.
 
 ```{r, fig.height=9, fig.width=10}
-plot_counts_all_bams(counts.df, 
-                     seqnames = "chr2L",
-                     start_region = 1, 
-                     end_region = 40000) +
-  geom_dm.res.lfc(dm_results) +
-  geom_peak.new(peaks) +
-  geom_gatc(gatc_sites) +
-  geom_genes.me(genes, txdb)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000
+) +
+    geom_dm.res.lfc(dm_results) +
+    geom_peak.new(peaks) +
+    geom_gatc(gatc_sites) +
+    geom_genes.me(genes, txdb)
 ```
 
 
 * If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
 
 ```{r, fig.height=9, fig.width=10}
-plot_wrap(id = peaks[1,]$peak_id, 
-          counts.df = counts.df, 
-          dm_results.df = dm_results, 
-          peaks.df = peaks, 
-          gatc_sites.df = gatc_sites, 
-          genes.df = genes, txdb = txdb)
+plot_wrap(
+    id = peaks[1, ]$peak_id,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 ```
 
 ```{r, fig.height=9, fig.width=10}
-plot_wrap(id = genes[1,]$ensembl_gene_id, 
-          counts.df = counts.df, 
-          dm_results.df = dm_results, 
-          peaks.df = peaks, 
-          gatc_sites.df = gatc_sites, 
-          genes.df = genes, txdb = txdb)
+plot_wrap(
+    id = genes[1, ]$ensembl_gene_id,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 ```
 
 
@@ -449,7 +460,7 @@ One of the last steps in a typical DamID analysis is gene ontology analysis. How
 
 ## 6.1 GO analysis with goseq
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
- 
+
 Outputs list of 4 graphs
 List of top 10 over-represented GO terms across the 3 GO categories
 Plot of goodness of fit of model
@@ -457,10 +468,10 @@ Plot of sample data
 Plot of sample data without bias correction (should be messy)
 
 ```{r}
-ontology <- goseq_fn(annotation$all, genes, regions=regions, extend_by=2000)
+ontology <- goseq_fn(annotation$all, genes, regions = regions, extend_by = 2000)
 
-knitr::kable(head(ontology$signif_results), digits=32)
-knitr::kable(head(ontology$prob_weights), digits=32)
+knitr::kable(head(ontology$signif_results), digits = 32)
+knitr::kable(head(ontology$prob_weights), digits = 32)
 ```
 
 
