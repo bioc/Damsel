@@ -30,7 +30,7 @@
 #'     geom_gatc(gatc_sites)
 #' # The plots can be layered -------------------------------------------------
 geom_gatc <- function(gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
-                      plot.space = 0.2, plot.height = 0.05) {
+    plot.space = 0.2, plot.height = 0.05) {
     structure(
         list(
             gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,

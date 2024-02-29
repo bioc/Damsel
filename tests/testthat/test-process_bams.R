@@ -13,12 +13,12 @@ test_that("Output is error", {
 
 
 test_that("Output is a message", {
- #throws error for next one
- expect_message(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")), nthreads = 2))
+    # throws error for next one
+    expect_message(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")), nthreads = 2))
 })
 
 test_that("No error", {
     expect_no_error(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds"))))
     # expect_no_warning(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds"))))
-    #expect_no_message(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")), nthreads = 2))
+    # expect_no_message(process_bams(path_to_bams = system.file("extdata", package = "Damsel"), regions = readRDS(test_path("fixtures", "regions.rds")), nthreads = 2))
 })

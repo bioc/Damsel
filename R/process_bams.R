@@ -94,5 +94,3 @@ check_paired <- function(list_files) {
     scan_result <- unlist(scan_result)
     scan_result
 }
-
-
