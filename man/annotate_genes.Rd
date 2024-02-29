@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{annotate_genes}
 \alias{annotate_genes}
-\title{New: annotation of peaks and genes}
+\title{Annotation of peaks and genes}
 \usage{
 annotate_genes(peaks, genes, regions, max_distance = 5000)
 }
@@ -29,18 +29,17 @@ This distance is relative, as the function will identify the closest genes, even
 The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc).
 }
 \examples{
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(org.Dm.eg.db)
 set.seed(123)
 example_regions <- random_regions()
 dm_results <- random_edgeR_results()
 peaks <- aggregate_peaks(dm_results)
-
-genes <- get_biomart_genes(
-    species = "dmelanogaster_gene_ensembl",
-    version = 109,
-    regions = example_regions
-)
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
 
 annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 # view all combinations
 annotate_genes(peaks, genes, example_regions, max_distance = NULL)
+
 }
