@@ -1,7 +1,7 @@
 Package: Damsel
 Type: Package
 Title: Damsel: an end to end analysis of DamID
-Version: 0.6.0
+Version: 0.7.0
 Author: Caitlin Page
 Maintainer: Caitlin Page <caitlin.page@petermac.org>
 Description: Damsel provides an end to end analysis of DamID data.
@@ -14,8 +14,10 @@ License: What license is it under?
 Encoding: UTF-8
 Suggests: 
     biovizBase,
+    biomaRt,
     BSgenome.Dmelanogaster.UCSC.dm6,
     knitr,
+    org.Dm.eg.db,
     rmarkdown,
     testthat (>= 3.0.0),
     TxDb.Dmelanogaster.UCSC.dm6.ensGene
@@ -24,7 +26,7 @@ Depends:
     R (>= 3.50)
 RoxygenNote: 7.3.1
 Imports: 
-    biomaRt,
+    AnnotationDbi,
     Biostrings,
     dplyr,
     edgeR,
@@ -32,9 +34,7 @@ Imports:
     GenomicFeatures,
     ggbio,
     ggplot2,
-    GO.db,
     goseq,
-    graphics,
     limma,
     magrittr,
     patchwork,
@@ -49,3 +49,4 @@ Imports:
     utils
 biocViews: DifferentialMethylation, PeakDetection, GenePrediction, GeneSetEnrichment
 VignetteBuilder: knitr
+LazyData: FALSE
