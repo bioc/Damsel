@@ -30,17 +30,18 @@ goseq_fn(annotation, genes, regions, extend_by = 2000, bias = NULL)
 `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 }
 \examples{
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(org.Dm.eg.db)
 set.seed(123)
 example_regions <- random_regions()
 peaks <- aggregate_peaks(random_edgeR_results())
-genes <- get_biomart_genes(
-    species = "dmelanogaster_gene_ensembl",
-    version = 109,
-    regions = example_regions
-)
+
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
 annotation <- annotate_genes(peaks, genes, example_regions)$all
 
 ontology <- goseq_fn(annotation, genes, example_regions)
 ontology$signif_results
 ontology$prob_weights
+
 }

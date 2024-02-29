@@ -33,17 +33,14 @@ A `ggplot_add` object.
 * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
-if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
+library(org.Dm.eg.db)
     set.seed(123)
     example_regions <- random_regions()
     counts.df <- random_counts()
-    genes <- get_biomart_genes(
-        species = "dmelanogaster_gene_ensembl",
-        version = 109,
-        regions = example_regions
-    )
 
-    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+    genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
 
     plot_counts_all_bams(counts.df,
         seqnames = "chr2L",
@@ -52,5 +49,5 @@ if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
         log2_scale = FALSE
     ) +
         geom_genes.me(genes, txdb)
-}
+
 }

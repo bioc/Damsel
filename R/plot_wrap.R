@@ -20,7 +20,8 @@
 #' @export
 #'
 #' @examples
-#' if (require("TxDb.Dmelanogaster.UCSC.dm6.ensGene")) {
+#' library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
+#' library("org.Dm.eg.db")
 #'     set.seed(123)
 #'     example_regions <- random_regions()
 #'     gatc_sites <- dplyr::mutate(example_regions,
@@ -30,13 +31,9 @@
 #'     counts.df <- random_counts()
 #'     dm_results <- random_edgeR_results()
 #'     peaks <- aggregate_peaks(dm_results)
-#'     genes <- get_biomart_genes(
-#'         species = "dmelanogaster_gene_ensembl",
-#'         version = 109,
-#'         regions = example_regions
-#'     )
 #'
-#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#'     txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+#'     genes <- collateGenes(txdb, example_regions, org.Db=org.Dm.eg.db)
 #'
 #'     ## plot using a peak_id
 #'     plot_wrap(
@@ -77,7 +74,7 @@
 #'         gatc_sites.df = gatc_sites,
 #'         genes.df = genes, txdb = txdb
 #'     )
-#' }
+#'
 plot_wrap <- function(id = NULL,
                       seqnames = NULL, start_region = NULL, end_region = NULL,
                       counts.df = NULL, dm_results.df = NULL, peaks.df = NULL,
@@ -91,6 +88,8 @@ plot_wrap <- function(id = NULL,
     }
     if (!is.null(id)) {
         #id <- id[!is.na(id)]
+        peaks.df <- data.frame(peaks.df)
+        genes.df <- data.frame(genes.df)
         df <- dplyr::filter(peaks.df, .data$peak_id %in% id)
         if(nrow(df) == 0) {
             df <- dplyr::filter(genes.df, .data$ensembl_gene_id %in% id)
