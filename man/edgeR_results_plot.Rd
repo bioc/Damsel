@@ -2,7 +2,10 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_results_plot}
 \alias{edgeR_results_plot}
-\title{Plot differential testing results}
+\title{Plot differential testing results
+This function has been deprecated and it's utility has been incorporated into testDmRegions (aka edgeR_results)
+`edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
+* for further details, see [edgeR::plotSmear()]}
 \usage{
 edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 }
@@ -17,6 +20,8 @@ edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 An object of class `MA` style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 }
 \description{
+Plot differential testing results
+This function has been deprecated and it's utility has been incorporated into testDmRegions (aka edgeR_results)
 `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 * for further details, see [edgeR::plotSmear()]
 }

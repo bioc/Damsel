@@ -10,7 +10,7 @@
 #'
 #' @return An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 #' @export
-#'
+#' @references edgeR
 #' @examples
 #' counts.df <- random_counts()
 #'
@@ -77,6 +77,8 @@ makeDGE <- edgeR_set_up
 #' edgeR_plot_mds(dge)
 # dmPlotMDS
 edgeR_plot_mds <- function(dge) {
+    .Deprecated("edgeR_plot_mds")
+    warning("This function has been deprecated in v0.7.1")
     group <- dge$samples$group %>% as.character()
     limma::plotMDS(dge, col = as.numeric(factor(group)))
 }
@@ -94,10 +96,10 @@ edgeR_plot_mds <- function(dge) {
 #' @param regions A data.frame of GATC regions.
 #' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
-#'
+#' @param plot An option to plot the results using edgeR::plotSmear. Default is TRUE.
 #' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
 #' @export
-#'
+#' @references edgeR, csaw
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -106,7 +108,7 @@ edgeR_plot_mds <- function(dge) {
 #'
 #' dm_results <- edgeR_results(dge, regions=example_regions, p.value = 0.01, lfc = 1)
 #' head(dm_results)
-edgeR_results <- function(dge, regions, p.value=0.01, lfc=1) {
+edgeR_results <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
     if (!is.numeric(p.value) | length(p.value) > 1) {
         stop("p.value must be 1 number, recommend using default value")
     }
@@ -125,6 +127,10 @@ edgeR_results <- function(dge, regions, p.value=0.01, lfc=1) {
         adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
         dm = ifelse(.data$logFC > lfc & .data$adjust.p < p.value, 1, 0)
     )
+    if (plot == TRUE) {
+      detags <- rownames(dge)[as.logical(lrt_table$dm)]
+      edgeR::plotSmear(qlf, de.tags = detags, ylab = "logFC - Fusion/Dam")
+    }
     lrt_table <- ..addDM(lrt_table, regions)
     lrt_table <- data.frame(lrt_table)
     lrt_table
@@ -134,7 +140,7 @@ edgeR_results <- function(dge, regions, p.value=0.01, lfc=1) {
 testDmRegions <- edgeR_results
 
 #' Plot differential testing results
-#'
+#' This function has been deprecated and it's utility has been incorporated into testDmRegions (aka edgeR_results)
 #' `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 #' * for further details, see [edgeR::plotSmear()]
 #'
@@ -152,6 +158,8 @@ testDmRegions <- edgeR_results
 #' edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 # dmPlotResults
 edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
+    .Deprecated("edgeR_results_plot")
+    warning("This function has been deprecated in v0.7.1")
     if (!is.numeric(p.value) | length(p.value) > 1) {
         stop("p.value must be 1 number, recommend using default value")
     }
