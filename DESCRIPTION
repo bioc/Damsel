@@ -1,7 +1,7 @@
 Package: Damsel
 Type: Package
 Title: Damsel: an end to end analysis of DamID
-Version: 0.7.0
+Version: 0.7.1
 Author: Caitlin Page
 Maintainer: Caitlin Page <caitlin.page@petermac.org>
 Description: Damsel provides an end to end analysis of DamID data.
@@ -32,6 +32,7 @@ Imports:
     edgeR,
     GenomeInfoDb,
     GenomicFeatures,
+    GenomicRanges,
     ggbio,
     ggplot2,
     goseq,

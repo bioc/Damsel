@@ -1,3 +1,7 @@
+# Damsel 0.7.1
+* new Bioconductor style names for functions alongside original function names
+* updated gene ontology plot
+
 # Damsel 0.7.0
 ## New features
 * updated gene ontology output of results
