@@ -13,7 +13,7 @@
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#'
+#' @seealso [geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
@@ -35,6 +35,7 @@
 #' ) +
 #'     geom_peak.new(peaks, peak.label = TRUE)
 #' # The plots can be layered -------------------------------------------------
+#' @references ggcoverage
 geom_peak.new <- function(peaks.df = NULL, peak.label = FALSE, peak.color = "black", peak.size = 5,
     plot.space = 0.1, plot.height = 0.05) {
     structure(
@@ -72,12 +73,12 @@ ggplot_add.peak.new <- function(object, plot, object_name) {
     plot.space <- object$plot.space
     plot.height <- object$plot.height
 
-    valid.bed <- GetRegion_hack(df = peaks.df, columns = c("seqnames", "start", "end", "peak_id"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
+    valid.bed <- ..getRegionsPlot(df = peaks.df, columns = c("seqnames", "start", "end", "peak_id"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
 
-    peak.plot <- plot_peak(valid.bed = valid.bed, plot.size = peak.size, plot.color = peak.color, peak.label = peak.label)
+    peak.plot <- ..plotPeak(valid.bed = valid.bed, plot.size = peak.size, plot.color = peak.color, peak.label = peak.label)
 
     peak.plot <- peak.plot + ggplot2::labs(y = "Peak") +
-        theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+        ..peakGatcTheme(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
     # assemble plot
     patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
         peak.plot,

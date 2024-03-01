@@ -4,9 +4,7 @@
 #'
 #' @param object A BSgenome package OR the path to a FASTA file.
 #'
-#' @return A `list` object composed of two `data.frames`.
-#'
-#' The first; "regions" provides the GATC regions used in downstream analysis. The second, "sites", provides the positions of the GATC sites, and is used in plotting the results.
+#' @return A `GRangesList` object of two GRanges; regions - providing the coordinates between adjacent GATC sites, and sites - providing the coordinates of the GATC sites.
 #' @export
 #' @examples
 #' if (require("BSgenome.Dmelanogaster.UCSC.dm6")) {
@@ -67,5 +65,9 @@ gatc_region_fn <- function(object) {
         ) %>%
         data.frame()
 
-    list(regions = regions, sites = df)
+    #list(regions = regions, sites = df)
+    GenomicRanges::GRangesList(regions = regions, sites = df)
 }
+#' @export
+#' @rdname gatc_region_fn
+getGatcRegions <- gatc_region_fn

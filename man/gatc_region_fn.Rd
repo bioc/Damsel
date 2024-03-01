@@ -2,17 +2,18 @@
 % Please edit documentation in R/gatc_track.R
 \name{gatc_region_fn}
 \alias{gatc_region_fn}
+\alias{getGatcRegions}
 \title{Extract GATC regions}
 \usage{
 gatc_region_fn(object)
+
+getGatcRegions(object)
 }
 \arguments{
 \item{object}{A BSgenome package OR the path to a FASTA file.}
 }
 \value{
-A `list` object composed of two `data.frames`.
-
-The first; "regions" provides the GATC regions used in downstream analysis. The second, "sites", provides the positions of the GATC sites, and is used in plotting the results.
+A `GRangesList` object of two GRanges; regions - providing the coordinates between adjacent GATC sites, and sites - providing the coordinates of the GATC sites.
 }
 \description{
 `gatc_region_fn` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.

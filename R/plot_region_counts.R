@@ -14,7 +14,8 @@
 #'
 #' @return A `ggplot` object.
 #' @export
-#'
+#' @references ggcoverage
+#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
@@ -64,7 +65,7 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     if (nrow(df) == 0) {
         stop("No data available for provided region, make the region larger")
     }
-    df <- plot_counts_reshape(df)
+    df <- ..plotCountsReshape(df)
 
     if (missing(colours)) {
         n_samples <- df %>%
@@ -95,16 +96,13 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
             group_levels = c("Fusion", "Dam"),
             seqnames, labs_fill = "Replicate", alpha = 0.5
         )
-        # ggplot2::facet_wrap(~ factor(df$dam, levels = c("Fusion", "Dam")), ncol = 1)
     } else if (layout == "spread") {
         sample_order <- df$bam %>% unique()
         colours <- c("#480871", "#E30AD0")
-        plot <- counts_ggplot(df, start_region, end_region, colours, "bam",
+        plot <- ..countsGgplot(df, start_region, end_region, colours, "bam",
             group_levels = sample_order,
             seqnames, labs_fill = "Replicate", alpha = 1
         ) +
-            # ggplot2::facet_wrap(~ df$bam, ncol = 1) +
-            # ggplot2::scale_fill_discrete() +
             ggplot2::theme(legend.position = "none")
     }
 
@@ -115,7 +113,11 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
     plot
 }
 
-plot_counts_reshape <- function(counts) {
+#' @export
+#' @rdname plot_counts_all_bams
+plotCounts <- plot_counts_all_bams
+
+..plotCountsReshape <- function(counts) {
     df <- counts %>%
         dplyr::mutate(number = seq_len(dplyr::n())) %>%
         .[rep(seq_len(nrow(.)), times = 4), ] %>%
@@ -145,7 +147,7 @@ plot_counts_reshape <- function(counts) {
     df
 }
 
-counts_ggplot <- function(df, start_region, end_region, colours, group, group_levels = NULL,
+..countsGgplot <- function(df, start_region, end_region, colours, group, group_levels = NULL,
     seqnames, labs_fill, alpha, ...) {
     if (!("dam_num" %in% colnames(df))) {
         df$dam_num <- df$dam

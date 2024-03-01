@@ -99,13 +99,13 @@ collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
         #  genes_ <- rtracklayer::import(genes)
         #  genes_$ensembl_gene_id <- genes_$ID
     } else if (grep("ensembl", genes)) {
-        genes_ <- access_biomart(species = genes, regions, version)
+        genes_ <- ..accessBiomart(species = genes, regions, version)
     }
-    genes_ <- annotate_gene_gatc(genes_, regions)
+    genes_ <- ..annotateGeneGatc(genes_, regions)
     genes_
 }
 
-access_biomart <- function(species, regions, version) {
+..accessBiomart <- function(species, regions, version) {
     if (!requireNamespace("biomaRt", quietly = TRUE)) {
         stop("Package \"biomaRt\" must be installed to use this function.",
             call. = FALSE
@@ -133,7 +133,7 @@ access_biomart <- function(species, regions, version) {
     gene_features <- plyranges::as_granges(gene_features)
 }
 
-annotate_gene_gatc <- function(genes, regions) {
+..annotateGeneGatc <- function(genes, regions) {
     # regions$seqnames <- paste0("chr", regions$seqnames)
     overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
         data.frame() %>%
@@ -194,11 +194,11 @@ annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
     genes_gr <- plyranges::as_granges(genes)
     peaks_gr <- plyranges::as_granges(peaks)
 
-    combo <- pair_genes_peaks(genes_gr, peaks_gr)
+    combo <- ..pairGenesPeaks(genes_gr, peaks_gr)
 
-    combo <- annotate_stats(combo)
+    combo <- ..annotateStats(combo)
 
-    combo <- peak_relative_position(combo)
+    combo <- ..peakRelativePosition(combo)
     combo <- combo %>%
         dplyr::mutate(num = seq_len(dplyr::n()))
 
@@ -226,9 +226,9 @@ annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
         combo <- dplyr::filter(combo, .data$min_distance <= max_distance)
     }
 
-    closest <- closest_gene(combo)
+    closest <- ..closestGene(combo)
 
-    combo_list <- annotate_top_5(combo)
+    combo_list <- ..annotateTop5(combo)
 
     cols_start <- which(colnames(combo) %in% c("seqnames", "start", "end", "width"))
     combo <- combo[, c(
@@ -241,9 +241,12 @@ annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
     list_results <- list(closest = closest, top_five = combo_list, all = combo)
     list_results
 }
+#' @export
+#' @rdname annotate_genes
+annotatePeaksGenes <- annotate_genes
 
 
-pair_genes_peaks <- function(genes_gr, peaks_gr) {
+..pairGenesPeaks <- function(genes_gr, peaks_gr) {
     pair_gene <- plyranges::pair_nearest(genes_gr, peaks_gr) %>%
         data.frame()
     pair_peak <- plyranges::pair_nearest(peaks_gr, genes_gr) %>%
@@ -281,7 +284,7 @@ pair_genes_peaks <- function(genes_gr, peaks_gr) {
     combo
 }
 
-annotate_stats <- function(combo) {
+..annotateStats <- function(combo) {
     df <- combo %>%
         dplyr::mutate(
             seqnames = .data$gene_seqnames,
@@ -302,7 +305,7 @@ annotate_stats <- function(combo) {
     df
 }
 
-peak_relative_position <- function(combo) {
+..peakRelativePosition <- function(combo) {
     df <- combo %>%
         dplyr::mutate(
             gap_ups = .data$gene_start - .data$peak_end,
@@ -331,7 +334,7 @@ peak_relative_position <- function(combo) {
     df
 }
 
-closest_gene <- function(combo) {
+..closestGene <- function(combo) {
     df <- combo %>%
         dplyr::filter(.data$count == 1) %>%
         dplyr::mutate(
@@ -348,7 +351,7 @@ closest_gene <- function(combo) {
     df
 }
 
-annotate_top_5 <- function(combo) {
+..annotateTop5 <- function(combo) {
     df <- combo %>%
         dplyr::filter(.data$count <= 5) %>%
         dplyr::group_by(.data$peak_id) %>%

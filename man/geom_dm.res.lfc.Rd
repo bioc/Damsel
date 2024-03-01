@@ -35,3 +35,9 @@ plot_counts_all_bams(counts.df,
 ) +
     geom_dm.res.lfc(dm_results)
 }
+\references{
+ggcoverage
+}
+\seealso{
+[geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+}

@@ -35,19 +35,25 @@ A `ggplot_add` object.
 \examples{
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 library(org.Dm.eg.db)
-    set.seed(123)
-    example_regions <- random_regions()
-    counts.df <- random_counts()
+set.seed(123)
+example_regions <- random_regions()
+counts.df <- random_counts()
 
-    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-    genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
 
-    plot_counts_all_bams(counts.df,
-        seqnames = "chr2L",
-        start_region = 1,
-        end_region = 40000,
-        log2_scale = FALSE
-    ) +
-        geom_genes.me(genes, txdb)
+plot_counts_all_bams(counts.df,
+    seqnames = "chr2L",
+    start_region = 1,
+    end_region = 40000,
+    log2_scale = FALSE
+) +
+    geom_genes.me(genes, txdb)
 
+}
+\references{
+ggbio and ggcoverage
+}
+\seealso{
+[geom_peak()] [geom_dm()] [geom_counts()] [geom_gatc()] [plot_wrap()]
 }

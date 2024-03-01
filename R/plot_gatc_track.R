@@ -11,7 +11,8 @@
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#'
+#' @references ggcoverage
+#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()]
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -65,13 +66,13 @@ ggplot_add.gatc <- function(object, plot, object_name) {
     plot.space <- object$plot.space
     plot.height <- object$plot.height
 
-    valid.bed <- GetRegion_hack(df = gatc_sites.df, columns = c("seqnames", "start", "end"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
+    valid.bed <- ..getRegionsPlot(df = gatc_sites.df, columns = c("seqnames", "start", "end"), chr = plot.chr, start = plot.region.start, end = plot.region.end)
 
-    gatc.plot <- plot_peak(valid.bed = valid.bed, plot.size = gatc.size, plot.color = gatc.color, peak.label = FALSE)
+    gatc.plot <- ..plotPeak(valid.bed = valid.bed, plot.size = gatc.size, plot.color = gatc.color, peak.label = FALSE)
 
     gatc.plot <- gatc.plot +
         ggplot2::labs(y = "GATC") +
-        theme_peak_hack(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
+        ..peakGatcTheme(margin.len = plot.space, x.range = c(plot.region.start, plot.region.end))
 
     # assemble plot
     patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),

@@ -8,8 +8,10 @@
 #' @param extend_by A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 #' * This is done to incorporate the acceptable distance of a peak to a gene.
 #' * This also allows for consistency across significant and non-significant genes
-#' @param bias alternatively, the bias can be input by itself.
+#' @param fdr_threshold The FDR threshold used for significance in the ontology. Default is 0.05
+#' @param bias Alternatively, the bias can be input by itself.
 #' @export
+#' @references goseq
 #' @return 4 objects
 #'  * List of top 10 over-represented GO terms across the 3 GO categories
 #'  * Plot of goodness of fit of model
@@ -26,14 +28,13 @@
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
-#' ontology <- goseq_fn(annotation, genes, example_regions)
+#' ontology <- testGeneOntology(annotation, genes, example_regions)
 #' ontology$signif_results
 #' ontology$prob_weights
-#'
-goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) {
+testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_threshold=0.05, bias=NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
     goseq_data <- genes
-    goseq_data <- gene_mod_extend(goseq_data, regions, extend_by = {{ extend_by }})
+    goseq_data <- ..geneModExtend(goseq_data, regions, extend_by = {{ extend_by }})
     goseq_data <- goseq_data %>%
         dplyr::mutate(dm = ifelse(.data$ensembl_gene_id %in% dm_genes$ensembl_gene_id, 1, 0))
 
@@ -50,7 +51,7 @@ goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) 
 
     GO.wall <- GO.wall %>% dplyr::mutate(FDR = stats::p.adjust(.data$over_represented_pvalue, method = "BH"))
     GO.wall <- GO.wall %>%
-        dplyr::filter(.data$FDR < 0.05) %>%
+        dplyr::filter(.data$FDR < fdr_threshold) %>%
         .[order(.$FDR, decreasing = FALSE), ]
 
     # go_terms <- character()
@@ -66,7 +67,7 @@ goseq_fn <- function(annotation, genes, regions, extend_by = 2000, bias = NULL) 
 }
 
 
-gene_mod_extend <- function(genes, regions, extend_by = 2000) {
+..geneModExtend <- function(genes, regions, extend_by = 2000) {
     genes_mod <- data.frame(genes)
     genes_mod$start <- genes_mod$start - extend_by
     genes_mod$end <- genes_mod$end + extend_by
@@ -93,13 +94,11 @@ gene_mod_extend <- function(genes, regions, extend_by = 2000) {
 
 #' Plot gene ontology results
 #'
-#' @param signif_results results as outputted from goseq_fn()$signif_results. Selects the top 20 GO terms as default
-#' @param plot_type Plot results as a bar or a dot plot. Bar is default method
-#' @param bar_x Select x axis for bar plot method= c(gene_ratio, gene_count, -log10FDR). Default is gene_ratio
+#' @param signif_results results as outputted from goseq_fn()$signif_results. Selects the top 10 GO terms as default
+#' @param fdr_threshold The FDR threshold used for significance in the ontology. Default is 0.05
 #'
 #' @return A ggplot2 object
 #' @export
-#'
 #' @examples
 #' library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 #' library("org.Dm.eg.db")
@@ -110,35 +109,23 @@ gene_mod_extend <- function(genes, regions, extend_by = 2000) {
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
-#' ontology <- goseq_fn(annotation, genes, example_regions)$signif_results
-#' plot_gene_ontology(ontology, plot_type = "bar", bar_x = "gene_ratio")
-#' plot_gene_ontology(ontology, plot_type = "dot")
+#' ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
+#' plotGeneOntology(ontology)
 #'
-plot_gene_ontology <- function(signif_results, plot_type = c("bar", "dot"), bar_x = c("gene_ratio", "gene_count", "-log10FDR")) {
-    df <- signif_results[seq_len(20), ]
+plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
+    df <- signif_results[seq_len(10), ]
     df <- df %>% dplyr::filter(!is.na(.data$category))
-    if ("bar" %in% plot_type) {
-        if ("gene_ratio" %in% bar_x) {
-            plot <- df %>%
-                ggplot2::ggplot(ggplot2::aes(x = numDEInCat / numInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
-                ggplot2::geom_bar(stat = "identity")
-        } else if (bar_x == "gene_count") {
-            plot <- df %>%
-                ggplot2::ggplot(ggplot2::aes(x = numDEInCat, y = factor(category, levels = rev(category)), fill = FDR)) +
-                ggplot2::geom_bar(stat = "identity")
-        } else if (bar_x == "-log10FDR") {
-            plot <- df %>%
-                ggplot2::ggplot(ggplot2::aes(x = -log10(FDR), y = factor(category, levels = rev(category)), fill = FDR)) +
-                ggplot2::geom_bar(stat = "identity")
-        }
-    } else if (plot_type == "dot") {
-        plot <- df %>%
-            .[order(.$numDEInCat / .$numInCat, decreasing = FALSE), ] %>%
-            ggplot2::ggplot(ggplot2::aes(x = numDEInCat / numInCat, y = factor(category, levels = category), colour = FDR)) +
-            ggplot2::geom_point(ggplot2::aes(size = numDEInCat))
-    }
+    max_fdr <- max(-log10(df$FDR)) + 5
+    plot <- df %>%
+        .[order(.$FDR, decreasing = FALSE), ] %>%
+        ggplot2::ggplot(ggplot2::aes(x = .data$FDR, y = factor(.data$term, levels = .data$term), colour = .data$ontology)) +
+        ggplot2::geom_point(ggplot2::aes(size = .data$numInCat)) +
+        ggplot2::geom_vline(xintercept = fdr_threshold, linetype = "dashed") +
+        ggplot2::scale_x_continuous(limits = c(0, max_fdr))
 
     plot <- plot +
-        ggplot2::labs(y = "GO category")
+        ggplot2::labs(y = "GO category") +
+        ggplot2::theme_bw()
     plot
 }
+

@@ -18,7 +18,7 @@
 #'
 #' @return A `ggplot` object - or list of plots if provided multiple peaks/genes
 #' @export
-#'
+#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [geom_counts()]
 #' @examples
 #' library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 #' library("org.Dm.eg.db")
@@ -128,3 +128,7 @@ plot_wrap <- function(id = NULL, seqnames = NULL, start_region = NULL,
     }
     list_plots
 }
+
+#' @export
+#' @rdname plot_wrap
+plotWrap <- plot_wrap

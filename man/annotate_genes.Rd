@@ -2,9 +2,12 @@
 % Please edit documentation in R/gene_annotation.R
 \name{annotate_genes}
 \alias{annotate_genes}
+\alias{annotatePeaksGenes}
 \title{Annotation of peaks and genes}
 \usage{
 annotate_genes(peaks, genes, regions, max_distance = 5000)
+
+annotatePeaksGenes(peaks, genes, regions, max_distance = 5000)
 }
 \arguments{
 \item{peaks}{A data.frame of peaks as outputted from [aggregate_peaks()]}
@@ -36,7 +39,7 @@ example_regions <- random_regions()
 dm_results <- random_edgeR_results()
 peaks <- aggregate_peaks(dm_results)
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 
 annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 # view all combinations

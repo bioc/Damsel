@@ -27,7 +27,7 @@ library(org.Dm.eg.db)
 set.seed(123)
 example_regions <- random_regions()
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-genes <- collateGenes(genes=txdb, regions=example_regions, org.Db=org.Dm.eg.db)
+genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 head(genes)
 
 }
