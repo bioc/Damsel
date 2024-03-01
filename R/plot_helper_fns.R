@@ -1,6 +1,6 @@
 ## in plot_peak and plot_gatc
 
-GetRegion_hack <- function(df, columns, chr, start, end = NULL) {
+..getRegionsPlot <- function(df, columns, chr, start, end = NULL) {
     # subset used chromosome
     df <- df[, columns]
     df$start <- as.numeric(df$start) + 1
@@ -24,7 +24,7 @@ GetRegion_hack <- function(df, columns, chr, start, end = NULL) {
     return(df.select)
 }
 
-plot_peak <- function(valid.bed, plot.size, plot.color, peak.label) {
+..plotPeak <- function(valid.bed, plot.size, plot.color, peak.label) {
     if (nrow(valid.bed) == 0) {
         message("No data available for this region")
         peak.plot <- ggplot2::ggplot() +
@@ -49,7 +49,7 @@ plot_peak <- function(valid.bed, plot.size, plot.color, peak.label) {
     peak.plot
 }
 
-theme_peak_hack <- function(margin.len, x.range) {
+..peakGatcTheme <- function(margin.len, x.range) {
     list(
         ggplot2::theme_classic(),
         ggplot2::theme(

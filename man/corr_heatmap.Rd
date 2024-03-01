@@ -2,9 +2,12 @@
 % Please edit documentation in R/correlation_results.R
 \name{corr_heatmap}
 \alias{corr_heatmap}
+\alias{plotCorrHeatmap}
 \title{Plot correlation heatmap}
 \usage{
 corr_heatmap(df, method = "spearman")
+
+plotCorrHeatmap(df, method = "spearman")
 }
 \arguments{
 \item{df}{A data.frame of GATC region counts as outputted from [process_bams()]}

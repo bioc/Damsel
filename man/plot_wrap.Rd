@@ -2,9 +2,25 @@
 % Please edit documentation in R/plot_wrap.R
 \name{plot_wrap}
 \alias{plot_wrap}
+\alias{plotWrap}
 \title{Wrapper function for plotting}
 \usage{
 plot_wrap(
+  id = NULL,
+  seqnames = NULL,
+  start_region = NULL,
+  end_region = NULL,
+  counts.df = NULL,
+  dm_results.df = NULL,
+  peaks.df = NULL,
+  genes.df = NULL,
+  txdb = NULL,
+  gatc_sites.df = NULL,
+  extend_by = 250,
+  ...
+)
+
+plotWrap(
   id = NULL,
   seqnames = NULL,
   start_region = NULL,
@@ -54,57 +70,60 @@ A `ggplot` object - or list of plots if provided multiple peaks/genes
 \examples{
 library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 library("org.Dm.eg.db")
-    set.seed(123)
-    example_regions <- random_regions()
-    gatc_sites <- dplyr::mutate(example_regions,
-        seqnames = paste0("chr", seqnames),
-        start = start - 3, end = start + 4
-    )
-    counts.df <- random_counts()
-    dm_results <- random_edgeR_results()
-    peaks <- aggregate_peaks(dm_results)
+set.seed(123)
+example_regions <- random_regions()
+gatc_sites <- dplyr::mutate(example_regions,
+    seqnames = paste0("chr", seqnames),
+    start = start - 3, end = start + 4
+)
+counts.df <- random_counts()
+dm_results <- random_edgeR_results()
+peaks <- aggregate_peaks(dm_results)
 
-    txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
-    genes <- collateGenes(txdb, example_regions, org.Db=org.Dm.eg.db)
+txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
+genes <- collateGenes(txdb, example_regions, org.Db = org.Dm.eg.db)
 
-    ## plot using a peak_id
-    plot_wrap(
-        id = peaks[1, ]$peak_id,
-        counts.df = counts.df,
-        dm_results.df = dm_results,
-        peaks.df = peaks,
-        gatc_sites.df = gatc_sites,
-        genes.df = genes, txdb = txdb
-    )
+## plot using a peak_id
+plot_wrap(
+    id = peaks[1, ]$peak_id,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 
-    ## plot using a gene id
-    plot_wrap(
-        id = genes[1, ]$ensembl_gene_id,
-        counts.df = counts.df,
-        dm_results.df = dm_results,
-        peaks.df = peaks,
-        gatc_sites.df = gatc_sites,
-        genes.df = genes, txdb = txdb
-    )
+## plot using a gene id
+plot_wrap(
+    id = genes[1, ]$ensembl_gene_id,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 
-    ## plot providing a region
-    plot_wrap(
-        seqnames = "chr2L", start_region = 1, end_region = 5000,
-        counts.df = counts.df,
-        dm_results.df = dm_results,
-        peaks.df = peaks,
-        gatc_sites.df = gatc_sites,
-        genes.df = genes, txdb = txdb
-    )
+## plot providing a region
+plot_wrap(
+    seqnames = "chr2L", start_region = 1, end_region = 5000,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 
-    ## plot multiple peaks or genes by providing a vector of id's
-    plot_wrap(
-        id = peaks[1:2, ]$peak_id,
-        counts.df = counts.df,
-        dm_results.df = dm_results,
-        peaks.df = peaks,
-        gatc_sites.df = gatc_sites,
-        genes.df = genes, txdb = txdb
-    )
+## plot multiple peaks or genes by providing a vector of id's
+plot_wrap(
+    id = peaks[1:2, ]$peak_id,
+    counts.df = counts.df,
+    dm_results.df = dm_results,
+    peaks.df = peaks,
+    gatc_sites.df = gatc_sites,
+    genes.df = genes, txdb = txdb
+)
 
+}
+\seealso{
+[geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [geom_counts()]
 }

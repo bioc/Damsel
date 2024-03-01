@@ -11,7 +11,8 @@
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#'
+#' @references ggcoverage
+#' @seealso [geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
@@ -66,9 +67,9 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
             dm = ifelse(.data$dm == -1, 0, .data$dm),
             meth_status = ifelse(.data$meth_status == "Downreg", "No_sig", .data$meth_status)
         )
-    df_colour <- dm_reshape(df_regions)
+    df_colour <- ..dmReshape(df_regions)
 
-    df_fc <- dm_max(df_regions)
+    df_fc <- ..dmMax(df_regions)
 
     colours_list <- c("Upreg" = "red", "Not_included" = "grey", "No_sig" = "black")
 
@@ -79,7 +80,7 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
         ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$logFC, yend = 0)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$logFC, yend = .data$logFC)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = 0, yend = 0)) +
-        dm_theme(colours = colours_list, x.range = c(plot.region.start, plot.region.end))
+        ..dmTheme(colours = colours_list, x.range = c(plot.region.start, plot.region.end))
     ggplot2::scale_y_continuous(
         limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
         expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right"
@@ -92,7 +93,8 @@ ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
     )
 }
 
-dm_reshape <- function(df_regions) {
+
+..dmReshape <- function(df_regions) {
     df <- df_regions %>%
         dplyr::mutate(number = seq_len(dplyr::n())) %>%
         .[rep(seq_len(nrow(.)), times = 4), ] %>%
@@ -116,7 +118,7 @@ dm_reshape <- function(df_regions) {
     df
 }
 
-dm_max <- function(df_regions) {
+..dmMax <- function(df_regions) {
     df <- df_regions %>%
         dplyr::summarise(
             abs_max = max(.data$logFC),
@@ -129,7 +131,7 @@ dm_max <- function(df_regions) {
     df
 }
 
-dm_theme <- function(colours, x.range) {
+..dmTheme <- function(colours, x.range) {
     list(
         ggplot2::theme_classic(),
         ggplot2::theme(

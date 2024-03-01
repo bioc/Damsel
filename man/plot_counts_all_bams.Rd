@@ -2,9 +2,21 @@
 % Please edit documentation in R/plot_region_counts.R
 \name{plot_counts_all_bams}
 \alias{plot_counts_all_bams}
+\alias{plotCounts}
 \title{Plot for counts for all samples across a given region}
 \usage{
 plot_counts_all_bams(
+  counts.df,
+  seqnames,
+  start_region = NULL,
+  end_region = NULL,
+  layout = c("stacked", "spread"),
+  log2_scale = FALSE,
+  colours = NULL,
+  ...
+)
+
+plotCounts(
   counts.df,
   seqnames,
   start_region = NULL,
@@ -65,4 +77,10 @@ plot_counts_all_bams(counts.df,
     log2_scale = FALSE
 ) +
     geom_dm.res.lfc(dm_results)
+}
+\references{
+ggcoverage
+}
+\seealso{
+[geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
 }

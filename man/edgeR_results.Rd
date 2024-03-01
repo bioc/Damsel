@@ -2,18 +2,21 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_results}
 \alias{edgeR_results}
+\alias{testDmRegions}
 \title{Differential testing}
 \usage{
-edgeR_results(dge, p.value = 0.01, lfc = 1, regions)
+edgeR_results(dge, regions, p.value = 0.01, lfc = 1)
+
+testDmRegions(dge, regions, p.value = 0.01, lfc = 1)
 }
 \arguments{
 \item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
 
+\item{regions}{A data.frame of GATC regions.}
+
 \item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01}
 
 \item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
-
-\item{regions}{A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`}
 }
 \value{
 A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
@@ -31,6 +34,6 @@ example_regions <- random_regions()
 counts.df <- random_counts()
 dge <- edgeR_set_up(counts.df)
 
-dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = example_regions)
+dm_results <- edgeR_results(dge, regions=example_regions, p.value = 0.01, lfc = 1)
 head(dm_results)
 }

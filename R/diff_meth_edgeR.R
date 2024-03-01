@@ -5,8 +5,8 @@
 #' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
 #' @param max.width Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
-#' @param keep_a Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
-#' @param keep_b Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
+#' @param min.cpm Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
+#' @param min.samples Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
 #'
 #' @return An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 #' @export
@@ -15,29 +15,28 @@
 #' counts.df <- random_counts()
 #'
 #' edgeR_set_up(counts.df)
-# dmSetUp
-edgeR_set_up <- function(counts.df, max.width = 10000, lib.size = NULL, keep_a = 0.5, keep_b = 3) {
+edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.samples=3) {
     if (!is.data.frame(counts.df)) {
         stop("Must have data.frame of counts")
     }
-    if (!is.numeric(keep_a) | length(keep_a) > 1) {
-        stop("keep_a must be 1 value, recommend using default value")
+    if (!is.numeric(min.cpm) | length(min.cpm) > 1) {
+        stop("min.cpm must be 1 value, recommend using default value")
     }
     if (!is.numeric(keep_b) | length(keep_b) > 1) {
-        stop("keep_b must be 1 value, recommend using default value")
+        stop("min.samples must be 1 value, recommend using default value")
     }
 
     counts.df <- counts.df %>% dplyr::filter(.data$width <= max.width)
-    matrix <- as.matrix(counts.df[, grepl("bam", colnames(counts.df), ignore.case = TRUE)]) # can I be sure they would have "bam" in it?
+    matrix <- as.matrix(counts.df[, grepl("bam", colnames(counts.df), ignore.case = TRUE)])
     rownames(matrix) <- counts.df$Position
 
     n_samples <- seq_len(ncol(matrix) / 2)
 
-    group <- rep(c("Dam", "Fusion"), times = length(n_samples)) # specify that this order is required
+    group <- rep(c("Dam", "Fusion"), times = length(n_samples))
 
     dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = counts.df[, 2:5])
 
-    keep <- rowSums(edgeR::cpm(dge) >= keep_a) >= keep_b # potentially will mess with
+    keep <- rowSums(edgeR::cpm(dge) >= min.cpm) >= min.samples
     dge <- dge[keep, , keep.lib.sizes = FALSE]
 
     dge <- edgeR::calcNormFactors(dge)
@@ -57,6 +56,9 @@ edgeR_set_up <- function(counts.df, max.width = 10000, lib.size = NULL, keep_a =
 
     dge
 }
+#' @export
+#' @rdname edgeR_set_up
+makeDGE <- edgeR_set_up
 
 #' Plot differences between samples: Multidimensional scaling
 #'
@@ -89,9 +91,9 @@ edgeR_plot_mds <- function(dge) {
 #' * [edgeR::decideTestsDGE()]
 #'
 #' @param dge A DGEList object as outputted from [edgeR_set_up()]
+#' @param regions A data.frame of GATC regions.
 #' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
-#' @param regions A data.frame of GATC regions. If not provided, default used is `regions_gatc_drosophila_dm6`
 #'
 #' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
 #' @export
@@ -102,11 +104,9 @@ edgeR_plot_mds <- function(dge) {
 #' counts.df <- random_counts()
 #' dge <- edgeR_set_up(counts.df)
 #'
-#' dm_results <- edgeR_results(dge, p.value = 0.01, lfc = 1, regions = example_regions)
+#' dm_results <- edgeR_results(dge, regions=example_regions, p.value = 0.01, lfc = 1)
 #' head(dm_results)
-# dmResults
-# also need to update this fn - adjusted p val
-edgeR_results <- function(dge, p.value = 0.01, lfc = 1, regions) {
+edgeR_results <- function(dge, regions, p.value=0.01, lfc=1) {
     if (!is.numeric(p.value) | length(p.value) > 1) {
         stop("p.value must be 1 number, recommend using default value")
     }
@@ -123,17 +123,15 @@ edgeR_results <- function(dge, p.value = 0.01, lfc = 1, regions) {
     lrt_table <- qlf$table
     lrt_table <- lrt_table %>% dplyr::mutate(
         adjust.p = stats::p.adjust(.data$PValue, method = "BH"),
-        # dm = dplyr::case_when(
-        # .data$logFC < lfc & .data$adjust.p < p.value ~ -1,
-        # abs(.data$logFC) < lfc ~ 0,
-        # .data$logFC > lfc & .data$adjust.p < p.value ~ 1, TRUE ~ 0
         dm = ifelse(.data$logFC > lfc & .data$adjust.p < p.value, 1, 0)
     )
-    lrt_table <- add_de(lrt_table, regions)
+    lrt_table <- ..addDM(lrt_table, regions)
     lrt_table <- data.frame(lrt_table)
     lrt_table
 }
-
+#' @export
+#' @rdname edgeR_results
+testDmRegions <- edgeR_results
 
 #' Plot differential testing results
 #'
@@ -189,8 +187,8 @@ edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
 #' * dm - 1,0,-1,NA ;
 #' * logFC: 0 if dm is NA ;
 #' * adjust.p: 1 if dm is NA :
-#' * meth_status: Upreg, No_sig, Downreg, Not_included
-add_de <- function(dm_results, regions) {
+#' * meth_status: Upreg, No_sig, Not_included
+..addDM <- function(dm_results, regions) {
     if (!is.data.frame(dm_results)) {
         stop("Must have data frame of differential testing results from `edgeR_results")
     }

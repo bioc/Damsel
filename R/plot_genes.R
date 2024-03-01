@@ -13,6 +13,8 @@
 #'
 #' @return A `ggplot_add` object.
 #' @export
+#' @references ggbio and ggcoverage
+#' @seealso [geom_peak()] [geom_dm()] [geom_counts()] [geom_gatc()] [plot_wrap()]
 #' @examples
 #' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 #' library(org.Dm.eg.db)
@@ -69,7 +71,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     plot.space <- object$plot.space
     plot.height <- object$plot.height
 
-    df <- GetRegion_hack(
+    df <- ..getRegionsPlot(
         df = df_og, columns = c("seqnames", "start", "end", "strand", "ensembl_gene_id"),
         chr = plot.chr, start = plot.region.start,
         end = plot.region.end
@@ -82,7 +84,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     } else {
         df_og <- df_og %>% dplyr::filter(.data$ensembl_gene_id %in% df$ensembl_gene_id)
 
-        exons <- exon_check(txdb, plot.chr, plot.region.start, plot.region.end)
+        exons <- ..exonCheck(txdb, plot.chr, plot.region.start, plot.region.end)
 
         if (nrow(exons) == 0) {
             gene_plot <- ggbio::autoplot(txdb, which = plyranges::as_granges(df_og))@ggplot
@@ -91,7 +93,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
         }
     }
     gene_plot <- gene_plot +
-        theme_gene_plot(
+        ..themeGenePlot(
             plot.start = plot.region.start, plot.end = plot.region.end,
             gene_lim = gene_limits
         )
@@ -103,7 +105,7 @@ ggplot_add.genes.me <- function(object, plot, object_name) {
     )
 }
 
-exon_check <- function(txdb, plot.chr, plot.region.start, plot.region.end) {
+..exonCheck <- function(txdb, plot.chr, plot.region.start, plot.region.end) {
     df <- GenomicFeatures::exons(txdb) %>%
         data.frame() %>%
         dplyr::filter(
@@ -113,7 +115,7 @@ exon_check <- function(txdb, plot.chr, plot.region.start, plot.region.end) {
         )
 }
 
-theme_gene_plot <- function(plot.start = plot.region.start,
+..themeGenePlot <- function(plot.start = plot.region.start,
                             plot.end = plot.region.end, gene_lim = gene_limits) {
     list(
         ggplot2::scale_x_continuous(expand = c(0, 0)),

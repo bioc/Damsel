@@ -55,3 +55,9 @@ plot_counts_all_bams(counts.df,
     geom_peak.new(peaks, peak.label = TRUE)
 # The plots can be layered -------------------------------------------------
 }
+\references{
+ggcoverage
+}
+\seealso{
+[geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+}

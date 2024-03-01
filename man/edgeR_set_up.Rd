@@ -2,14 +2,23 @@
 % Please edit documentation in R/diff_meth_edgeR.R
 \name{edgeR_set_up}
 \alias{edgeR_set_up}
+\alias{makeDGE}
 \title{Create DGE object for differential testing}
 \usage{
 edgeR_set_up(
   counts.df,
   max.width = 10000,
   lib.size = NULL,
-  keep_a = 0.5,
-  keep_b = 3
+  min.cpm = 0.5,
+  min.samples = 3
+)
+
+makeDGE(
+  counts.df,
+  max.width = 10000,
+  lib.size = NULL,
+  min.cpm = 0.5,
+  min.samples = 3
 )
 }
 \arguments{
@@ -19,9 +28,9 @@ edgeR_set_up(
 
 \item{lib.size}{Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified}
 
-\item{keep_a}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5}
+\item{min.cpm}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5}
 
-\item{keep_b}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
+\item{min.samples}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
 }
 \value{
 An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details

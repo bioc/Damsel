@@ -15,7 +15,6 @@
 #' counts.df <- random_counts()
 #' corr_heatmap(counts.df, method = "spearman")
 #' @export
-# corrHeatmap
 corr_heatmap <- function(df, method = "spearman") {
     if (!is.data.frame(df)) {
         stop("data.frame of counts is required")
@@ -47,5 +46,7 @@ corr_heatmap <- function(df, method = "spearman") {
         ggplot2::theme_minimal() +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
         ggplot2::coord_fixed()
-    # heatmap_plot
 }
+#' @export
+#' @rdname corr_heatmap
+plotCorrHeatmap <- corr_heatmap
