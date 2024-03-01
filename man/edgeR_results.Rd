@@ -5,9 +5,9 @@
 \alias{testDmRegions}
 \title{Differential testing}
 \usage{
-edgeR_results(dge, regions, p.value = 0.01, lfc = 1)
+edgeR_results(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE)
 
-testDmRegions(dge, regions, p.value = 0.01, lfc = 1)
+testDmRegions(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE)
 }
 \arguments{
 \item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
@@ -17,6 +17,8 @@ testDmRegions(dge, regions, p.value = 0.01, lfc = 1)
 \item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01}
 
 \item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
+
+\item{plot}{An option to plot the results using edgeR::plotSmear. Default is TRUE.}
 }
 \value{
 A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
@@ -36,4 +38,7 @@ dge <- edgeR_set_up(counts.df)
 
 dm_results <- edgeR_results(dge, regions=example_regions, p.value = 0.01, lfc = 1)
 head(dm_results)
+}
+\references{
+edgeR, csaw
 }

@@ -43,3 +43,6 @@ counts.df <- random_counts()
 
 edgeR_set_up(counts.df)
 }
+\references{
+edgeR
+}
