@@ -1,64 +1,3 @@
-#' Deprecated: Extract gene information from Ensembl using biomaRt
-#'
-#' @description
-#' This function has been deprecated and replaced with `collateGenes`
-#' `get_biomart_genes` accesses the Ensembl database via [biomaRt::useEnsembl() and biomaRt::getBM()] to obtain the location of genes from the selected species.
-#' * Also identifies the number of GATC regions matching to each gene.
-#'
-#' @param species The species of interest. Format is first letter of genus, followed by full name of species, followed by gene_ensembl. For example: Drosophila melanogaster is dmelanogaster_gene_ensembl
-#' @param version The Ensembl version of the genome. If not specified, default is 109 (the most recent update to the Drosophila melanogaster dm6 genome)
-#' @param regions A data frame of GATC regions.
-#'
-#' @return A data.frame of information about the genes. Columns include: seqnames, start, end, width, strand, ensembl_gene_id, gene_name, ensembl_transcript_id, TSS (transcription start site), n_regions (number of overlapping GATC regions)
-#' @export
-get_biomart_genes <- function(species, version = 109, regions) {
-    .Deprecated("collateGenes")
-    warning("This function has been deprecated in v0.7.0")
-    if (!is.character(species)) {
-        stop("Species must be a character vector")
-    }
-    if (!is.data.frame(regions)) {
-        stop("Regions must be a data frame")
-    }
-    if (missing(version)) {
-        message("Default version 109 used")
-    }
-
-    ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
-    BM.info <- biomaRt::getBM(
-        attributes = c("ensembl_gene_id", "ensembl_transcript_id", "transcript_is_canonical"),
-        filters = "chromosome_name",
-        values = unique(regions$seqnames),
-        mart = ensembl
-    )
-    gene_features <- biomaRt::getBM(
-        attributes = c(
-            "ensembl_gene_id", "external_gene_name", "ensembl_transcript_id",
-            "chromosome_name", "start_position", "end_position", "strand",
-            "transcription_start_site"
-        ),
-        filters = "ensembl_transcript_id",
-        values = dplyr::filter(BM.info, .data$transcript_is_canonical == 1)$ensembl_transcript_id,
-        mart = ensembl
-    )
-    gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position), ]
-    colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
-
-    overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(gene_features)) %>%
-        data.frame() %>%
-        dplyr::group_by(.data$ensembl_gene_id) %>%
-        dplyr::summarise(n_regions = dplyr::n()) %>%
-        data.frame()
-    gene_features$n_regions <- overlap[match(gene_features$ensembl_gene_id, overlap$ensembl_gene_id), "n_regions"]
-    gene_features <- gene_features %>%
-        dplyr::mutate(
-            n_regions = dplyr::coalesce(.data$n_regions, 0),
-            seqnames = paste0("chr", .data$seqnames)
-        )
-
-    gene_features
-}
-
 #' New: Get list of genes
 #'
 #' Takes a Txdb object, path to a gff file, or a species (biomaRt) and returns a GRanges of genes.
@@ -83,7 +22,7 @@ get_biomart_genes <- function(species, version = 109, regions) {
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' head(genes)
-collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
+collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
     regions <- data.frame(regions)
     if (inherits(genes, "TxDb")) {
         genes_ <- GenomicFeatures::genes(genes)
@@ -156,7 +95,7 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
 #' Annotation of peaks and genes
 #'
 #' @description
-#' `annotate_genes` identifies the closest gene(s) for the peaks outputted from `aggregate_peaks()`.
+#' `annotatePeaksGenes` identifies the closest gene(s) for the peaks outputted from `aggregate_peaks()`.
 #'
 #' This distance is relative, as the function will identify the closest genes, even if they are up to a million bp away. The max_distance parameter limits this, with a default setting of 5000 bp. All of the possible pairings are visible with `max_distance=NULL`.
 #' The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc).
@@ -178,21 +117,21 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
 #' set.seed(123)
 #' example_regions <- random_regions()
 #' dm_results <- random_edgeR_results()
-#' peaks <- new_peaks_fn(dm_results)
+#' peaks <- identifyPeaks(dm_results)
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #'
-#' annotate_genes(peaks, genes, example_regions, max_distance = 5000)
+#' annotatePeaksGenes(peaks, genes, example_regions, max_distance = 5000)
 #' # view all combinations
-#' annotate_genes(peaks, genes, example_regions, max_distance = NULL)
-annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
+#' annotatePeaksGenes(peaks, genes, example_regions, max_distance = NULL)
+annotatePeaksGenes <- function(peaks, genes, regions, max_distance = 5000) {
     if ((!is.data.frame(peaks) | !is.data.frame(genes) | !is.data.frame(regions)) &&
         !(inherits(peaks, "GRanges") | inherits(genes, "GRanges") | inherits(regions, "GRanges"))) {
         stop("Require data.frame of peaks, genes, and regions")
     }
     regions <- data.frame(regions) %>%
-      dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
-      plyranges::as_granges()
+        dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
+        plyranges::as_granges()
     genes_gr <- plyranges::as_granges(genes)
     peaks_gr <- plyranges::as_granges(peaks)
 
@@ -240,9 +179,7 @@ annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
     list_results <- list(closest = closest, top_five = combo_list, all = combo)
     list_results
 }
-#' @export
-#' @rdname annotate_genes
-annotatePeaksGenes <- annotate_genes
+
 
 
 ..pairGenesPeaks <- function(genes_gr, peaks_gr) {

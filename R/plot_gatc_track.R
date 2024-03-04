@@ -12,7 +12,7 @@
 #' @return A `ggplot_add` object.
 #' @export
 #' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
-#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()] [ggplot2::ggplot_add()]
+#' @seealso [plotCounts()] [geom_peak()] [geom_dm()] [geom_genes.tx()] [plotWrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -22,7 +22,7 @@
 #'     start = start - 3, end = start + 4
 #' )
 #'
-#' plot_counts_all_bams(counts.df,
+#' plotCounts(counts.df,
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
@@ -30,8 +30,9 @@
 #' ) +
 #'     geom_gatc(gatc_sites)
 #' # The plots can be layered -------------------------------------------------
-geom_gatc <- function(gatc_sites.df=NULL, gatc.color="red", gatc.size=5,
-    plot.space=0.2, plot.height=0.05) {
+geom_gatc <- function(
+    gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
+    plot.space = 0.2, plot.height = 0.05) {
     structure(
         list(
             gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,

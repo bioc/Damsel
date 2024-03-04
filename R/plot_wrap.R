@@ -18,7 +18,7 @@
 #'
 #' @return A `ggplot2` object - or list of plots if provided multiple peaks/genes
 #' @export
-#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [geom_counts()]
+#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [plotCounts()]
 #' @examples
 #' library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 #' library("org.Dm.eg.db")
@@ -30,13 +30,13 @@
 #' )
 #' counts.df <- random_counts()
 #' dm_results <- random_edgeR_results()
-#' peaks <- new_peaks_fn(dm_results)
+#' peaks <- identifyPeaks(dm_results)
 #'
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(txdb, example_regions, org.Db = org.Dm.eg.db)
 #'
 #' ## plot using a peak_id
-#' plot_wrap(
+#' plotWrap(
 #'     id = peaks[1, ]$peak_id,
 #'     counts.df = counts.df,
 #'     dm_results.df = dm_results,
@@ -46,7 +46,7 @@
 #' )
 #'
 #' ## plot using a gene id
-#' plot_wrap(
+#' plotWrap(
 #'     id = genes[1, ]$ensembl_gene_id,
 #'     counts.df = counts.df,
 #'     dm_results.df = dm_results,
@@ -56,7 +56,7 @@
 #' )
 #'
 #' ## plot providing a region
-#' plot_wrap(
+#' plotWrap(
 #'     seqnames = "chr2L", start_region = 1, end_region = 5000,
 #'     counts.df = counts.df,
 #'     dm_results.df = dm_results,
@@ -66,7 +66,7 @@
 #' )
 #'
 #' ## plot multiple peaks or genes by providing a vector of id's
-#' plot_wrap(
+#' plotWrap(
 #'     id = peaks[1:2, ]$peak_id,
 #'     counts.df = counts.df,
 #'     dm_results.df = dm_results,
@@ -75,9 +75,10 @@
 #'     genes.df = genes, txdb = txdb
 #' )
 #'
-plot_wrap <- function(id=NULL, seqnames=NULL, start_region=NULL,
-    end_region=NULL, counts.df=NULL, dm_results.df=NULL, peaks.df=NULL,
-    genes.df=NULL, txdb=NULL, gatc_sites.df=NULL, extend_by=250, ...) {
+plotWrap <- function(
+    id = NULL, seqnames = NULL, start_region = NULL,
+    end_region = NULL, counts.df = NULL, dm_results.df = NULL, peaks.df = NULL,
+    genes.df = NULL, txdb = NULL, gatc_sites.df = NULL, extend_by = 250, ...) {
     if (is.null(id) & is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
         stop("Please provide an id (peak or ensembl_gene_id), or a region to plot (seqnames, start_region, end_region)")
     }
@@ -113,22 +114,18 @@ plot_wrap <- function(id=NULL, seqnames=NULL, start_region=NULL,
 
     list_plots <- list()
     for (i in seq_len(length_start)) {
-        plot <- plot_counts_all_bams(counts.df,
+        plot <- plotCounts(counts.df,
             seqnames = chr[i],
             start_region = start_region[i],
             end_region = end_region[i],
             ...
         ) +
-            geom_dm.res.lfc(dm_results.df) +
-            geom_peak.new(peaks.df) +
+            geom_dm(dm_results.df) +
+            geom_peak(peaks.df) +
             geom_gatc(gatc_sites.df) +
-            geom_genes.me(genes.df, txdb, ...)
+            geom_genes.tx(genes.df, txdb, ...)
 
         list_plots[[i]] <- plot
     }
     list_plots
 }
-
-#' @export
-#' @rdname plot_wrap
-plotWrap <- plot_wrap

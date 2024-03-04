@@ -1,6 +1,6 @@
 #' Plotting genes
 #'
-#' `geom_genes.me` is a ggplot2 layer that visualises the positions of genes across a given region.
+#' `geom_genes.tx` is a ggplot2 layer that visualises the positions of genes across a given region.
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #' @param genes.df A data.frame of genes as outputted from `get_biomart_genes`.
@@ -15,7 +15,7 @@
 #' @export
 #' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 #' Yin T, Cook D, Lawrence M (2012). “ggbio: an R package for extending the grammar of graphics for genomic data.” Genome Biology, 13(8), R77.
-#' @seealso [geom_peak()] [geom_dm()] [geom_counts()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
+#' @seealso [geom_peak()] [geom_dm()] [geom_counts()] [geom_gatc()] [plotWrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 #' library(org.Dm.eg.db)
@@ -26,30 +26,31 @@
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(txdb, example_regions, org.Dm.eg.db)
 #'
-#' plot_counts_all_bams(counts.df,
+#' plotCounts(counts.df,
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
 #'     log2_scale = FALSE
 #' ) +
-#'     geom_genes.me(genes, txdb)
+#'     geom_genes.tx(genes, txdb)
 #'
-geom_genes.me <- function(genes.df, txdb, gene_limits=NULL,
-    plot.space=0.1, plot.height=0.3) {
+geom_genes.tx <- function(
+    genes.df, txdb, gene_limits = NULL,
+    plot.space = 0.1, plot.height = 0.3) {
     structure(
         list(
             genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,
             plot.space = plot.space, plot.height = plot.height
         ),
-        class = "genes.me"
+        class = "genes.tx"
     )
 }
 
 
 #' @export
-ggplot_add.genes.me <- function(object, plot, object_name) {
+ggplot_add.genes.tx <- function(object, plot, object_name) {
     if (!is.data.frame(object$genes.df) && !inherits(object$genes.df, "GRanges")) {
-        stop("data.frame of genes is required")
+        stop("data.frame/GRanges of genes is required")
     }
     if (is.null(object$gene_limits)) {
         message("If gene is disproportional to the plot, use gene_limits = c(y1,y2). If gene is too large, recommend setting to c(0,2) and adjusting the plot.height accordingly.")

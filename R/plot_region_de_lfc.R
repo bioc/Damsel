@@ -12,32 +12,32 @@
 #' @return A `ggplot_add` object.
 #' @export
 #' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
-#' @seealso [geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
+#' @seealso [geom_peak()] [plotCounts()] [geom_genes()] [geom_gatc()] [plotWrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
 #' dm_results <- random_edgeR_results()
-#' plot_counts_all_bams(counts.df,
+#' plotCounts(counts.df,
 #'     seqnames = "chr2L",
 #'     start_region = 1,
 #'     end_region = 40000,
 #'     log2_scale = FALSE
 #' ) +
-#'     geom_dm.res.lfc(dm_results)
-geom_dm.res.lfc <- function(dm_results.df,
-                            plot.space=0.1, plot.height=0.1) {
+#'     geom_dm(dm_results)
+geom_dm <- function(dm_results.df,
+                    plot.space = 0.1, plot.height = 0.1) {
     structure(
         list(
             dm_results.df = dm_results.df, plot.space = 0.1, plot.height = plot.height
         ),
-        class = "dm.res.lfc"
+        class = "dm"
     )
 }
 
 #' @export
-ggplot_add.dm.res.lfc <- function(object, plot, object_name) {
+ggplot_add.dm <- function(object, plot, object_name) {
     if (!is.data.frame(object$dm_results.df)) {
-        stop("data.frame of de results is required")
+        stop("data.frame of dm results is required")
     }
     plot2 <- plot
     while ("patchwork" %in% class(plot2)) {

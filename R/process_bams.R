@@ -1,6 +1,6 @@
 #' Obtain region counts for BAM files
 #'
-#' `process_bams()` obtains the raw counts for the regions between GATC sites, from indexed BAM files specified in the path.
+#' `countBamInGATC()` obtains the raw counts for the regions between GATC sites, from indexed BAM files specified in the path.
 #'
 #' @param path_to_bams A string identifying the directory containing the BAM files.
 #' @param regions A GRanges object of GATC regions. The GATC regions can be made with `gatc_track()`.
@@ -18,14 +18,14 @@
 #' @examples
 #' path_to_bams <- system.file("extdata", package = "Damsel")
 #' example_regions <- random_regions()
-#' counts.df <- process_bams(path_to_bams,
+#' counts.df <- countBamInGATC(path_to_bams,
 #'     regions = example_regions,
 #'     nthreads = 2
 #' )
 #' head(counts.df)
 #' # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
 #' @export
-process_bams <- function(path_to_bams, regions, nthreads=2, ...) {
+countBamInGATC <- function(path_to_bams, regions, nthreads = 2, ...) {
     if (!is.character(path_to_bams)) {
         stop("Path to bams must be a character vector")
     }
@@ -48,7 +48,7 @@ process_bams <- function(path_to_bams, regions, nthreads=2, ...) {
     }
     list_files <- list_files[!grepl(".bai", list_files)]
     path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams))
-        == "/", path_to_bams, paste0(path_to_bams, "/"))
+    == "/", path_to_bams, paste0(path_to_bams, "/"))
     list_files <- paste0(path_to_bams, list_files)
 
     scan_result <- ..checkPaired(list_files)
@@ -64,19 +64,25 @@ process_bams <- function(path_to_bams, regions, nthreads=2, ...) {
     }
     if (length(paired_samples) != 0) {
         for (i in seq_len(length(paired_samples))) {
-            counts_feature <- cbind(counts_feature,
+            counts_feature <- cbind(
+                counts_feature,
                 data.frame(Rsubread::featureCounts(paired_samples[i],
-                annot.ext = regions_feat, isPairedEnd = TRUE,
-                allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads,
-                ...)$counts))
+                    annot.ext = regions_feat, isPairedEnd = TRUE,
+                    allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads,
+                    ...
+                )$counts)
+            )
         }
     }
     if (length(single_samples) != 0) {
         for (i in seq_len(length(single_samples))) {
-            counts_feature <- cbind(counts_feature,
+            counts_feature <- cbind(
+                counts_feature,
                 data.frame(Rsubread::featureCounts(single_samples[i],
-                annot.ext = regions_feat, allowMultiOverlap = TRUE,
-                fraction = TRUE, nthreads = nthreads, ...)$counts))
+                    annot.ext = regions_feat, allowMultiOverlap = TRUE,
+                    fraction = TRUE, nthreads = nthreads, ...
+                )$counts)
+            )
         }
     }
     if (same_name == TRUE) {
@@ -85,9 +91,6 @@ process_bams <- function(path_to_bams, regions, nthreads=2, ...) {
 
     counts_feature
 }
-#' @export
-#' @rdname process_bams
-countBamInGATC <- process_bams
 
 ..checkPaired <- function(list_files) {
     scan_result <- list()
