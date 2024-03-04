@@ -5,7 +5,12 @@
 .Rdata
 .httr-oauth
 .DS_Store
+Damsel.Rproj
 inst/doc
-data-raw/
+inst/.DS_Store
 inst/extdata/
+inst/extdata/.DS_Store
+data-raw/
+data-raw/.DS_Store
 tests/testthat/fixtures/
+tests/testthat/fixtures/.DS_Store
