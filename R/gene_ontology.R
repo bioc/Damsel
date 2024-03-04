@@ -30,7 +30,7 @@
 #' ontology <- testGeneOntology(annotation, genes, example_regions)
 #' ontology$signif_results
 #' ontology$prob_weights
-testGeneOntology <- function(annotation, genes, regions, extend_by = 2000, fdr_threshold = 0.05, bias = NULL) {
+testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_threshold=0.05, bias=NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
     regions <- data.frame(regions)
     goseq_data <- genes
@@ -60,7 +60,7 @@ testGeneOntology <- function(annotation, genes, regions, extend_by = 2000, fdr_t
 }
 
 
-..geneModExtend <- function(genes, regions, extend_by = 2000) {
+..geneModExtend <- function(genes, regions, extend_by=2000) {
     genes_mod <- data.frame(genes)
     genes_mod$start <- genes_mod$start - extend_by
     genes_mod$end <- genes_mod$end + extend_by
@@ -108,7 +108,7 @@ testGeneOntology <- function(annotation, genes, regions, extend_by = 2000, fdr_t
 #'
 #' ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 #' plotGeneOntology(ontology)
-plotGeneOntology <- function(signif_results, fdr_threshold = 0.05) {
+plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
     df <- signif_results[seq_len(10), ]
     df <- df %>% dplyr::filter(!is.na(.data$category))
     max_fdr <- max(-log10(df$FDR)) + 5

@@ -1,6 +1,6 @@
 ## in plot_peak and plot_gatc
 
-..getRegionsPlot <- function(df, columns, chr, start, end = NULL) {
+..getRegionsPlot <- function(df, columns, chr, start, end=NULL) {
     # subset used chromosome
     df <- df[, columns]
     df$start <- as.numeric(df$start) + 1

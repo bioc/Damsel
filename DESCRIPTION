@@ -1,7 +1,7 @@
 Package: Damsel
 Type: Package
 Title: Damsel: an end to end analysis of DamID
-Version: 0.8
+Version: 0.99.0
 Author: Caitlin Page
 Maintainer: Caitlin Page <caitlin.page@petermac.org>
 Description: Damsel provides an end to end analysis of DamID data.

@@ -76,9 +76,9 @@
 #' )
 #'
 plotWrap <- function(
-    id = NULL, seqnames = NULL, start_region = NULL,
-    end_region = NULL, counts.df = NULL, dm_results.df = NULL, peaks.df = NULL,
-    genes.df = NULL, txdb = NULL, gatc_sites.df = NULL, extend_by = 250, ...) {
+    id=NULL, seqnames=NULL, start_region=NULL,
+    end_region=NULL, counts.df=NULL, dm_results.df=NULL, peaks.df=NULL,
+    genes.df=NULL, txdb=NULL, gatc_sites.df=NULL, extend_by=250, ...) {
     if (is.null(id) & is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
         stop("Please provide an id (peak or ensembl_gene_id), or a region to plot (seqnames, start_region, end_region)")
     }

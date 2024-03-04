@@ -19,7 +19,7 @@
 #' counts.df <- random_counts()
 #'
 #' makeDGE(counts.df)
-makeDGE <- function(counts.df, max.width = 10000, lib.size = NULL, min.cpm = 0.5, min.samples = 3) {
+makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.samples=3) {
     if (!is.data.frame(counts.df)) {
         stop("Must have data.frame of counts")
     }
@@ -91,7 +91,7 @@ makeDGE <- function(counts.df, max.width = 10000, lib.size = NULL, min.cpm = 0.5
 #'
 #' dm_results <- testDmRegions(dge, regions = example_regions, p.value = 0.01, lfc = 1)
 #' head(dm_results)
-testDmRegions <- function(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE) {
+testDmRegions <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
     if (!is.numeric(p.value) | length(p.value) > 1) {
         stop("p.value must be 1 number, recommend using default value")
     }
