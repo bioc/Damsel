@@ -19,5 +19,6 @@
 #'   \item{dam_1_SRR7948872.BAM, sd_1_SRR7948874.BAM, dam_2_SRR7948876.BAM,
 #'   sd_2_SRR7948877.BAM}{Sample counts}
 #' }
+#' @usage data("dros_counts")
 #' @source <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120731>
 "dros_counts"
