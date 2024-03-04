@@ -16,4 +16,8 @@ Useful links:
 }
 
 }
+\author{
+\strong{Maintainer}: Caitlin Page \email{caitlin.page@petermac.org}
+
+}
 \keyword{internal}
