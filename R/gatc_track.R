@@ -1,6 +1,6 @@
 #' Extract GATC regions
 #'
-#' `gatc_region_fn` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.
+#' `getGatcRegions` identifies and extracts the GATC sites and regions from a BSgenome object or a fasta file.
 #'
 #' @param object A BSgenome package OR the path to a FASTA file.
 #'
@@ -8,13 +8,13 @@
 #' @export
 #' @examples
 #' if (require("BSgenome.Dmelanogaster.UCSC.dm6")) {
-#'     gatc <- gatc_region_fn(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
+#'     gatc <- getGatcRegions(BSgenome.Dmelanogaster.UCSC.dm6::BSgenome.Dmelanogaster.UCSC.dm6)
 #'
 #'     head(gatc$regions)
 #'
 #'     head(gatc$sites)
 #' }
-gatc_region_fn <- function(object) {
+getGatcRegions <- function(object) {
     if (missing(object)) {
         stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
     }
@@ -67,6 +67,3 @@ gatc_region_fn <- function(object) {
 
     GenomicRanges::GRangesList(regions = regions, sites = df)
 }
-#' @export
-#' @rdname gatc_region_fn
-getGatcRegions <- gatc_region_fn

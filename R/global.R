@@ -19,6 +19,8 @@
     utils::globalVariables("numInCat")
     utils::globalVariables("FDR")
     utils::globalVariables("category")
+    utils::globalVariables("seqnames")
+    utils::globalVariables("start")
 
     invisible()
 }

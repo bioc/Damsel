@@ -1,6 +1,6 @@
 #' Plot correlation heatmap
 #'
-#' `corr_heatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
+#' `plotCorrHeatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 #' * uses the non-parametric "spearman's" correlation.
 #'
 #' The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
@@ -13,9 +13,9 @@
 #' * Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 #' @examples
 #' counts.df <- random_counts()
-#' corr_heatmap(counts.df, method = "spearman")
+#' plotCorrHeatmap(counts.df, method = "spearman")
 #' @export
-corr_heatmap <- function(df, method="spearman") {
+plotCorrHeatmap <- function(df, method = "spearman") {
     if (!is.data.frame(df)) {
         stop("data.frame of counts is required")
     }
@@ -47,6 +47,3 @@ corr_heatmap <- function(df, method="spearman") {
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 1, size = 12, hjust = 1)) +
         ggplot2::coord_fixed()
 }
-#' @export
-#' @rdname corr_heatmap
-plotCorrHeatmap <- corr_heatmap

@@ -21,16 +21,16 @@
 #' library(org.Dm.eg.db)
 #' set.seed(123)
 #' example_regions <- random_regions()
-#' peaks <- new_peaks_fn(random_edgeR_results())
+#' peaks <- identifyPeaks(random_edgeR_results())
 #'
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
-#' annotation <- annotate_genes(peaks, genes, example_regions)$all
+#' annotation <- annotatePeaksGenes(peaks, genes, example_regions)$all
 #'
 #' ontology <- testGeneOntology(annotation, genes, example_regions)
 #' ontology$signif_results
 #' ontology$prob_weights
-testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_threshold=0.05, bias=NULL) {
+testGeneOntology <- function(annotation, genes, regions, extend_by = 2000, fdr_threshold = 0.05, bias = NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
     regions <- data.frame(regions)
     goseq_data <- genes
@@ -101,14 +101,14 @@ testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_thr
 #' library("org.Dm.eg.db")
 #' set.seed(123)
 #' example_regions <- random_regions()
-#' peaks <- new_peaks_fn(random_edgeR_results())
+#' peaks <- identifyPeaks(random_edgeR_results())
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
-#' annotation <- annotate_genes(peaks, genes, example_regions)$all
+#' annotation <- annotatePeaksGenes(peaks, genes, example_regions)$all
 #'
 #' ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 #' plotGeneOntology(ontology)
-plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
+plotGeneOntology <- function(signif_results, fdr_threshold = 0.05) {
     df <- signif_results[seq_len(10), ]
     df <- df %>% dplyr::filter(!is.na(.data$category))
     max_fdr <- max(-log10(df$FDR)) + 5
@@ -124,4 +124,3 @@ plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
         ggplot2::theme_bw()
     plot
 }
-

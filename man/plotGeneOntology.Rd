@@ -25,10 +25,10 @@ library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 library("org.Dm.eg.db")
 set.seed(123)
 example_regions <- random_regions()
-peaks <- new_peaks_fn(random_edgeR_results())
+peaks <- identifyPeaks(random_edgeR_results())
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
-annotation <- annotate_genes(peaks, genes, example_regions)$all
+annotation <- annotatePeaksGenes(peaks, genes, example_regions)$all
 
 ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 plotGeneOntology(ontology)

@@ -1,7 +1,7 @@
 Package: Damsel
 Type: Package
 Title: Damsel: an end to end analysis of DamID
-Version: 0.7.1
+Version: 0.8
 Author: Caitlin Page
 Maintainer: Caitlin Page <caitlin.page@petermac.org>
 Description: Damsel provides an end to end analysis of DamID data.
@@ -9,13 +9,14 @@ Description: Damsel provides an end to end analysis of DamID data.
     Damsel allows for IGV style plots to be built as the results build, inspired by ggcoverage, and using the functionality and layering ability of ggplot2.
     Damsel also conducts gene ontology testing with bias correction through goseq, and future versions of Damsel will also incorporate motif enrichment analysis.
     Overall, Damsel is the first package allowing for an end to end analysis with visual capabilities. The goal of Damsel was to bring all the analysis into one place, and allow for exploratory analysis within R.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 Suggests: 
     biovizBase,
     biomaRt,
     BSgenome.Dmelanogaster.UCSC.dm6,
     knitr,
+    limma,
     org.Dm.eg.db,
     rmarkdown,
     testthat (>= 3.0.0),
@@ -35,7 +36,6 @@ Imports:
     ggbio,
     ggplot2,
     goseq,
-    limma,
     magrittr,
     patchwork,
     plyranges,

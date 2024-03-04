@@ -39,7 +39,7 @@ gatc_sites <- dplyr::mutate(example_regions,
     start = start - 3, end = start + 4
 )
 
-plot_counts_all_bams(counts.df,
+plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
     end_region = 40000,
@@ -52,5 +52,5 @@ plot_counts_all_bams(counts.df,
 ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 }
 \seealso{
-[geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()] [ggplot2::ggplot_add()]
+[plotCounts()] [geom_peak()] [geom_dm()] [geom_genes.tx()] [plotWrap()] [ggplot2::ggplot_add()]
 }
