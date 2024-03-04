@@ -10,18 +10,19 @@ edgeR_results(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE)
 testDmRegions(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE)
 }
 \arguments{
-\item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
+\item{dge}{A DGEList object as outputted from [edgeR_set_up()].}
 
 \item{regions}{A data.frame of GATC regions.}
 
-\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.}
 
-\item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
+\item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1.}
 
 \item{plot}{An option to plot the results using edgeR::plotSmear. Default is TRUE.}
 }
 \value{
-A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
+A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: 0,1,NA), logFC, adjust.p, meth_status (No_signal, Upreg, Not_included).
+If plot=TRUE, will also return a [edgeR::plotSmear()] plot of the results.
 }
 \description{
 `edgeR_results` calculates the differential methylation results, identifying which GATC regions have been enriched in the Fusion samples relative to the controls.
@@ -40,5 +41,11 @@ dm_results <- edgeR_results(dge, regions=example_regions, p.value = 0.01, lfc = 
 head(dm_results)
 }
 \references{
-edgeR, csaw
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.” Bioinformatics, 26(1), 139-140. doi:10.1093/bioinformatics/btp616.
+McCarthy DJ, Chen Y, Smyth GK (2012). “Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation.” Nucleic Acids Research, 40(10), 4288-4297. doi:10.1093/nar/gks042.
+Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline.” F1000Research, 5, 1438. doi:10.12688/f1000research.8987.2.
+Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
+}
+\seealso{
+[edgeR_set_up()]
 }

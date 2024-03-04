@@ -14,9 +14,9 @@ testGeneOntology(
 )
 }
 \arguments{
-\item{annotation}{A data.frame of annotated genes and peaks as `annotate_peaks()$all`}
+\item{annotation}{A data.frame of annotated genes and peaks as `annotate_peaks()$all`.}
 
-\item{genes}{A data.frame of gene data as outputted from `get_biomart_genes()`}
+\item{genes}{A data.frame of gene data as outputted from `get_biomart_genes()`.}
 
 \item{regions}{A data.frame of GATC regions.}
 
@@ -29,21 +29,20 @@ testGeneOntology(
 \item{bias}{Alternatively, the bias can be input by itself.}
 }
 \value{
-4 objects
- * List of top 10 over-represented GO terms across the 3 GO categories
+3 objects
  * Plot of goodness of fit of model
  * Data frame of significant GO category results
  * Probability weights for each gene
 }
 \description{
-`goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+`goseq_fn` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 }
 \examples{
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 library(org.Dm.eg.db)
 set.seed(123)
 example_regions <- random_regions()
-peaks <- aggregate_peaks(random_edgeR_results())
+peaks <- new_peaks_fn(random_edgeR_results())
 
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
@@ -54,5 +53,5 @@ ontology$signif_results
 ontology$prob_weights
 }
 \references{
-goseq
+Young MD, Wakefield MJ, Smyth GK, Oshlack A (2010). “Gene ontology analysis for RNA-seq: accounting for selection bias.” Genome Biology, 11, R14.
 }

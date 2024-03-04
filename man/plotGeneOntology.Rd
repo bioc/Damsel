@@ -7,7 +7,7 @@
 plotGeneOntology(signif_results, fdr_threshold = 0.05)
 }
 \arguments{
-\item{signif_results}{results as outputted from goseq_fn()$signif_results. Selects the top 10 GO terms as default}
+\item{signif_results}{The results as outputted from goseq_fn()$signif_results. Selects the top 10 GO terms as default.}
 
 \item{fdr_threshold}{The FDR threshold used for significance in the ontology. Default is 0.05}
 }
@@ -15,19 +15,21 @@ plotGeneOntology(signif_results, fdr_threshold = 0.05)
 A ggplot2 object
 }
 \description{
-Plot gene ontology results
+`plotGeneOntology()` plots the top 10 GO terms in a ggplot2 style plot.
+}
+\details{
+A dot plot with the FDR on the x-axis, the size of the dot being the number of genes in the GO category, and the colour of the dot being the ontology (Biological Process, Cellular Component, and Molecular Function).
 }
 \examples{
 library("TxDb.Dmelanogaster.UCSC.dm6.ensGene")
 library("org.Dm.eg.db")
 set.seed(123)
 example_regions <- random_regions()
-peaks <- aggregate_peaks(random_edgeR_results())
+peaks <- new_peaks_fn(random_edgeR_results())
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 annotation <- annotate_genes(peaks, genes, example_regions)$all
 
 ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 plotGeneOntology(ontology)
-
 }

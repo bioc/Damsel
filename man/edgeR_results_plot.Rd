@@ -10,9 +10,9 @@ This function has been deprecated and it's utility has been incorporated into te
 edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 }
 \arguments{
-\item{dge}{A DGEList object as outputted from [edgeR_set_up()]}
+\item{dge}{A DGEList object as outputted from [edgeR_set_up()].}
 
-\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.}
 
 \item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1}
 }
@@ -24,10 +24,4 @@ Plot differential testing results
 This function has been deprecated and it's utility has been incorporated into testDmRegions (aka edgeR_results)
 `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 * for further details, see [edgeR::plotSmear()]
-}
-\examples{
-counts.df <- random_counts()
-dge <- edgeR_set_up(counts.df)
-
-edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
 }

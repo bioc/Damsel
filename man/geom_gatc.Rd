@@ -13,22 +13,22 @@ geom_gatc(
 )
 }
 \arguments{
-\item{gatc_sites.df}{A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`}
+\item{gatc_sites.df}{A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`.}
 
-\item{gatc.color}{Specify colour of lines. Default is red}
+\item{gatc.color}{Specify colour of lines. Default is red.}
 
-\item{gatc.size}{Specify size of the line. Default is 5}
+\item{gatc.size}{Specify size of the line. Default is 5.}
 
-\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.2}
+\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.2.}
 
-\item{plot.height}{Specify overall height of the plot. Recommend leaving to the default: 0.05}
+\item{plot.height}{Specify overall height of the plot. Recommend leaving to the default: 0.05.}
 }
 \value{
 A `ggplot_add` object.
 }
 \description{
-`geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
-* cannot be plotted by itself, must be added to an existing ggplot object - see examples.
+`geom_gatc` is a ggplot2 layer that visualises the positions of GATC sites across a given region.
+* cannot be plotted by itself, must be added to an existing ggplot2 object - see examples.
 }
 \examples{
 set.seed(123)
@@ -49,8 +49,8 @@ plot_counts_all_bams(counts.df,
 # The plots can be layered -------------------------------------------------
 }
 \references{
-ggcoverage
+ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 }
 \seealso{
-[geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()]
+[geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()] [ggplot2::ggplot_add()]
 }

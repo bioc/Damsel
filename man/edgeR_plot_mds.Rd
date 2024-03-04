@@ -16,9 +16,3 @@ An object of class `MDS`. Refer to [edgeR::plotMDS()] for details
 `edgeR_plot_mds` visualises the difference between samples.
 * expect control (Dam-only) samples to cluster together and for Fusion samples to cluster together
 }
-\examples{
-counts.df <- random_counts()
-dge <- edgeR_set_up(counts.df)
-
-edgeR_plot_mds(dge)
-}

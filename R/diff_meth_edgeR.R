@@ -1,16 +1,20 @@
 #' Create DGE object for differential testing
 #'
-#' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
+#' `edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [limma::plotMDS()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
-#' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)
+#' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).
 #' @param max.width Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.
-#' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified
-#' @param min.cpm Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5
-#' @param min.samples Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)
+#' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified.
+#' @param min.cpm Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5.
+#' @param min.samples Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples).
 #'
 #' @return An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 #' @export
-#' @references edgeR
+#' @references Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.” Bioinformatics, 26(1), 139-140. doi:10.1093/bioinformatics/btp616.
+#' McCarthy DJ, Chen Y, Smyth GK (2012). “Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation.” Nucleic Acids Research, 40(10), 4288-4297. doi:10.1093/nar/gks042.
+#' Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline.” F1000Research, 5, 1438. doi:10.12688/f1000research.8987.2.
+#' Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
+#' @seealso [edgeR_results()] [process_bams()]
 #' @examples
 #' counts.df <- random_counts()
 #'
@@ -22,7 +26,7 @@ edgeR_set_up <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5,
     if (!is.numeric(min.cpm) | length(min.cpm) > 1) {
         stop("min.cpm must be 1 value, recommend using default value")
     }
-    if (!is.numeric(keep_b) | length(keep_b) > 1) {
+    if (!is.numeric(min.samples) | length(min.samples) > 1) {
         stop("min.samples must be 1 value, recommend using default value")
     }
 
@@ -69,13 +73,6 @@ makeDGE <- edgeR_set_up
 #'
 #' @return An object of class `MDS`. Refer to [edgeR::plotMDS()] for details
 #' @export
-#'
-#' @examples
-#' counts.df <- random_counts()
-#' dge <- edgeR_set_up(counts.df)
-#'
-#' edgeR_plot_mds(dge)
-# dmPlotMDS
 edgeR_plot_mds <- function(dge) {
     .Deprecated("edgeR_plot_mds")
     warning("This function has been deprecated in v0.7.1")
@@ -92,14 +89,19 @@ edgeR_plot_mds <- function(dge) {
 #' * [edgeR::glmQLFTest()]
 #' * [edgeR::decideTestsDGE()]
 #'
-#' @param dge A DGEList object as outputted from [edgeR_set_up()]
+#' @param dge A DGEList object as outputted from [edgeR_set_up()].
 #' @param regions A data.frame of GATC regions.
-#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
-#' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.
+#' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1.
 #' @param plot An option to plot the results using edgeR::plotSmear. Default is TRUE.
-#' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: -1,0,1,NA), logFC, adjust.p, meth_status (Downreg, No_signal, Upreg, Not_included)
+#' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: 0,1,NA), logFC, adjust.p, meth_status (No_signal, Upreg, Not_included).
+#' If plot=TRUE, will also return a [edgeR::plotSmear()] plot of the results.
 #' @export
-#' @references edgeR, csaw
+#' @references Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.” Bioinformatics, 26(1), 139-140. doi:10.1093/bioinformatics/btp616.
+#' McCarthy DJ, Chen Y, Smyth GK (2012). “Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation.” Nucleic Acids Research, 40(10), 4288-4297. doi:10.1093/nar/gks042.
+#' Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline.” F1000Research, 5, 1438. doi:10.12688/f1000research.8987.2.
+#' Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
+#' @seealso [edgeR_set_up()]
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -116,7 +118,7 @@ edgeR_results <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
         stop("lfc must be 1 number, recommend using default value")
     }
     if (missing(regions)) {
-        message("GATC region data.frame required")
+        message("GATC regions required")
     }
     group <- dge$samples$group %>% as.character()
     design <- dge$design
@@ -144,19 +146,12 @@ testDmRegions <- edgeR_results
 #' `edgeR_results_plot` provides an MA style plot for differential methylation results, allowing for a visualisation of the logFC, P values, and spread of -1,0,1 results.
 #' * for further details, see [edgeR::plotSmear()]
 #'
-#' @param dge A DGEList object as outputted from [edgeR_set_up()]
-#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01
+#' @param dge A DGEList object as outputted from [edgeR_set_up()].
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1
 #'
 #' @return An object of class `MA` style scatter plot with average logCPM on x-axis, average logFC on y-axis, with dots coloured by significance
 #' @export
-#'
-#' @examples
-#' counts.df <- random_counts()
-#' dge <- edgeR_set_up(counts.df)
-#'
-#' edgeR_results_plot(dge, p.value = 0.01, lfc = 1)
-# dmPlotResults
 edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
     .Deprecated("edgeR_results_plot")
     warning("This function has been deprecated in v0.7.1")
@@ -192,7 +187,7 @@ edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
 #' @param regions A data.frame of GATC regions, default is regions_gatc_drosophila_dm6
 #'
 #' @return A `data.frame` of regions with added information about the dm results;
-#' * dm - 1,0,-1,NA ;
+#' * dm - 1,0,NA ;
 #' * logFC: 0 if dm is NA ;
 #' * adjust.p: 1 if dm is NA :
 #' * meth_status: Upreg, No_sig, Not_included
@@ -200,10 +195,11 @@ edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
     if (!is.data.frame(dm_results)) {
         stop("Must have data frame of differential testing results from `edgeR_results")
     }
-    if (!is.data.frame(regions)) {
-        stop("Regions must be a data.frame")
+    if (!is.data.frame(regions) && !(inherits(regions, "GRanges"))) {
+        stop("Regions must be provided")
     }
     results <- dm_results
+    regions <- data.frame(regions)
     df <- regions %>%
         dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = seq_len(nrow(.)))
     df$dm <- results[match(df$Position, row.names(results)), "dm"]
@@ -214,7 +210,6 @@ edgeR_results_plot <- function(dge, p.value = 0.01, lfc = 1) {
         dplyr::mutate(meth_status = dplyr::case_when(
             is.na(.data$dm) ~ "Not_included",
             .data$dm == 1 ~ "Upreg",
-            # .data$dm == -1 ~ "Downreg",
             TRUE ~ "No_sig"
         ))
     df <- df %>%

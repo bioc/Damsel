@@ -1,9 +1,9 @@
 #' Gene ontology analysis
 #'
-#'  `goseq_fn` identifies the top 10 over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+#'  `goseq_fn` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 #'
-#' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`
-#' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`
+#' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`.
+#' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`.
 #' @param regions A data.frame of GATC regions.
 #' @param extend_by A number to extend the start and end of the genes. We recommend leaving to the default of 2000 bp.
 #' * This is done to incorporate the acceptable distance of a peak to a gene.
@@ -11,9 +11,8 @@
 #' @param fdr_threshold The FDR threshold used for significance in the ontology. Default is 0.05
 #' @param bias Alternatively, the bias can be input by itself.
 #' @export
-#' @references goseq
-#' @return 4 objects
-#'  * List of top 10 over-represented GO terms across the 3 GO categories
+#' @references Young MD, Wakefield MJ, Smyth GK, Oshlack A (2010). “Gene ontology analysis for RNA-seq: accounting for selection bias.” Genome Biology, 11, R14.
+#' @return 3 objects
 #'  * Plot of goodness of fit of model
 #'  * Data frame of significant GO category results
 #'  * Probability weights for each gene
@@ -22,7 +21,7 @@
 #' library(org.Dm.eg.db)
 #' set.seed(123)
 #' example_regions <- random_regions()
-#' peaks <- aggregate_peaks(random_edgeR_results())
+#' peaks <- new_peaks_fn(random_edgeR_results())
 #'
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
@@ -33,6 +32,7 @@
 #' ontology$prob_weights
 testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_threshold=0.05, bias=NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
+    regions <- data.frame(regions)
     goseq_data <- genes
     goseq_data <- ..geneModExtend(goseq_data, regions, extend_by = {{ extend_by }})
     goseq_data <- goseq_data %>%
@@ -54,14 +54,7 @@ testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_thr
         dplyr::filter(.data$FDR < fdr_threshold) %>%
         .[order(.$FDR, decreasing = FALSE), ]
 
-    # go_terms <- character()
-    #  for (go in GO.wall$category[seq_len(10)]) {
-    #   go_terms <- c(go_terms, print(GO.db::GOTERM[[go]]))
-    # }
-
-    list <- list( # top_go = go_terms,
-        signif_results = GO.wall, prob_weights = pwf
-    )
+    list <- list(signif_results = GO.wall, prob_weights = pwf)
 
     list
 }
@@ -94,7 +87,11 @@ testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_thr
 
 #' Plot gene ontology results
 #'
-#' @param signif_results results as outputted from goseq_fn()$signif_results. Selects the top 10 GO terms as default
+#' `plotGeneOntology()` plots the top 10 GO terms in a ggplot2 style plot.
+#'
+#' A dot plot with the FDR on the x-axis, the size of the dot being the number of genes in the GO category, and the colour of the dot being the ontology (Biological Process, Cellular Component, and Molecular Function).
+#'
+#' @param signif_results The results as outputted from goseq_fn()$signif_results. Selects the top 10 GO terms as default.
 #' @param fdr_threshold The FDR threshold used for significance in the ontology. Default is 0.05
 #'
 #' @return A ggplot2 object
@@ -104,14 +101,13 @@ testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_thr
 #' library("org.Dm.eg.db")
 #' set.seed(123)
 #' example_regions <- random_regions()
-#' peaks <- aggregate_peaks(random_edgeR_results())
+#' peaks <- new_peaks_fn(random_edgeR_results())
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' annotation <- annotate_genes(peaks, genes, example_regions)$all
 #'
 #' ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 #' plotGeneOntology(ontology)
-#'
 plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
     df <- signif_results[seq_len(10), ]
     df <- df %>% dplyr::filter(!is.na(.data$category))

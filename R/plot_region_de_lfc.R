@@ -1,18 +1,18 @@
-#' Plotting dm results with lfc
+#' Plotting results from differential methylation testing
 #'
-#' `geom_dm.res.lfc` is a ggplot layer that visualises the dm_results and logFC across a given region.
+#' `geom_dm.res.lfc` is a ggplot2 layer that visualises the dm_results and logFC across a given region.
 #'
-#' * regions are coloured by dm result: 1, 0, -1, NA (grey for NA)
+#' * regions are coloured by dm result: 1, 0, NA (grey for NA)
 #' * cannot be plotted by itself, must be added to an existing plot - see examples.
 #'
-#' @param dm_results.df A data.frame of differential testing results as outputted from `edgeR_results()`
-#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1
-#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.1
+#' @param dm_results.df A data.frame of differential testing results as outputted from `edgeR_results()`.
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1.
+#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.1.
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#' @references ggcoverage
-#' @seealso [geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+#' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
+#' @seealso [geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
@@ -25,7 +25,7 @@
 #' ) +
 #'     geom_dm.res.lfc(dm_results)
 geom_dm.res.lfc <- function(dm_results.df,
-                            plot.space = 0.1, plot.height = 0.1) {
+                            plot.space=0.1, plot.height=0.1) {
     structure(
         list(
             dm_results.df = dm_results.df, plot.space = 0.1, plot.height = plot.height

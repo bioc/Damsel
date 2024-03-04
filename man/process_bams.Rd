@@ -39,3 +39,7 @@ counts.df <- process_bams(path_to_bams,
 head(counts.df)
 # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
 }
+\references{
+Liao Y, Smyth GK, Shi W (2019). “The R package Rsubread is easier, faster, cheaper and better for alignment and quantification of RNA sequencing reads.” Nucleic Acids Research, 47, e47. doi:10.1093/nar/gkz114.
+Morgan M, Pagès H, Obenchain V, Hayden N (2024). Rsamtools: Binary alignment (BAM), FASTA, variant call (BCF), and tabix file import. R package version 2.19.3, https://bioconductor.org/packages/Rsamtools.
+}

@@ -13,7 +13,7 @@
 }
 \value{
 A `data.frame` of regions with added information about the dm results;
-* dm - 1,0,-1,NA ;
+* dm - 1,0,NA ;
 * logFC: 0 if dm is NA ;
 * adjust.p: 1 if dm is NA :
 * meth_status: Upreg, No_sig, Not_included
