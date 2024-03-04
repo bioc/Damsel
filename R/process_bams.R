@@ -13,7 +13,8 @@
 #' * The ".bam" extension is retained in the sample name as an identifier for the sample columns
 #' * If necessary, at this stage please rearrange the BAM file columns so they are ordered in the following way: Dam_1, Fusion_1, Dam_2, Fusion_2 etc
 #' * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
-#'
+#' @references Liao Y, Smyth GK, Shi W (2019). “The R package Rsubread is easier, faster, cheaper and better for alignment and quantification of RNA sequencing reads.” Nucleic Acids Research, 47, e47. doi:10.1093/nar/gkz114.
+#' Morgan M, Pagès H, Obenchain V, Hayden N (2024). Rsamtools: Binary alignment (BAM), FASTA, variant call (BCF), and tabix file import. R package version 2.19.3, https://bioconductor.org/packages/Rsamtools.
 #' @examples
 #' path_to_bams <- system.file("extdata", package = "Damsel")
 #' example_regions <- random_regions()

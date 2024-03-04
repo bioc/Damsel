@@ -56,13 +56,13 @@ plotWrap(
 
 \item{gatc_sites.df}{A data.frame of gatc sites as from [gatc_track()$sites]. Default is NULL.}
 
-\item{extend_by}{extend region. Default is 250}
+\item{extend_by}{A number to extend the limits of the provided region by. Default is 250 bp.}
 
 \item{...}{arguments passed to geom_genes.me. Allows for adjusting of the plot appearance via gene_limits and plot.height if necessary.
 * Default for gene_limits is NULL. If the gene is disproportionately large for the plot space, we recommend reducing the size with gene_limits = c(0,2)}
 }
 \value{
-A `ggplot` object - or list of plots if provided multiple peaks/genes
+A `ggplot2` object - or list of plots if provided multiple peaks/genes
 }
 \description{
 `plot_wrap` plots all the available plots at once
@@ -78,7 +78,7 @@ gatc_sites <- dplyr::mutate(example_regions,
 )
 counts.df <- random_counts()
 dm_results <- random_edgeR_results()
-peaks <- aggregate_peaks(dm_results)
+peaks <- new_peaks_fn(dm_results)
 
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 genes <- collateGenes(txdb, example_regions, org.Db = org.Dm.eg.db)

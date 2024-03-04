@@ -22,21 +22,21 @@ makeDGE(
 )
 }
 \arguments{
-\item{counts.df}{A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...)}
+\item{counts.df}{A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).}
 
 \item{max.width}{Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.}
 
-\item{lib.size}{Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified}
+\item{lib.size}{Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified.}
 
-\item{min.cpm}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5}
+\item{min.cpm}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5.}
 
-\item{min.samples}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples)}
+\item{min.samples}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples).}
 }
 \value{
 An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 }
 \description{
-`edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [edgeR_plot_mds()], and then for identifying differentially methylated regions [edgeR_results()].
+`edgeR_set_up()` sets up the edgeR analysis for visualisation of the samples [limma::plotMDS()], and then for identifying differentially methylated regions [edgeR_results()].
 }
 \examples{
 counts.df <- random_counts()
@@ -44,5 +44,11 @@ counts.df <- random_counts()
 edgeR_set_up(counts.df)
 }
 \references{
-edgeR
+Robinson MD, McCarthy DJ, Smyth GK (2010). “edgeR: a Bioconductor package for differential expression analysis of digital gene expression data.” Bioinformatics, 26(1), 139-140. doi:10.1093/bioinformatics/btp616.
+McCarthy DJ, Chen Y, Smyth GK (2012). “Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation.” Nucleic Acids Research, 40(10), 4288-4297. doi:10.1093/nar/gks042.
+Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline.” F1000Research, 5, 1438. doi:10.12688/f1000research.8987.2.
+Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
+}
+\seealso{
+[edgeR_results()] [process_bams()]
 }

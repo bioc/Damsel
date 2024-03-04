@@ -12,11 +12,11 @@
 #' @param genes.df A data.frame of genes as from [get_biomart_genes()]. Default is NULL.
 #' @param txdb A TxDb object as from a TxDb package. Default is NULL.
 #' @param gatc_sites.df A data.frame of gatc sites as from [gatc_track()$sites]. Default is NULL.
-#' @param extend_by extend region. Default is 250
+#' @param extend_by A number to extend the limits of the provided region by. Default is 250 bp.
 #' @param ... arguments passed to geom_genes.me. Allows for adjusting of the plot appearance via gene_limits and plot.height if necessary.
 #' * Default for gene_limits is NULL. If the gene is disproportionately large for the plot space, we recommend reducing the size with gene_limits = c(0,2)
 #'
-#' @return A `ggplot` object - or list of plots if provided multiple peaks/genes
+#' @return A `ggplot2` object - or list of plots if provided multiple peaks/genes
 #' @export
 #' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [geom_counts()]
 #' @examples
@@ -30,7 +30,7 @@
 #' )
 #' counts.df <- random_counts()
 #' dm_results <- random_edgeR_results()
-#' peaks <- aggregate_peaks(dm_results)
+#' peaks <- new_peaks_fn(dm_results)
 #'
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(txdb, example_regions, org.Db = org.Dm.eg.db)
@@ -75,9 +75,9 @@
 #'     genes.df = genes, txdb = txdb
 #' )
 #'
-plot_wrap <- function(id = NULL, seqnames = NULL, start_region = NULL,
-    end_region = NULL, counts.df = NULL, dm_results.df = NULL, peaks.df = NULL,
-    genes.df = NULL, txdb = NULL, gatc_sites.df = NULL, extend_by = 250, ...) {
+plot_wrap <- function(id=NULL, seqnames=NULL, start_region=NULL,
+    end_region=NULL, counts.df=NULL, dm_results.df=NULL, peaks.df=NULL,
+    genes.df=NULL, txdb=NULL, gatc_sites.df=NULL, extend_by=250, ...) {
     if (is.null(id) & is.null(seqnames) & is.null(start_region) & is.null(end_region)) {
         stop("Please provide an id (peak or ensembl_gene_id), or a region to plot (seqnames, start_region, end_region)")
     }

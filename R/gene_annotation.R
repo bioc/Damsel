@@ -61,16 +61,20 @@ get_biomart_genes <- function(species, version = 109, regions) {
 
 #' New: Get list of genes
 #'
-#' takes a Txdb object, path to a gff file, or a species (biomart) and returns a GRanges of genes.
+#' Takes a Txdb object, path to a gff file, or a species (biomaRt) and returns a GRanges of genes.
 #'
-#' @param genes A Txdb object, path to file, or a species for accessing biomart.
-#' @param regions GATC region file
-#' @param org.Db Required if using a Txdb object so to access gene names
-#' @param version Required for using biomart
+#' @param genes A Txdb object, path to file, or a species for accessing biomaRt.
+#' @param regions GATC region file.
+#' @param org.Db Required if using a Txdb object so to access gene names.
+#' @param version Required for using biomaRt.
 #'
-#' @return GRanges object of genes and available supplementary information - specifically the TSS, and number of GATC regions overlapping the gene.
+#' @return A GRanges object of genes and available supplementary information - specifically the TSS, and number of GATC regions overlapping the gene.
 #' @export
-#'
+#' @references Carlson M (2019). org.Dm.eg.db: Genome wide annotation for Fly. R package version 3.8.2.
+#' Durinck S, Spellman P, Birney E, Huber W (2009). “Mapping identifiers for the integration of genomic datasets with the R/Bioconductor package biomaRt.” Nature Protocols, 4, 1184–1191.
+#' Durinck S, Moreau Y, Kasprzyk A, Davis S, De Moor B, Brazma A, Huber W (2005). “BioMart and Bioconductor: a powerful link between biological databases and microarray data analysis.” Bioinformatics, 21, 3439–3440.
+#' Lee, Stuart, Cook, Dianne, Lawrence, Michael (2019). “plyranges: a grammar of genomic data transformation.” Genome Biol., 20(1), 4. http://dx.doi.org/10.1186/s13059-018-1597-8.
+#' Team BC, Maintainer BP (2019). TxDb.Dmelanogaster.UCSC.dm6.ensGene: Annotation package for TxDb object(s). R package version 3.4.6.
 #' @examples
 #' library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)
 #' library(org.Dm.eg.db)
@@ -79,9 +83,8 @@ get_biomart_genes <- function(species, version = 109, regions) {
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' head(genes)
-#'
-collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
-    regions <- regions
+collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
+    regions <- data.frame(regions)
     if (inherits(genes, "TxDb")) {
         genes_ <- GenomicFeatures::genes(genes)
         genes_$ensembl_gene_id <- names(genes_)
@@ -95,9 +98,6 @@ collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
         if (seq_chr == TRUE) {
             regions$seqnames <- paste0("chr", regions$seqnames)
         }
-        # } else if (grep("gff", genes)) {
-        #  genes_ <- rtracklayer::import(genes)
-        #  genes_$ensembl_gene_id <- genes_$ID
     } else if (grep("ensembl", genes)) {
         genes_ <- ..accessBiomart(species = genes, regions, version)
     }
@@ -161,9 +161,9 @@ collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
 #' This distance is relative, as the function will identify the closest genes, even if they are up to a million bp away. The max_distance parameter limits this, with a default setting of 5000 bp. All of the possible pairings are visible with `max_distance=NULL`.
 #' The minimum distance between the peak and gene is calculated, (0 if the peak is within the gene or vice versa) and the relative position of the peak to the gene is also provided (Upstream, Downstream, Overlapping upstream, Contained within etc).
 #'
-#' @param peaks A data.frame of peaks as outputted from [aggregate_peaks()]
-#' @param genes A data.frame of genes as outputted from [get_biomart_genes()]
-#' @param regions A data.frame of GATC regions.
+#' @param peaks A data.frame of peaks as outputted from [aggregate_peaks()].
+#' @param genes A data.frame of genes as outputted from [get_biomart_genes()].
+#' @param regions A `GRanges` object of GATC regions.
 #' @param max_distance A number providing the limit for the minimum distance from peak to gene.
 #' * Default is 5000. If set to `NULL`, will output all available combinations.
 #'
@@ -178,19 +178,21 @@ collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
 #' set.seed(123)
 #' example_regions <- random_regions()
 #' dm_results <- random_edgeR_results()
-#' peaks <- aggregate_peaks(dm_results)
+#' peaks <- new_peaks_fn(dm_results)
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #'
 #' annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 #' # view all combinations
 #' annotate_genes(peaks, genes, example_regions, max_distance = NULL)
-#'
 annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
     if ((!is.data.frame(peaks) | !is.data.frame(genes) | !is.data.frame(regions)) &&
         !(inherits(peaks, "GRanges") | inherits(genes, "GRanges") | inherits(regions, "GRanges"))) {
-        stop("Require data.frame of peaks as outputted from `aggregate_peaks`, genes, and regions")
+        stop("Require data.frame of peaks, genes, and regions")
     }
+    regions <- data.frame(regions) %>%
+      dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
+      plyranges::as_granges()
     genes_gr <- plyranges::as_granges(genes)
     peaks_gr <- plyranges::as_granges(peaks)
 
@@ -205,10 +207,7 @@ annotate_genes <- function(peaks, genes, regions, max_distance = 5000) {
     n_regions <- combo[, c("seqnames", "start", "end", "width", "num")]
 
     n_regions <- plyranges::find_overlaps_within(
-        plyranges::as_granges(dplyr::mutate(regions,
-            seqnames = paste0("chr", .data$seqnames)
-        )),
-        plyranges::as_granges(n_regions)
+        regions, plyranges::as_granges(n_regions)
     ) %>%
         data.frame() %>%
         dplyr::group_by(.data$num) %>%

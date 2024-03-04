@@ -1,20 +1,20 @@
 #' Plot for counts for all samples across a given region
 #'
-#' `plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.
+#' `plot_counts_all_bams` plots a ggplot2 object visualising the raw counts from the bam files across a given region.
 #' * this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 #'
-#' @param counts.df A data.frame of counts as outputted from [process_bams()]
-#' @param seqnames A character string of the chromosome of interest
-#' @param start_region A number providing the start of region to plot
-#' @param end_region A number providing the end of region to plot
+#' @param counts.df A data.frame of counts as outputted from [process_bams()].
+#' @param seqnames A character string of the chromosome of interest.
+#' @param start_region A number providing the start of region to plot.
+#' @param end_region A number providing the end of region to plot.
 #' @param layout Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".
 #' @param log2_scale Determines whether or not to display the counts on a log2 scale. Default is FALSE.
 #' @param colours Specify colours for the replicates.
 #' @param ... Arguments passed to ggplot2
 #'
-#' @return A `ggplot` object.
+#' @return A `ggplot2` object.
 #' @export
-#' @references ggcoverage
+#' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 #' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
 #' @examples
 #' set.seed(123)
@@ -42,7 +42,7 @@
 #'     log2_scale = FALSE
 #' ) +
 #'     geom_dm.res.lfc(dm_results)
-plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, layout = c("stacked", "spread"), log2_scale = FALSE, colours = NULL, ...) {
+plot_counts_all_bams <- function(counts.df, seqnames, start_region=NULL, end_region=NULL, layout=c("stacked", "spread"), log2_scale=FALSE, colours=NULL, ...) {
     if (!is.data.frame(counts.df)) {
         stop("data.frame of counts is required")
     }
@@ -92,7 +92,7 @@ plot_counts_all_bams <- function(counts.df, seqnames, start_region = NULL, end_r
             dplyr::ungroup() %>%
             dplyr::mutate(dam_2 = paste0(.data$dam, "_", .data$dam_num))
 
-        plot <- counts_ggplot(df, start_region, end_region, colours, "dam",
+        plot <- ..countsGgplot(df, start_region, end_region, colours, "dam",
             group_levels = c("Fusion", "Dam"),
             seqnames, labs_fill = "Replicate", alpha = 0.5
         )

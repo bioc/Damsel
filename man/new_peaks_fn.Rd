@@ -2,20 +2,27 @@
 % Please edit documentation in R/peak_calling.R
 \name{new_peaks_fn}
 \alias{new_peaks_fn}
-\title{New peaks function}
+\alias{identifyPeaks}
+\title{Identify peaks from differentially methylated regions}
 \usage{
 new_peaks_fn(dm_results, gap_size = 150)
+
+identifyPeaks(dm_results, gap_size = 150)
 }
 \arguments{
-\item{dm_results}{results from differential testing}
+\item{dm_results}{The results from differential testing.}
 
-\item{gap_size}{maximum gap in bp between dm regions}
+\item{gap_size}{The maximum gap in base pairs between differentially methylated regions to be 'skipped'. Default is 150}
 }
 \value{
-df of peaks ranked by p-value
+A data.frame of peaks ranked by p-value.
 }
 \description{
-New peaks function
+`identifyPeaks` aggregates neighbouring differentially methylated regions, identifying 'peaks' where the provided transcription factor is believed to have bound to the DNA. These locations can then be used to identify the potential target genes.
+}
+\details{
+Small unmethylated regions are able to be 'skipped' over and included into peaks through the gap_size paramter, whose default is 150bp. This was selected due to the common approach of 75bp sequencing of DamID from the edges of the fragments.
+The FDR and logFC for each peak is calculated via the theory of [csaw::getBestTest()] where the 'best' (smallest) p-value in the regions that make up the peak is selected as representative of the peak. The logFC is therefore the corresponding logFC from the FDR.
 }
 \examples{
 set.seed(123)
@@ -23,4 +30,8 @@ counts.df <- random_counts()
 dm_results <- random_edgeR_results()
 peaks <- new_peaks_fn(dm_results)
 peaks
+}
+\references{
+Lun ATL, Smyth GK (2016). “csaw: a Bioconductor package for differential binding analysis of ChIP-seq data using sliding windows.” Nucleic Acids Res., 44(5), e45.
+Lun ATL, Smyth GK (2014). “De novo detection of differentially bound regions for ChIP-seq data using peaks and windows: controlling error rates correctly.” Nucleic Acids Res., 42(11), e95.
 }

@@ -2,25 +2,25 @@
 % Please edit documentation in R/plot_region_de_lfc.R
 \name{geom_dm.res.lfc}
 \alias{geom_dm.res.lfc}
-\title{Plotting dm results with lfc}
+\title{Plotting results from differential methylation testing}
 \usage{
 geom_dm.res.lfc(dm_results.df, plot.space = 0.1, plot.height = 0.1)
 }
 \arguments{
-\item{dm_results.df}{A data.frame of differential testing results as outputted from `edgeR_results()`}
+\item{dm_results.df}{A data.frame of differential testing results as outputted from `edgeR_results()`.}
 
-\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1}
+\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1.}
 
-\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.1}
+\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.1.}
 }
 \value{
 A `ggplot_add` object.
 }
 \description{
-`geom_dm.res.lfc` is a ggplot layer that visualises the dm_results and logFC across a given region.
+`geom_dm.res.lfc` is a ggplot2 layer that visualises the dm_results and logFC across a given region.
 }
 \details{
-* regions are coloured by dm result: 1, 0, -1, NA (grey for NA)
+* regions are coloured by dm result: 1, 0, NA (grey for NA)
 * cannot be plotted by itself, must be added to an existing plot - see examples.
 }
 \examples{
@@ -36,8 +36,8 @@ plot_counts_all_bams(counts.df,
     geom_dm.res.lfc(dm_results)
 }
 \references{
-ggcoverage
+ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 }
 \seealso{
-[geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+[geom_peak()] [geom_counts()] [geom_genes()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
 }

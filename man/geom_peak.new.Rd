@@ -14,30 +14,30 @@ geom_peak.new(
 )
 }
 \arguments{
-\item{peaks.df}{A data.frame of peaks as outputted from `aggregate_peaks()`}
+\item{peaks.df}{A data.frame of peaks as outputted from `aggregate_peaks()`.}
 
-\item{peak.label}{Specify whether peak_id labels should be added to the plot. Default is FALSE}
+\item{peak.label}{Specify whether peak_id labels should be added to the plot. Default is FALSE.}
 
-\item{peak.color}{Specify colour of peak. Default is black}
+\item{peak.color}{Specify colour of peak. Default is black.}
 
-\item{peak.size}{Specify size of rectangle. Default is 5}
+\item{peak.size}{Specify size of rectangle. Default is 5.}
 
-\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1}
+\item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1.}
 
-\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.05}
+\item{plot.height}{Specify overall height of plot. Recommend leaving to the default: 0.05.}
 }
 \value{
 A `ggplot_add` object.
 }
 \description{
-`geom_peak.new` is a ggplot layer that visualises the positions of peaks across a given region.
+`geom_peak.new` is a ggplot2 layer that visualises the positions of peaks across a given region.
 * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 }
 \examples{
 set.seed(123)
 counts.df <- random_counts()
 dm_results <- random_edgeR_results()
-peaks <- aggregate_peaks(dm_results)
+peaks <- new_peaks_fn(dm_results)
 plot_counts_all_bams(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -56,8 +56,10 @@ plot_counts_all_bams(counts.df,
 # The plots can be layered -------------------------------------------------
 }
 \references{
+ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
+
 ggcoverage
 }
 \seealso{
-[geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+[geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
 }

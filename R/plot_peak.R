@@ -1,24 +1,25 @@
 #' Plotting peaks
 #'
-#' `geom_peak.new` is a ggplot layer that visualises the positions of peaks across a given region.
+#' `geom_peak.new` is a ggplot2 layer that visualises the positions of peaks across a given region.
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #'
-#' @param peaks.df A data.frame of peaks as outputted from `aggregate_peaks()`
-#' @param peak.label Specify whether peak_id labels should be added to the plot. Default is FALSE
-#' @param peak.color Specify colour of peak. Default is black
-#' @param peak.size Specify size of rectangle. Default is 5
-#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1
-#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.05
+#' @param peaks.df A data.frame of peaks as outputted from `aggregate_peaks()`.
+#' @param peak.label Specify whether peak_id labels should be added to the plot. Default is FALSE.
+#' @param peak.color Specify colour of peak. Default is black.
+#' @param peak.size Specify size of rectangle. Default is 5.
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1.
+#' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.05.
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#' @seealso [geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]
+#' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
+#' @seealso [geom_counts()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' set.seed(123)
 #' counts.df <- random_counts()
 #' dm_results <- random_edgeR_results()
-#' peaks <- aggregate_peaks(dm_results)
+#' peaks <- new_peaks_fn(dm_results)
 #' plot_counts_all_bams(counts.df,
 #'     seqnames = "chr2L",
 #'     start_region = 1,
@@ -36,8 +37,8 @@
 #'     geom_peak.new(peaks, peak.label = TRUE)
 #' # The plots can be layered -------------------------------------------------
 #' @references ggcoverage
-geom_peak.new <- function(peaks.df = NULL, peak.label = FALSE, peak.color = "black", peak.size = 5,
-    plot.space = 0.1, plot.height = 0.05) {
+geom_peak.new <- function(peaks.df=NULL, peak.label=FALSE, peak.color="black", peak.size=5,
+    plot.space=0.1, plot.height=0.05) {
     structure(
         list(
             peaks.df = peaks.df, peak.label = peak.label, peak.color = peak.color, peak.size = peak.size,

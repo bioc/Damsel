@@ -28,13 +28,13 @@ plotCounts(
 )
 }
 \arguments{
-\item{counts.df}{A data.frame of counts as outputted from [process_bams()]}
+\item{counts.df}{A data.frame of counts as outputted from [process_bams()].}
 
-\item{seqnames}{A character string of the chromosome of interest}
+\item{seqnames}{A character string of the chromosome of interest.}
 
-\item{start_region}{A number providing the start of region to plot}
+\item{start_region}{A number providing the start of region to plot.}
 
-\item{end_region}{A number providing the end of region to plot}
+\item{end_region}{A number providing the end of region to plot.}
 
 \item{layout}{Determines the layout of the plot. Default is "stacked" collapsing the Dam samples into one plot, and the Fusion samples into another. Samples can be plotted separately using "spread".}
 
@@ -45,10 +45,10 @@ plotCounts(
 \item{...}{Arguments passed to ggplot2}
 }
 \value{
-A `ggplot` object.
+A `ggplot2` object.
 }
 \description{
-`plot_counts_all_bams` plots a ggplot object visualising the raw counts from the bam files across a given region.
+`plot_counts_all_bams` plots a ggplot2 object visualising the raw counts from the bam files across a given region.
 * this can be used as the base layer (set n_col = 1) for additional plot layers (geom_peak.new, geom_gatc, geom_de.res.lfc etc)
 }
 \examples{
@@ -79,7 +79,7 @@ plot_counts_all_bams(counts.df,
     geom_dm.res.lfc(dm_results)
 }
 \references{
-ggcoverage
+ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
 }
 \seealso{
 [geom_peak()] [geom_dm()] [geom_genes()] [geom_gatc()] [plot_wrap()]

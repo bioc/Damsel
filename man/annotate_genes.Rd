@@ -10,11 +10,11 @@ annotate_genes(peaks, genes, regions, max_distance = 5000)
 annotatePeaksGenes(peaks, genes, regions, max_distance = 5000)
 }
 \arguments{
-\item{peaks}{A data.frame of peaks as outputted from [aggregate_peaks()]}
+\item{peaks}{A data.frame of peaks as outputted from [aggregate_peaks()].}
 
-\item{genes}{A data.frame of genes as outputted from [get_biomart_genes()]}
+\item{genes}{A data.frame of genes as outputted from [get_biomart_genes()].}
 
-\item{regions}{A data.frame of GATC regions.}
+\item{regions}{A `GRanges` object of GATC regions.}
 
 \item{max_distance}{A number providing the limit for the minimum distance from peak to gene.
 * Default is 5000. If set to `NULL`, will output all available combinations.}
@@ -37,12 +37,11 @@ library(org.Dm.eg.db)
 set.seed(123)
 example_regions <- random_regions()
 dm_results <- random_edgeR_results()
-peaks <- aggregate_peaks(dm_results)
+peaks <- new_peaks_fn(dm_results)
 txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 
 annotate_genes(peaks, genes, example_regions, max_distance = 5000)
 # view all combinations
 annotate_genes(peaks, genes, example_regions, max_distance = NULL)
-
 }

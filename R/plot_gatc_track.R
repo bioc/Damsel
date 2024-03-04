@@ -1,18 +1,18 @@
 #' Plot for a GATC track
 #'
-#' `geom_gatc` is a ggplot layer that visualises the positions of GATC sites across a given region.
-#' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
+#' `geom_gatc` is a ggplot2 layer that visualises the positions of GATC sites across a given region.
+#' * cannot be plotted by itself, must be added to an existing ggplot2 object - see examples.
 #'
-#' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`
-#' @param gatc.color Specify colour of lines. Default is red
-#' @param gatc.size Specify size of the line. Default is 5
-#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.2
-#' @param plot.height Specify overall height of the plot. Recommend leaving to the default: 0.05
+#' @param gatc_sites.df A data.frame of positions of GATC sites - can be made from `gatc_track()$sites`.
+#' @param gatc.color Specify colour of lines. Default is red.
+#' @param gatc.size Specify size of the line. Default is 5.
+#' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.2.
+#' @param plot.height Specify overall height of the plot. Recommend leaving to the default: 0.05.
 #'
 #' @return A `ggplot_add` object.
 #' @export
-#' @references ggcoverage
-#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()]
+#' @references ggcoverage - Visualise and annotate omics coverage with ggplot2. https://github.com/showteeth/ggcoverage/tree/main
+#' @seealso [geom_peak()] [geom_dm()] [geom_genes()] [geom_counts()] [plot_wrap()] [ggplot2::ggplot_add()]
 #' @examples
 #' set.seed(123)
 #' example_regions <- random_regions()
@@ -30,8 +30,8 @@
 #' ) +
 #'     geom_gatc(gatc_sites)
 #' # The plots can be layered -------------------------------------------------
-geom_gatc <- function(gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
-    plot.space = 0.2, plot.height = 0.05) {
+geom_gatc <- function(gatc_sites.df=NULL, gatc.color="red", gatc.size=5,
+    plot.space=0.2, plot.height=0.05) {
     structure(
         list(
             gatc_sites.df = gatc_sites.df, gatc.color = gatc.color, gatc.size = gatc.size,
@@ -44,8 +44,8 @@ geom_gatc <- function(gatc_sites.df = NULL, gatc.color = "red", gatc.size = 5,
 
 #' @export
 ggplot_add.gatc <- function(object, plot, object_name) {
-    if (!is.data.frame(object$gatc_sites.df)) {
-        stop("data.frame of GATC sites is required")
+    if (!is.data.frame(object$gatc_sites.df) && !inherits(object$gatc_sites.df, "GRanges")) {
+        stop("data.frame/GRanges object of GATC sites is required")
     }
     plot2 <- plot
     while ("patchwork" %in% class(plot2)) {
@@ -60,7 +60,7 @@ ggplot_add.gatc <- function(object, plot, object_name) {
     plot.region.end <- plot.data[2] %>% as.numeric()
 
     # get parameters
-    gatc_sites.df <- object$gatc_sites.df
+    gatc_sites.df <- object$gatc_sites.df %>% data.frame()
     gatc.color <- object$gatc.color
     gatc.size <- object$gatc.size
     plot.space <- object$plot.space

@@ -20,7 +20,7 @@ A data frame with 383,654 rows and 10 columns:
 <https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE120731>
 }
 \usage{
-dros_counts
+data("dros_counts")
 }
 \description{
 A subset of data from the DamID experiment in Vissers et al., (2018), GEO
