@@ -18,7 +18,7 @@
 #' dm_results <- random_edgeR_results()
 #' peaks <- identifyPeaks(dm_results)
 #' peaks
-identifyPeaks <- function(dm_results, gap_size = 150) {
+identifyPeaks <- function(dm_results, gap_size=150) {
     if (!is.data.frame(dm_results)) {
         stop("Must have data frame of differential_testing results from `edgeR_results`")
     }

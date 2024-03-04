@@ -15,7 +15,7 @@
 #' counts.df <- random_counts()
 #' plotCorrHeatmap(counts.df, method = "spearman")
 #' @export
-plotCorrHeatmap <- function(df, method = "spearman") {
+plotCorrHeatmap <- function(df, method="spearman") {
     if (!is.data.frame(df)) {
         stop("data.frame of counts is required")
     }

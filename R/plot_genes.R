@@ -35,8 +35,8 @@
 #'     geom_genes.tx(genes, txdb)
 #'
 geom_genes.tx <- function(
-    genes.df, txdb, gene_limits = NULL,
-    plot.space = 0.1, plot.height = 0.3) {
+    genes.df, txdb, gene_limits=NULL,
+    plot.space=0.1, plot.height=0.3) {
     structure(
         list(
             genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,

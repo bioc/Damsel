@@ -22,7 +22,7 @@
 #' txdb <- TxDb.Dmelanogaster.UCSC.dm6.ensGene
 #' genes <- collateGenes(genes = txdb, regions = example_regions, org.Db = org.Dm.eg.db)
 #' head(genes)
-collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
+collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
     regions <- data.frame(regions)
     if (inherits(genes, "TxDb")) {
         genes_ <- GenomicFeatures::genes(genes)
@@ -124,7 +124,7 @@ collateGenes <- function(genes, regions, org.Db = NULL, version = NULL) {
 #' annotatePeaksGenes(peaks, genes, example_regions, max_distance = 5000)
 #' # view all combinations
 #' annotatePeaksGenes(peaks, genes, example_regions, max_distance = NULL)
-annotatePeaksGenes <- function(peaks, genes, regions, max_distance = 5000) {
+annotatePeaksGenes <- function(peaks, genes, regions, max_distance=5000) {
     if ((!is.data.frame(peaks) | !is.data.frame(genes) | !is.data.frame(regions)) &&
         !(inherits(peaks, "GRanges") | inherits(genes, "GRanges") | inherits(regions, "GRanges"))) {
         stop("Require data.frame of peaks, genes, and regions")

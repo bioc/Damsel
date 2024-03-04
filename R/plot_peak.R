@@ -37,8 +37,8 @@
 #'     geom_peak(peaks, peak.label = TRUE)
 #' # The plots can be layered -------------------------------------------------
 geom_peak <- function(
-    peaks.df = NULL, peak.label = FALSE, peak.color = "black", peak.size = 5,
-    plot.space = 0.1, plot.height = 0.05) {
+    peaks.df=NULL, peak.label=FALSE, peak.color="black", peak.size=5,
+    plot.space=0.1, plot.height=0.05) {
     structure(
         list(
             peaks.df = peaks.df, peak.label = peak.label, peak.color = peak.color, peak.size = peak.size,

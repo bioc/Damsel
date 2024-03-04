@@ -24,12 +24,9 @@
 #'     log2_scale = FALSE
 #' ) +
 #'     geom_dm(dm_results)
-geom_dm <- function(dm_results.df,
-                    plot.space = 0.1, plot.height = 0.1) {
-    structure(
-        list(
-            dm_results.df = dm_results.df, plot.space = 0.1, plot.height = plot.height
-        ),
+geom_dm <- function(dm_results.df, plot.space=0.1, plot.height=0.1) {
+    structure(list(dm_results.df = dm_results.df, plot.space = 0.1,
+        plot.height = plot.height),
         class = "dm"
     )
 }

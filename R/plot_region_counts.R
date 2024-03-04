@@ -42,7 +42,8 @@
 #'     log2_scale = FALSE
 #' ) +
 #'     geom_dm(dm_results)
-plotCounts <- function(counts.df, seqnames, start_region = NULL, end_region = NULL, layout = c("stacked", "spread"), log2_scale = FALSE, colours = NULL, ...) {
+plotCounts <- function(counts.df, seqnames, start_region=NULL, end_region=NULL,
+    layout=c("stacked", "spread"), log2_scale=FALSE, colours=NULL, ...) {
     if (!is.data.frame(counts.df)) {
         stop("data.frame of counts is required")
     }
