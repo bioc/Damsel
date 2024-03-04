@@ -44,7 +44,7 @@ gatc_region_fn <- function(object) {
             seqnames = ifelse(stringr::str_detect(.data$seqnames, "chr"),
                 .data$seqnames, paste0("chr", .data$seqnames)
             ),
-            Position = paste0(.data$seqnames, "-", "start")
+            Position = paste0(.data$seqnames, "-", start)
         )
 
     df <- df[, c("Position", "seqnames", "start", "end", "width")]
@@ -65,7 +65,6 @@ gatc_region_fn <- function(object) {
         ) %>%
         data.frame()
 
-    #list(regions = regions, sites = df)
     GenomicRanges::GRangesList(regions = regions, sites = df)
 }
 #' @export
