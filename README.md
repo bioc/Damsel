@@ -4,26 +4,34 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of Damsel is to ...
+The goal of Damsel is to conduct an end-to-end analysis for DamID.
+It takes an input of BAM files and a GATC region file and generates counts,
+identifies methylated regions, identifies peaks, associating peaks with genes, 
+conducts gene ontology testing, and provides a variety of adjustable ggplot2 
+style visualisations.
 
 ## Installation
 
 You can install the development version of Damsel like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
-#BiocManager::install("Oshlack/Damsel", auth_token = "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")
+BiocManager::install("Oshlack/Damsel")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+Here we generate example results from the differential methylation results,
+and plot layers of raw counts and the logFC.
 
 ``` r
 library(Damsel)
-## basic example code
+set.seed(123)
+example_regions <- random_regions()
+example_counts <- random_counts()
+example_dm <- random_edgeR_results()
+head(example_dm)
+plotCounts(example_counts, "chr2L", 1, 5000) +
+    geom_dm(example_dm)
 ```
-
-## Citation
 
 
