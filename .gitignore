@@ -4,14 +4,9 @@
 .Ruserdata
 .Rdata
 .httr-oauth
-.DS_Store
+**/.DS_Store
 Damsel.Rproj
 inst/doc
-inst/.DS_Store
 inst/extdata/
-inst/extdata/.DS_Store
 data-raw/
-data-raw/.DS_Store
 tests/testthat/fixtures/
-tests/testthat/fixtures/.DS_Store
-.DS_Store
