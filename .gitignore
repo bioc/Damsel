@@ -8,4 +8,3 @@
 *.Rproj
 inst/doc
 data-raw/
-tests/testthat/fixtures/
