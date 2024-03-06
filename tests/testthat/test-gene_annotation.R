@@ -14,8 +14,8 @@ test_that("annotatePeaksGenes.new: Output is error", {
     expect_error(annotatePeaksGenes())
     expect_error(annotatePeaksGenes(genes = readRDS(test_path("fixtures", "test_genes.rds")), regions = readRDS(test_path("fixtures", "regions.rds"))))
     expect_error(annotatePeaksGenes(peaks = list(a = c(2, 3, 4)), genes = readRDS(test_path("fixtures", "test_genes.rds")), regions = readRDS(test_path("fixtures", "regions.rds"))))
-    expect_error(annotatePeaksGenes(peaks = readRDS(test_path("fixtures", "test_peaks.rds")), regions = readRDS(test_path("fixtures", "regions.rds"))))
-    expect_error(annotatePeaksGenes(peaks = readRDS(test_path("fixtures", "test_peaks.rds")), genes = 4, regions = readRDS(test_path("fixtures", "regions.rds"))))
+    expect_error(annotatePeaksGenes(peaks = readRDS(test_path("fixtures", "test_peaks_new.rds")), regions = readRDS(test_path("fixtures", "regions.rds"))))
+    expect_error(annotatePeaksGenes(peaks = readRDS(test_path("fixtures", "test_peaks_new.rds")), genes = 4, regions = readRDS(test_path("fixtures", "regions.rds"))))
 })
 
 test_that("annotatePeaksGenes.new: Output is no error", {
