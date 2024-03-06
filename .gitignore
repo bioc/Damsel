@@ -5,7 +5,7 @@
 .Rdata
 .httr-oauth
 **/.DS_Store
-Damsel-clone-final.Rproj
+*.Rproj
 inst/doc
 inst/extdata/
 data-raw/
