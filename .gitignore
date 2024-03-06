@@ -7,6 +7,5 @@
 **/.DS_Store
 *.Rproj
 inst/doc
-inst/extdata/
 data-raw/
 tests/testthat/fixtures/
