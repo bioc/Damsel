@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, include=FALSE}
 library(Damsel)
 ```
 
@@ -32,7 +32,10 @@ The DamID example data used in this vignette is available in the package and has
 
 # Installation
 ```{r eval=FALSE}
-BiocManager::install("Oshlack/Damsel", force = TRUE)
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Damsel")
 library(Damsel)
 ```
 
