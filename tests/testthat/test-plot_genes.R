@@ -17,8 +17,8 @@ test_that("geom_genes.tx: Output is error", {
 })
 
 test_that("geom_genes.tx: Output is no error", {
-    expect_no_error(plotCounts(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 50000, end_region = 100000) +
+    expect_no_error(plotCounts(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 1, end_region = 10000) +
         geom_genes.tx(collateGenes(genes = "dmelanogaster_gene_ensembl", version = 109, regions = readRDS(test_path("fixtures", "regions.rds"))), TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene))
-    expect_no_error(plotCounts(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 7000, end_region = 9000) +
+    expect_no_error(plotCounts(readRDS(test_path("fixtures", "test_counts_df.rds")), seqnames = "chr2L", start_region = 500, end_region = 9000) +
         geom_genes.tx(readRDS(test_path("fixtures", "test_genes.rds")), TxDb.Dmelanogaster.UCSC.dm6.ensGene::TxDb.Dmelanogaster.UCSC.dm6.ensGene))
 })
