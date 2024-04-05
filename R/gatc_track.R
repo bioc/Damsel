@@ -18,13 +18,13 @@ getGatcRegions <- function(object) {
     if (missing(object)) {
         stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
     }
-    if (!class(object) %in% c("BSgenome", "character")) {
+    if (!inherits(object, "BSgenome")) {
         stop("Must have a BSgenome object such as BSgenome.Dmelanogaster.UCSC.dm6, OR the path to a FASTA file")
     }
-    if (class(object) %in% "BSgenome") {
+    if (inherits(object, "BSgenome")) {
         fasta <- object
         names_fasta <- GenomeInfoDb::seqnames(object)
-    } else if (class(object) %in% "character") {
+    } else if (inherits(object, "character")) {
         fasta <- Biostrings::readDNAStringSet(object)
         names_fasta <- names(fasta)
     }

@@ -122,25 +122,7 @@ testDmRegions <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
 
 
 
-#' Add dm_results to GATC regions
-#'
-#' Used within aggregate_peaks to add in the regions that were excluded from edgeR analysis for low counts
-#'
-#' @param dm_results A data.frame as outputted from [edgeR_results()]
-#' @param regions A data.frame of GATC regions, default is regions_gatc_drosophila_dm6
-#'
-#' @return A `data.frame` of regions with added information about the dm results;
-#' * dm - 1,0,NA ;
-#' * logFC: 0 if dm is NA ;
-#' * adjust.p: 1 if dm is NA :
-#' * meth_status: Upreg, No_sig, Not_included
 ..addDM <- function(dm_results, regions) {
-    if (!is.data.frame(dm_results)) {
-        stop("Must have data frame of differential testing results from `edgeR_results")
-    }
-    if (!is.data.frame(regions) && !(inherits(regions, "GRanges"))) {
-        stop("Regions must be provided")
-    }
     results <- dm_results
     regions <- data.frame(regions)
     df <- regions %>%

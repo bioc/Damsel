@@ -35,7 +35,7 @@ testGeneOntology(
  * Probability weights for each gene
 }
 \description{
-`goseq_fn` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+`testGeneOntology` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 }
 \examples{
 library(TxDb.Dmelanogaster.UCSC.dm6.ensGene)

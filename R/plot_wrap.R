@@ -87,7 +87,6 @@ plotWrap <- function(
         stop("All data.frames must be inputted (counts.df, dm_results.df, peaks.df, genes.df, gatc_sites.df)")
     }
     if (!is.null(id)) {
-        # id <- id[!is.na(id)]
         peaks.df <- data.frame(peaks.df)
         genes.df <- data.frame(genes.df)
         df <- dplyr::filter(peaks.df, .data$peak_id %in% id)
@@ -123,7 +122,7 @@ plotWrap <- function(
             geom_dm(dm_results.df) +
             geom_peak(peaks.df) +
             geom_gatc(gatc_sites.df) +
-            geom_genes.tx(genes.df, txdb, ...)
+            geom_genes_tx(genes.df, txdb, ...)
 
         list_plots[[i]] <- plot
     }

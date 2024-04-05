@@ -1,6 +1,6 @@
 #' Gene ontology analysis
 #'
-#'  `goseq_fn` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
+#'  `testGeneOntology` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 #'
 #' @param annotation A data.frame of annotated genes and peaks as `annotate_peaks()$all`.
 #' @param genes A data.frame of gene data as outputted from `get_biomart_genes()`.
@@ -30,7 +30,7 @@
 #' ontology <- testGeneOntology(annotation, genes, example_regions)
 #' ontology$signif_results
 #' ontology$prob_weights
-testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_threshold=0.05, bias=NULL) {
+testGeneOntology <- function(annotation, genes, regions, extend_by = 2000, fdr_threshold = 0.05, bias = NULL) {
     dm_genes <- dplyr::filter(annotation, .data$min_distance <= extend_by)
     regions <- data.frame(regions)
     goseq_data <- genes
@@ -109,7 +109,7 @@ testGeneOntology <- function(annotation, genes, regions, extend_by=2000, fdr_thr
 #' ontology <- testGeneOntology(annotation, genes, example_regions)$signif_results
 #' plotGeneOntology(ontology)
 plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
-    df <- signif_results[seq_len(10), ]
+    df <- signif_results[seq_len(min(10, nrow(signif_results))), ]
     df <- df %>% dplyr::filter(!is.na(.data$category))
     max_fdr <- max(-log10(df$FDR)) + 5
     plot <- df %>%

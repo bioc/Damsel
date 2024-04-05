@@ -49,6 +49,25 @@
     peak.plot
 }
 
+..regionRectangle <- function(df) {
+    df_ <- df
+    df_ <- df_ %>%
+        dplyr::mutate(number = seq_len(dplyr::n())) %>%
+        .[rep(seq_len(nrow(.)), times = 4), ] %>%
+        .[order(.$number), ] %>%
+        dplyr::group_by(.data$number) %>%
+        dplyr::mutate(num = seq_len(dplyr::n())) %>%
+        dplyr::mutate(
+            Position = dplyr::case_when(
+                .data$num == 1 ~ .data$start,
+                .data$num == 2 ~ .data$start,
+                .data$num == 3 ~ .data$end,
+                TRUE ~ .data$end
+            )
+        )
+    df_
+}
+
 ..peakGatcTheme <- function(margin.len, x.range) {
     list(
         ggplot2::theme_classic(),

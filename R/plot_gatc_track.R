@@ -49,7 +49,7 @@ ggplot_add.gatc <- function(object, plot, object_name) {
         stop("data.frame/GRanges object of GATC sites is required")
     }
     plot2 <- plot
-    while ("patchwork" %in% class(plot2)) {
+    while (inherits(plot2, "patchwork")) {
         plot2 <- plot2[[1]]
     }
     plot.data <- plot2$labels$title

@@ -2,7 +2,7 @@
 % Please edit documentation in R/gene_annotation.R
 \name{collateGenes}
 \alias{collateGenes}
-\title{New: Get list of genes}
+\title{Get list of genes}
 \usage{
 collateGenes(genes, regions, org.Db = NULL, version = NULL)
 }
