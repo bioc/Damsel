@@ -5,7 +5,7 @@ test_that("peaks_new:Output is a data.frame", {
 
 test_that("peaks_new:Output is error", {
     expect_error(identifyPeaks())
-    expect_error(identifyPeaks(dm_results = list(a = c(1, 2), b = c("E", "F"))), "Must have data frame of differential_testing results from `edgeR_results`") # , ignore.case = TRUE)
+    expect_error(identifyPeaks(dm_results = list(a = c(1, 2), b = c("E", "F"))), "Must have data frame of differential_testing results from `testDmRegions`") # , ignore.case = TRUE)
 })
 
 

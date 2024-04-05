@@ -20,7 +20,7 @@
 #' peaks
 identifyPeaks <- function(dm_results, gap_size=150) {
     if (!is.data.frame(dm_results)) {
-        stop("Must have data frame of differential_testing results from `edgeR_results`")
+        stop("Must have data frame of differential_testing results from `testDmRegions`")
     }
     df <- data.frame(dm_results)
     peaks <- df %>%
@@ -60,11 +60,9 @@ identifyPeaks <- function(dm_results, gap_size=150) {
         tidyr::fill(seq, .direction = "up")
 
     peaks <- ..simplifyPeaks(peaks)
-    # gaps <- gaps_new(df = peaks, dm_results = df, gap_size = {{ gap_size }})
 
     gaps <- ..checkForGaps(df = peaks, gap_size = {{ gap_size }})
     if (nrow(gaps) != 0) {
-        #  gaps <- ..peakGaps(df = peaks, dm_results = df, gap_size = {{ gap_size }})
         gaps_ <- ..findGaps(gaps, gap_size = {{ gap_size }})
         gaps_ <- ..simplifyGaps(gaps_, gaps)
         gaps <- ..overlapGaps(gaps_, peaks, dm_results)

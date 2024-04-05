@@ -25,7 +25,7 @@
 #' ) +
 #'     geom_dm(dm_results)
 geom_dm <- function(dm_results.df, plot.space=0.1, plot.height=0.1) {
-    structure(list(dm_results.df = dm_results.df, plot.space = 0.1,
+    structure(list(dm_results.df = dm_results.df, plot.space = plot.space,
         plot.height = plot.height),
         class = "dm"
     )
@@ -37,7 +37,7 @@ ggplot_add.dm <- function(object, plot, object_name) {
         stop("data.frame of dm results is required")
     }
     plot2 <- plot
-    while ("patchwork" %in% class(plot2)) {
+    while (inherits(plot2, "patchwork")) {
         plot2 <- plot2[[1]]
     }
     plot.data <- plot2$labels$title
@@ -77,11 +77,11 @@ ggplot_add.dm <- function(object, plot, object_name) {
         ggplot2::geom_segment(ggplot2::aes(x = .data$end, xend = .data$end, y = .data$logFC, yend = 0)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = .data$logFC, yend = .data$logFC)) +
         ggplot2::geom_segment(ggplot2::aes(x = .data$start, xend = .data$end, y = 0, yend = 0)) +
-        ..dmTheme(colours = colours_list, x.range = c(plot.region.start, plot.region.end))
-    ggplot2::scale_y_continuous(
-        limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
-        expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right"
-    )
+        ..dmTheme(margin.len = plot.space, colours = colours_list, x.range = c(plot.region.start, plot.region.end)) +
+        ggplot2::scale_y_continuous(
+            limits = c(-(df_fc$abs_fc) - 0.5, df_fc$abs_fc + 0.5),
+            expand = c(0, 0), breaks = c(-round(df_fc$abs_fc), 0, round(df_fc$abs_fc)), position = "right"
+            )
 
     # assemble plot
     patchwork::wrap_plots(plot + ggplot2::theme(plot.margin = ggplot2::margin(t = plot.space, b = plot.space)),
@@ -92,19 +92,9 @@ ggplot_add.dm <- function(object, plot, object_name) {
 
 
 ..dmReshape <- function(df_regions) {
-    df <- df_regions %>%
-        dplyr::mutate(number = seq_len(dplyr::n())) %>%
-        .[rep(seq_len(nrow(.)), times = 4), ] %>%
-        .[order(.$number), ] %>%
-        dplyr::group_by(.data$number) %>%
-        dplyr::mutate(num = seq_len(dplyr::n())) %>%
+    df <- ..regionRectangle(df_regions)
+    df <- df %>%
         dplyr::mutate(
-            Position = dplyr::case_when(
-                .data$num == 1 ~ .data$start,
-                .data$num == 2 ~ .data$start,
-                .data$num == 3 ~ .data$end,
-                TRUE ~ .data$end
-            ),
             y_axis_2 = dplyr::case_when(
                 .data$num == 1 ~ 0,
                 .data$num == 2 ~ .data$logFC,
@@ -128,7 +118,7 @@ ggplot_add.dm <- function(object, plot, object_name) {
     df
 }
 
-..dmTheme <- function(colours, x.range) {
+..dmTheme <- function(margin.len, colours, x.range) {
     list(
         ggplot2::theme_classic(),
         ggplot2::theme(
@@ -137,7 +127,7 @@ ggplot_add.dm <- function(object, plot, object_name) {
             axis.title.x = ggplot2::element_blank(),
             axis.ticks.x = ggplot2::element_blank(),
             panel.border = ggplot2::element_rect(colour = "black", fill = NA, linewidth = 1),
-            plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+            plot.margin = ggplot2::margin(t = margin.len, b = margin.len)
         ),
         ggplot2::scale_colour_manual(values = colours, name = "dm_result"),
         ggplot2::scale_fill_manual(values = colours, name = "dm_result"),

@@ -6,7 +6,7 @@
 #' @export
 #' @examples
 #' head(random_regions(size = 50))
-random_regions <- function(size = 50) {
+random_regions <- function(size=50) {
     df <- list(start = 50, end = 85, width = 36) %>% data.frame()
     size_n <- size - 1
     random_width <- floor(stats::runif(size_n, 5, 1000))
@@ -31,7 +31,7 @@ random_regions <- function(size = 50) {
 #' @export
 #' @examples
 #' head(random_counts(size = 50))
-random_counts <- function(size = 50) {
+random_counts <- function(size=50) {
     counts <- random_regions(size)
     size <- nrow(counts)
     counts$Dam_1.bam <- stats::rnorm(size, 100)
@@ -51,7 +51,7 @@ random_counts <- function(size = 50) {
 #' @export
 #' @examples
 #' head(random_edgeR_results(size = 50))
-random_edgeR_results <- function(size = 50) {
+random_edgeR_results <- function(size=50) {
     results <- random_regions(size)
     results$seqnames <- paste0("chr", results$seqnames)
     results$number <- seq_len(size)

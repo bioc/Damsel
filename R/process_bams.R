@@ -25,7 +25,7 @@
 #' head(counts.df)
 #' # rearrange columns of bam files so that: Dam_1, Fusion_1, Dam_2, Fusion_2
 #' @export
-countBamInGATC <- function(path_to_bams, regions, nthreads = 2, ...) {
+countBamInGATC <- function(path_to_bams, regions, nthreads=2, ...) {
     if (!is.character(path_to_bams)) {
         stop("Path to bams must be a character vector")
     }
@@ -47,9 +47,10 @@ countBamInGATC <- function(path_to_bams, regions, nthreads = 2, ...) {
         stop("No .bai files present in path: Please ensure every BAM file has a corresponding .bai file")
     }
     list_files <- list_files[!grepl(".bai", list_files)]
-    path_to_bams <- ifelse(substring(path_to_bams, first = nchar(path_to_bams))
-    == "/", path_to_bams, paste0(path_to_bams, "/"))
-    list_files <- paste0(path_to_bams, list_files)
+    path_to_bams <- ifelse(grepl("/$", path_to_bams),
+        gsub("/$", "", path_to_bams), path_to_bams
+    )
+    list_files <- file.path(path_to_bams, list_files)
 
     scan_result <- ..checkPaired(list_files)
     paired_samples <- list_files[grep(TRUE, scan_result)]
@@ -63,27 +64,24 @@ countBamInGATC <- function(path_to_bams, regions, nthreads = 2, ...) {
         counts_feature$seqnames <- paste0("chr", counts_feature$seqnames)
     }
     if (length(paired_samples) != 0) {
-        for (i in seq_len(length(paired_samples))) {
-            counts_feature <- cbind(
-                counts_feature,
-                data.frame(Rsubread::featureCounts(paired_samples[i],
-                    annot.ext = regions_feat, isPairedEnd = TRUE,
-                    allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads,
-                    ...
-                )$counts)
-            )
-        }
+        counts_feature <- cbind(
+            counts_feature,
+            Rsubread::featureCounts(paired_samples,
+                annot.ext = regions_feat,
+                isPairedEnd = TRUE, allowMultiOverlap = TRUE, fraction = TRUE,
+                nthreads = nthreads, ...
+            )$counts
+        )
     }
     if (length(single_samples) != 0) {
-        for (i in seq_len(length(single_samples))) {
-            counts_feature <- cbind(
-                counts_feature,
-                data.frame(Rsubread::featureCounts(single_samples[i],
-                    annot.ext = regions_feat, allowMultiOverlap = TRUE,
-                    fraction = TRUE, nthreads = nthreads, ...
-                )$counts)
-            )
-        }
+        counts_feature <- cbind(
+            counts_feature,
+            Rsubread::featureCounts(single_samples,
+                annot.ext = regions_feat,
+                allowMultiOverlap = TRUE, fraction = TRUE, nthreads = nthreads,
+                ...
+            )$counts
+        )
     }
     if (same_name == TRUE) {
         counts_feature$seqnames <- paste0("chr", counts_feature$seqnames)
@@ -93,10 +91,6 @@ countBamInGATC <- function(path_to_bams, regions, nthreads = 2, ...) {
 }
 
 ..checkPaired <- function(list_files) {
-    scan_result <- list()
-    for (i in seq_len(length(list_files))) {
-        scan_result <- list(scan_result, Rsamtools::testPairedEndBam(list_files[i]))
-    }
-    scan_result <- unlist(scan_result)
+    scan_result <- vapply(list_files, Rsamtools::testPairedEndBam, c(a = TRUE))
     scan_result
 }

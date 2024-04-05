@@ -42,7 +42,8 @@
 #'     log2_scale = FALSE
 #' ) +
 #'     geom_dm(dm_results)
-plotCounts <- function(counts.df, seqnames, start_region=NULL, end_region=NULL,
+plotCounts <- function(
+    counts.df, seqnames, start_region=NULL, end_region=NULL,
     layout=c("stacked", "spread"), log2_scale=FALSE, colours=NULL, ...) {
     if (!is.data.frame(counts.df)) {
         stop("data.frame of counts is required")
@@ -116,18 +117,7 @@ plotCounts <- function(counts.df, seqnames, start_region=NULL, end_region=NULL,
 
 
 ..plotCountsReshape <- function(counts) {
-    df <- counts %>%
-        dplyr::mutate(number = seq_len(dplyr::n())) %>%
-        .[rep(seq_len(nrow(.)), times = 4), ] %>%
-        .[order(.$number), ] %>%
-        dplyr::group_by(.data$number) %>%
-        dplyr::mutate(num = seq_len(dplyr::n())) %>%
-        dplyr::mutate(Position = dplyr::case_when(
-            .data$num == 1 ~ .data$start,
-            .data$num == 2 ~ .data$start,
-            .data$num == 3 ~ .data$end,
-            TRUE ~ .data$end
-        ))
+    df <- ..regionRectangle(counts)
     df <- df %>% dplyr::mutate_at(ggplot2::vars(tidyr::matches(".bam", ignore.case = TRUE)), ~ dplyr::case_when(
         .data$num == 1 ~ 0,
         .data$num == 2 ~ .,

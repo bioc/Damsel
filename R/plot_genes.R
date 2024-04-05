@@ -1,6 +1,6 @@
 #' Plotting genes
 #'
-#' `geom_genes.tx` is a ggplot2 layer that visualises the positions of genes across a given region.
+#' `geom_genes_tx` is a ggplot2 layer that visualises the positions of genes across a given region.
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #' @param genes.df A data.frame of genes as outputted from `get_biomart_genes`.
@@ -32,9 +32,9 @@
 #'     end_region = 40000,
 #'     log2_scale = FALSE
 #' ) +
-#'     geom_genes.tx(genes, txdb)
+#'     geom_genes_tx(genes, txdb)
 #'
-geom_genes.tx <- function(
+geom_genes_tx <- function(
     genes.df, txdb, gene_limits=NULL,
     plot.space=0.1, plot.height=0.3) {
     structure(
@@ -42,13 +42,13 @@ geom_genes.tx <- function(
             genes.df = genes.df, txdb = txdb, gene_limits = gene_limits,
             plot.space = plot.space, plot.height = plot.height
         ),
-        class = "genes.tx"
+        class = "genes_tx"
     )
 }
 
 
 #' @export
-ggplot_add.genes.tx <- function(object, plot, object_name) {
+ggplot_add.genes_tx <- function(object, plot, object_name) {
     if (!is.data.frame(object$genes.df) && !inherits(object$genes.df, "GRanges")) {
         stop("data.frame/GRanges of genes is required")
     }
@@ -56,7 +56,7 @@ ggplot_add.genes.tx <- function(object, plot, object_name) {
         message("If gene is disproportional to the plot, use gene_limits = c(y1,y2). If gene is too large, recommend setting to c(0,2) and adjusting the plot.height accordingly.")
     }
     plot2 <- plot
-    while ("patchwork" %in% class(plot2)) {
+    while (inherits(plot2, "patchwork")) {
         plot2 <- plot2[[1]]
     }
     plot.data <- plot2$labels$title
@@ -96,8 +96,8 @@ ggplot_add.genes.tx <- function(object, plot, object_name) {
     }
     gene_plot <- gene_plot +
         ..themeGenePlot(
-            plot.start = plot.region.start, plot.end = plot.region.end,
-            gene_lim = gene_limits
+            margin.len = plot.space, plot.start = plot.region.start,
+            plot.end = plot.region.end, gene_lim = gene_limits
         )
 
     # assemble plot
@@ -117,8 +117,7 @@ ggplot_add.genes.tx <- function(object, plot, object_name) {
         )
 }
 
-..themeGenePlot <- function(plot.start = plot.region.start,
-                            plot.end = plot.region.end, gene_lim = gene_limits) {
+..themeGenePlot <- function(margin.len, plot.start, plot.end, gene_lim) {
     list(
         ggplot2::scale_x_continuous(expand = c(0, 0)),
         ggplot2::coord_cartesian(xlim = c(plot.start, plot.end)),
@@ -143,7 +142,7 @@ ggplot_add.genes.tx <- function(object, plot, object_name) {
                 colour = "black",
                 fill = NA, linewidth = 1
             ),
-            plot.margin = ggplot2::margin(t = 0.1, b = 0.1)
+            plot.margin = ggplot2::margin(t = margin.len, b = margin.len)
         )
     )
 }

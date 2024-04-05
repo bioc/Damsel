@@ -1,4 +1,4 @@
-#' New: Get list of genes
+#' Get list of genes
 #'
 #' Takes a Txdb object, path to a gff file, or a species (biomaRt) and returns a GRanges of genes.
 #'
@@ -73,7 +73,6 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
 }
 
 ..annotateGeneGatc <- function(genes, regions) {
-    # regions$seqnames <- paste0("chr", regions$seqnames)
     overlap <- plyranges::find_overlaps_within(plyranges::as_granges(regions), plyranges::as_granges(genes)) %>%
         data.frame() %>%
         dplyr::group_by(.data$ensembl_gene_id) %>%
@@ -84,7 +83,6 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
     genes_ <- genes_ %>%
         dplyr::mutate(
             n_regions = dplyr::coalesce(.data$n_regions, 0)
-            # seqnames = ifelse(grepl("chr", seqnames), seqnames, paste0("chr", seqnames))
         ) %>%
         .[order(.$start), ] %>%
         .[order(.$seqnames), ]
@@ -188,30 +186,21 @@ annotatePeaksGenes <- function(peaks, genes, regions, max_distance=5000) {
     pair_peak <- plyranges::pair_nearest(peaks_gr, genes_gr) %>%
         data.frame()
 
-    pair_gene <- pair_gene %>%
-        stats::setNames(c(
-            "gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
-            "peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
-            colnames(.[11:ncol(.)])
-        ))
-    pair_peak <- pair_peak %>%
-        stats::setNames(c(
-            "peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
-            "gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
-            colnames(.[11:ncol(.)])
-        ))
+    colnames(pair_gene) <- colnames(pair_gene) %>%
+        gsub("granges.x.", "gene_", .) %>%
+        gsub("granges.y.", "peak_", .)
+    colnames(pair_peak) <- colnames(pair_peak) %>%
+        gsub("granges.x.", "peak_", .) %>%
+        gsub("granges.y.", "gene_", .)
 
     # same order of columns
     pair_peak <- pair_peak[, colnames(pair_gene)]
 
     overlaps <- plyranges::pair_overlaps(genes_gr, peaks_gr) %>%
         data.frame()
-    overlaps <- overlaps %>%
-        stats::setNames(c(
-            "gene_seqnames", "gene_start", "gene_end", "gene_width", "gene_strand",
-            "peak_seqnames", "peak_start", "peak_end", "peak_width", "peak_strand",
-            colnames(.[11:ncol(.)])
-        ))
+    colnames(overlaps) <- colnames(overlaps) %>%
+        gsub("granges.x.", "gene_", .) %>%
+        gsub("granges.y.", "peak_", .)
 
 
     combo <- rbind(pair_gene, pair_peak, overlaps) %>%
