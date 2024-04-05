@@ -17,7 +17,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Caitlin Page \email{caitlin.page@petermac.org}
+\strong{Maintainer}: Caitlin Page \email{caitlin.page@petermac.org} (\href{https://orcid.org/0009-0004-7949-8143}{ORCID})
 
 }
 \keyword{internal}
