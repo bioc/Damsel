@@ -1,6 +1,6 @@
 ---
 title: "Damsel-workflow"
-output: rmarkdown::html_vignette
+output: BiocStyle::html_document
 vignette: >
   %\VignetteIndexEntry{Damsel-workflow}
   %\VignetteEngine{knitr::rmarkdown}
@@ -32,19 +32,20 @@ The DamID example data used in this vignette is available in the package and has
 
 # Installation
 ```{r eval=FALSE}
-if (!require("BiocManager", quietly = TRUE))
+if (!require("BiocManager", quietly = TRUE)) {
     install.packages("BiocManager")
+}
 
 BiocManager::install("Damsel")
 library(Damsel)
 ```
 
 
-# 2. Processing the BAM files
+# Processing the BAM files
 
 As a DamID analysis tool, Damsel requires a GATC region file for analysis. These regions serve as a guide to extract counts from the BAM files.
 
-## 2.1 Introducing the GATC region file
+## Introducing the GATC region file
 
 
 It can be generated with `getGatcRegions()` using a `BSGenome` object or a FASTA file.
@@ -69,20 +70,8 @@ If you already have your own GATC region file, ensure that it has the same forma
 * end: end of region
 * width: length of region (ensure that is is correct according to `[plyranges::as_granges()])`
 
-The GATC regions are not evenly distributed across the genome, and vary greatly in size. 
-This can be explored in more detail via boxplots 
 
-```{r region boxplot, fig.height=5, fig.width=5}
-regions.df <- data.frame(regions)
-ggplot2::ggplot(
-    regions.df,
-    ggplot2::aes(x = seqnames, y = log(width))
-) +
-    ggplot2::geom_boxplot()
-```
-
-
-## 2.2 Extracting the counts within the GATC regions
+## Extracting the counts within the GATC regions
 
 Note: Damsel requires BAM files that have been mapped to the reference genome.
 
@@ -116,46 +105,25 @@ data("dros_counts")
 * The DamID data captures the ~75bp region extending from each GATC site, so although regions are of differing widths, there is a null to minimal length bias present on the data, and does not require length correction.
 
 
-## 2.3 Correlation analysis of samples
+## Correlation analysis of samples
 
 At this stage, the similarities and differences between the samples can be analysed via correlation.
 `plotCorrHeatmap` plots the correlation of all available BAM files Dam and Fusion, to visualise the similarity between files.
 The default for all Damsel correlation analysis is the non-parametric "spearman's" correlation.
 The correlation between Dam_1 and Fusion_1 can be expected to reach ~ 0.7, whereas the correlation between Dam_1 & Dam_3 or Fusion_1 & Fusion_2 would be expected to be closer to ~0.9
 
-```{r heatmap, fig.height=6, fig.width=6}
+```{r heatmap}
 plotCorrHeatmap(df = counts.df, method = "spearman")
 ```
 
 Two specific samples can also be compared using `ggscatter` which plots a scatterplot of the two samples, overlaid with the correlation results. [ggpubr::ggscatter()]
 
 
-## 2.4 Visualisation of coverage
+## Visualisation of coverage
 
 A specific region can be selected to view the counts across samples.
 
-```{r coverage, fig.height=7, fig.width=10}
-plotCounts(counts.df,
-    seqnames = "chr2L",
-    start_region = 1,
-    end_region = 40000,
-    log2_scale = FALSE,
-    layout = "stacked"
-)
-```
-
-
-```{r coverage2, fig.height=7, fig.width=10}
-plotCounts(counts.df,
-    seqnames = "chr2L",
-    start_region = 1,
-    end_region = 40000,
-    layout = "stacked",
-    log2_scale = TRUE
-)
-```
-
-```{r coverage3, fig.height=7, fig.width=10}
+```{r coverage3, fig.wide=TRUE}
 plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -163,25 +131,16 @@ plotCounts(counts.df,
     layout = "spread"
 )
 ```
+As shown in the following plots, the default layout is `"stacked"`, where the replicates are overlaid. The counts can also be displayed in a log2 ratio with `log2_scale=TRUE`
 
 
-```{r coverage4, fig.height=7, fig.width=10}
-plotCounts(counts.df,
-    seqnames = "chr2L",
-    start_region = 1,
-    end_region = 40000,
-    layout = "spread",
-    log2_scale = TRUE
-)
-```
-
-# 3. Differential methylation analysis
+# Differential methylation analysis
 
 The goal with DamID analysis is to identify regions that are enriched in the fusion sample relative to the control. In Damsel, this step is referred to as differential methylation analysis, and makes use of [`edgeR`].
 
 For ease of use, Damsel has four main edgeR based functions which compile different steps and functions from within edgeR. 
 
-## 3.1 Setting up edgeR analysis
+## Setting up edgeR analysis
 
 `makeDGE` sets up the edgeR analysis for differential methylation testing. Taking the data frame of samples and regions as input, it conducts the following steps:
 
@@ -200,7 +159,7 @@ head(dge)
 The output from this step is a DGEList containing all of the information from the steps.
 
 
-## 3.2 Examining the data - multidimensional scaling plot
+## Examining the data - multidimensional scaling plot
 
 It's important to visualise the differences between the samples.
 
@@ -213,7 +172,7 @@ limma::plotMDS(dge, col = as.numeric(factor(group)))
 ```
 
 
-## 3.3 Identifying differentially methylated regions
+## Identifying differentially methylated regions
 
 After exploring the data visually, it's time to identify the enriched regions. `testDmRegions` compiles the edgeR functions for differential testing with one key modification - it outputs the results with the adjusted p values as well as the raw p values.
 
@@ -237,7 +196,7 @@ knitr::kable(head(dm_results), digits = 32)
 
 The edgeR results can be plotted alongside the counts as well.
 
-```{r, fig.height=8, fig.width=10}
+```{r, fig.wide=TRUE}
 plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -257,7 +216,7 @@ gatc_sites <- regions_and_sites$sites
 knitr::kable(head(gatc_sites))
 ```
 
-```{r, fig.height=9, fig.width=10}
+```{r, fig.wide=TRUE}
 plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -270,7 +229,7 @@ plotCounts(counts.df,
 
 
 
-# 4. Identifying peaks (bridges)
+# Identifying peaks (bridges)
 
 As you could see from the plot of the differential methylation results, there are 10s of 1000s of enriched regions. To reduce the scale of this data to something that can be more biologically meaningul, enriched regions can be compiled into peaks.
 
@@ -284,25 +243,14 @@ The FDR and logFC for each peak is calculated via the theory of [csaw::getBestTe
 peaks <- identifyPeaks(dm_results)
 nrow(peaks)
 
-knitr::kable(head(peaks), format = "html", table.attr = "style='width:30%;'", digits = 32)
+knitr::kable(head(peaks), digits = 32)
 ```
 
 ## Plotting
 
 A peak plot layer can be added to our graph
 
-```{r, fig.height=8, fig.width=10}
-plotCounts(counts.df,
-    seqnames = "chr2L",
-    start_region = 1,
-    end_region = 40000
-) +
-    geom_dm(dm_results) +
-    geom_peak(peaks) +
-    geom_gatc(gatc_sites)
-```
-
-```{r, fig.height=8, fig.width=10}
+```{r, fig.wide=TRUE}
 plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -312,8 +260,9 @@ plotCounts(counts.df,
     geom_peak(peaks, peak.label = TRUE) +
     geom_gatc(gatc_sites)
 ```
+The default version will not plot the peak.label
 
-# 5. Identifying genes associated with peaks
+# Identifying genes associated with peaks
 
 The peak information itself - while interesting, has no biological meaning. As the peaks represent a region that the Fusion protein interacted with on the DNA, likely as a transcription factor, we wish to identify the gene that is being affected. To do so, we need to associate the peaks with a potential "target" gene.
 
@@ -323,11 +272,11 @@ It must also be noted that the Drosophila melanogaster genome and transcription 
 
 In the Damsel methodology, peaks are considered to associate with genes if they are within 5kb upstream or downstream. If multiple genes are within these criteria, they are all listed, with the closest gene given the primary position.
 
-## 5.1 Extract genes 
+## Extract genes 
 
 The function `collateGenes()` uses two different mechanisms to create a list of genes. It allows for the use of a TxDb object/annotation package, or can access biomaRt.
 
-### 5.1.1 A TxDb object
+### A TxDb object
 The simplest approach is to use a TxDb annotation package. A TxDb package is available for most species and has information about the genes, exons, cds, promoters, etc - which can all be accessed using the GenomicFeatures package.
 This presentation has a lot of slides on how to use TxDb objects to access different data types: https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicFeatures_In_Bioconductor.html#10
 
@@ -347,7 +296,7 @@ knitr::kable(head(genes))
 ```
 Using the TxDb package, Damsel assumes that the TSS (transcription start site) is the same as the start site of the gene, taking the strand into account.
 
-### 5.1.2 Accessing the biomaRt resource
+### Accessing the biomaRt resource
 Alternatively, the name of a species listed in biomaRt can be provided, and the version of the genome. The advantage of biomaRt is that a greater amount of information is able to be uncovered, including the canonical transcript. 
 A guide to understanding more about how biomaRt functions is here: https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html
 ```{r eval=FALSE}
@@ -362,7 +311,7 @@ collateGenes(genes = "dmelanogaster_gene_ensembl", regions = regions, version = 
 * identifies the number of GATC regions that overlap with each gene
 
 
-## 5.2 Annotating genes to peaks
+## Annotating genes to peaks
 
 As stated above, Damsel associates genes with peaks if they are within 5 kb upstream or downstream. This maximum distance is an adjustable parameter within the `annotatePeaksGenes()` function. If set to `NULL` it will output all possible combinations as defined by `plyranges::pair_nearest`. The nature of this function means that the closest gene will be found for every peak, even if that distance is in the millions. If the user sets `max_distance=NULL`, we recommend undergoing some filtering to remove those associations.
 
@@ -377,11 +326,11 @@ knitr::kable(str(annotation$all), digits = 32)
 ```
 
 
-## 5.3 Interpreting results and plotting
+## Interpreting results and plotting
 
 Now that we have the genes from `collateGenes()`, this can be added as a layer to the previous plots. This plot requires the gene positions as a guide for a `Txdb` or `EnsDb` object, building off the autoplot generic built by `ggbio`.
 
-```{r, fig.height=9, fig.width=10}
+```{r, fig.wide=TRUE}
 plotCounts(counts.df,
     seqnames = "chr2L",
     start_region = 1,
@@ -390,13 +339,13 @@ plotCounts(counts.df,
     geom_dm(dm_results) +
     geom_peak(peaks) +
     geom_gatc(gatc_sites) +
-    geom_genes.tx(genes, txdb)
+    geom_genes_tx(genes, txdb)
 ```
 
 
 * If the scale of the gene plot is disproportional to the height of the overall plot - if it is too large or too squished, it can be adjusted using the `plot.height` argument.
 
-```{r, fig.height=9, fig.width=10}
+```{r, fig.wide=TRUE}
 plotWrap(
     id = peaks[1, ]$peak_id,
     counts.df = counts.df,
@@ -407,7 +356,7 @@ plotWrap(
 )
 ```
 
-```{r, fig.height=9, fig.width=10}
+```{r, fig.wide=TRUE}
 plotWrap(
     id = genes[1, ]$ensembl_gene_id,
     counts.df = counts.df,
@@ -419,11 +368,11 @@ plotWrap(
 ```
 
 
-# 6. Gene ontology 
+# Gene ontology 
 One of the last steps in a typical DamID analysis is gene ontology analysis. However, a key mistake made in this analysis using any common data type - including RNA-seq, is the lack of bias correction. We correct for this by utilising the [goseq] package. Without bias correction, the ontology results would be biased towards longer genes - the longer the gene, the more likely it would be to have a peak associated with it, and therefore be called as significant. We can see this in the plot below.
 
 
-## 6.1 GO analysis with goseq
+## GO analysis with goseq
 `testGeneOntology` identifies the over-represented GO terms from the peak data, correcting for the number of GATC regions matching to each gene.
 
 3 outputs

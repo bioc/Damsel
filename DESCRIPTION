@@ -2,7 +2,9 @@ Package: Damsel
 Type: Package
 Title: Damsel: an end to end analysis of DamID
 Version: 0.99.1
-Authors@R: person("Caitlin", "Page", email = "caitlin.page@petermac.org", role = c("aut", "cre"))
+Authors@R: person("Caitlin", "Page", 
+    email = "caitlin.page@petermac.org", role = c("aut", "cre"),
+    comment = c(ORCID = "0009-0004-7949-8143"))
 Description: Damsel provides an end to end analysis of DamID data.
     Damsel takes bam files from Dam-only control and fusion samples and counts the reads matching to each GATC region. edgeR is utilised to identify regions of enrichment in the fusion relative to the control. Enriched regions are combined into peaks, and are associated with nearby genes.
     Damsel allows for IGV style plots to be built as the results build, inspired by ggcoverage, and using the functionality and layering ability of ggplot2.
@@ -11,8 +13,9 @@ Description: Damsel provides an end to end analysis of DamID data.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Suggests: 
-    biovizBase,
+    BiocStyle,
     biomaRt,
+    biovizBase,
     BSgenome.Dmelanogaster.UCSC.dm6,
     knitr,
     limma,
@@ -22,7 +25,7 @@ Suggests:
     TxDb.Dmelanogaster.UCSC.dm6.ensGene
 Config/testthat/edition: 3
 Depends: 
-    R (>= 3.50)
+    R (>= 4.4.0)
 RoxygenNote: 7.3.1
 Imports: 
     AnnotationDbi,
