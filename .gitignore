@@ -8,3 +8,4 @@
 *.Rproj
 inst/doc
 data-raw/
+tests/testthat/Rplots.pdf
