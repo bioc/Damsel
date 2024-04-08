@@ -33,6 +33,7 @@ countBamInGATC <- function(path_to_bams, regions, nthreads=2, ...) {
         stop("GATC region file must be a GRanges object")
     }
     regions <- data.frame(regions)
+    regions <- regions[,c("Position", "seqnames", "start", "end", "width", "strand")]
     regions_feat <- regions[, !names(regions) %in% "width"]
     colnames(regions_feat) <- c("GeneID", "Chr", "Start", "End", "Strand")
     regions_feat$Start <- as.integer(regions_feat$Start)
