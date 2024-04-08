@@ -124,7 +124,7 @@ testDmRegions <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
 
 ..addDM <- function(dm_results, regions) {
     results <- dm_results
-    regions <- data.frame(regions)
+    regions <- data.frame(regions) %>% dplyr::relocate(Position)
     df <- regions %>%
         dplyr::mutate(seqnames = paste0("chr", .data$seqnames), number = seq_len(nrow(.)))
     df$dm <- results[match(df$Position, row.names(results)), "dm"]
