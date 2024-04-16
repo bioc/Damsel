@@ -18,8 +18,7 @@
 #' example_regions <- random_regions()
 #' counts.df <- random_counts()
 #' gatc_sites <- dplyr::mutate(example_regions,
-#'     seqnames = paste0("chr", seqnames),
-#'     start = start - 3, end = start + 4
+#'     start = start - 3, end = start + 4, width = end - start + 1
 #' )
 #'
 #' plotCounts(counts.df,
@@ -61,7 +60,8 @@ ggplot_add.gatc <- function(object, plot, object_name) {
     plot.region.end <- plot.data[2] %>% as.numeric()
 
     # get parameters
-    gatc_sites.df <- object$gatc_sites.df %>% data.frame()
+    gatc_sites.df <- object$gatc_sites.df
+    gatc_sites.df <- ..changeStyle(gatc_sites.df, "UCSC")
     gatc.color <- object$gatc.color
     gatc.size <- object$gatc.size
     plot.space <- object$plot.space

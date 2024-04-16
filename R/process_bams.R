@@ -33,7 +33,13 @@ countBamInGATC <- function(path_to_bams, regions, nthreads=2, ...) {
         stop("GATC region file must be a GRanges object")
     }
     regions <- data.frame(regions)
-    regions <- regions[,c("Position", "seqnames", "start", "end", "width", "strand")]
+    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(unique(regions$seqnames))) {
+      regions <- ..changeStyle(regions, "NCBI")
+    }
+    if(!"Position" %in% colnames(regions)) {
+        regions <- regions %>% dplyr::mutate(Position = paste0("chr", seqnames, "-", start))
+    }
+    regions <- regions[,c("Position", "seqnames", "start", "end", "width", "strand"), drop = FALSE]
     regions_feat <- regions[, !names(regions) %in% "width"]
     colnames(regions_feat) <- c("GeneID", "Chr", "Start", "End", "Strand")
     regions_feat$Start <- as.integer(regions_feat$Start)

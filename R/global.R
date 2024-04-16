@@ -21,6 +21,7 @@
     utils::globalVariables("category")
     utils::globalVariables("seqnames")
     utils::globalVariables("start")
+    utils::globalVariables("end")
 
     invisible()
 }
