@@ -186,7 +186,7 @@ These results are incorporated with the region data, providing a result for ever
 Setting plot=TRUE will plot an [`edgeR::plotSmear()`] alongside the results
 
 ```{r}
-dm_results <- testDmRegions(dge, p.value = 0.01, lfc = 1, regions = regions, plot = TRUE)
+dm_results <- testDmRegions(dge, p.value = 0.05, lfc = 1, regions = regions, plot = TRUE)
 dm_results %>%
     dplyr::group_by(meth_status) %>%
     dplyr::summarise(n = dplyr::n())

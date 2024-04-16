@@ -4,14 +4,14 @@
 \alias{testDmRegions}
 \title{Differential testing}
 \usage{
-testDmRegions(dge, regions, p.value = 0.01, lfc = 1, plot = TRUE)
+testDmRegions(dge, regions, p.value = 0.05, lfc = 1, plot = TRUE)
 }
 \arguments{
 \item{dge}{A DGEList object as outputted from [makeDGE()].}
 
 \item{regions}{A data.frame of GATC regions.}
 
-\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.}
+\item{p.value}{A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05.}
 
 \item{lfc}{A number giving the minimum absolute log2-fold-change for significant results. Default is 1.}
 
@@ -34,7 +34,7 @@ example_regions <- random_regions()
 counts.df <- random_counts()
 dge <- makeDGE(counts.df)
 
-dm_results <- testDmRegions(dge, regions = example_regions, p.value = 0.01, lfc = 1)
+dm_results <- testDmRegions(dge, regions = example_regions, p.value = 0.05, lfc = 1)
 head(dm_results)
 }
 \references{

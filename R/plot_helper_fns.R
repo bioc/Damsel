@@ -7,7 +7,7 @@
     df <- df[df$seqnames == chr, ] %>% dplyr::arrange(start)
     rownames(df) <- NULL
 
-    df.select <- df[df$end >= start & df$start <= end, ]
+    df.select <- dplyr::filter(df, end >= {{start}}, start <= {{end}})
     if (nrow(df.select) == 0) {
         return(df.select)
     }

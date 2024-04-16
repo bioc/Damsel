@@ -29,8 +29,15 @@ makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.
     if (!is.numeric(min.samples) | length(min.samples) > 1) {
         stop("min.samples must be 1 value, recommend using default value")
     }
-
+    if(!"width" %in% colnames(counts.df)) {
+        counts.df <- counts.df %>% dplyr::mutate(end = as.double(.data$end),
+            start = as.double(.data$start))
+        counts.df <- dplyr::mutate(counts.df, width = end - start + 1)
+    }
     counts.df <- counts.df %>% dplyr::filter(.data$width <= max.width)
+    if(length(grep("bam", colnames(counts.df), ignore.case = TRUE)) == 0) {
+        stop("Samples must have bam or BAM in the name")
+    }
     matrix <- as.matrix(counts.df[, grepl("bam", colnames(counts.df), ignore.case = TRUE)])
     rownames(matrix) <- counts.df$Position
 
@@ -72,7 +79,7 @@ makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.
 #'
 #' @param dge A DGEList object as outputted from [makeDGE()].
 #' @param regions A data.frame of GATC regions.
-#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.01.
+#' @param p.value A number between 0 and 1 providing the required false discovery rate (FDR). Default is 0.05.
 #' @param lfc A number giving the minimum absolute log2-fold-change for significant results. Default is 1.
 #' @param plot An option to plot the results using edgeR::plotSmear. Default is TRUE.
 #' @return A `data.frame` of differential methylation results. Columns are: Position (chromosome-start), seqnames, start, end, width, strand, number (region number), dm (edgeR result: 0,1,NA), logFC, adjust.p, meth_status (No_signal, Upreg, Not_included).
@@ -89,9 +96,9 @@ makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.
 #' counts.df <- random_counts()
 #' dge <- makeDGE(counts.df)
 #'
-#' dm_results <- testDmRegions(dge, regions = example_regions, p.value = 0.01, lfc = 1)
+#' dm_results <- testDmRegions(dge, regions = example_regions, p.value = 0.05, lfc = 1)
 #' head(dm_results)
-testDmRegions <- function(dge, regions, p.value=0.01, lfc=1, plot=TRUE) {
+testDmRegions <- function(dge, regions, p.value=0.05, lfc=1, plot=TRUE) {
     if (!is.numeric(p.value) | length(p.value) > 1) {
         stop("p.value must be 1 number, recommend using default value")
     }
