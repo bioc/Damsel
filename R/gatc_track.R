@@ -39,16 +39,15 @@ getGatcRegions <- function(object) {
             seqnames = x
         )
     }) %>%
-        dplyr::bind_rows() %>%
-        dplyr::mutate(
-            seqnames = ifelse(stringr::str_detect(.data$seqnames, "chr"),
-                .data$seqnames, paste0("chr", .data$seqnames)
-            ),
-            Position = paste0(.data$seqnames, "-", start)
-        )
+        dplyr::bind_rows()
+    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(names_fasta)) {
+        df <- ..changeStyle(df, "NCBI", names_fasta)
+    }
+    df <- df %>%
+        dplyr::mutate(Position = paste0("chr", .data$seqnames, "-", start),
+            strand = "*")
 
-    df <- df[, c("Position", "seqnames", "start", "end", "width")]
-    df$strand <- "*"
+    df <- df[, c("Position", "seqnames", "start", "end", "width", "strand"), drop = FALSE]
 
     regions <- df %>%
         dplyr::group_by(.data$seqnames) %>%
@@ -60,10 +59,8 @@ getGatcRegions <- function(object) {
         dplyr::mutate(width = .data$end - .data$start + 1) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
-            Position = paste0(.data$seqnames, "-", .data$start),
-            seqnames = gsub("chr", "", .data$seqnames)
-        ) %>%
-        data.frame()
+            Position = paste0("chr", .data$seqnames, "-", .data$start)
+        )
 
     GenomicRanges::GRangesList(regions = regions, sites = df)
 }

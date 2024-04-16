@@ -27,15 +27,15 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
     if (inherits(genes, "TxDb")) {
         genes_ <- GenomicFeatures::genes(genes)
         genes_$ensembl_gene_id <- names(genes_)
-        genes_ <- data.frame(genes_)[, c("seqnames", "start", "end", "width", "strand", "ensembl_gene_id")]
+        genes_ <- data.frame(genes_)[, c("seqnames", "start", "end", "width", "strand", "ensembl_gene_id"), drop = FALSE]
         gene_names <- AnnotationDbi::select(org.Db, keys = AnnotationDbi::keys(genes), keytype = "ENSEMBL", columns = c("SYMBOL"))
         genes_$gene_name <- gene_names[match(genes_$ensembl_gene_id, gene_names$ENSEMBL), "SYMBOL"]
         genes_ <- genes_ %>% dplyr::mutate(TSS = ifelse(.data$strand == "+", .data$start, .data$end))
         message("TSS taken as start of gene, taking strand into account")
         genes_ <- plyranges::as_granges(genes_)
-        seq_chr <- GenomeInfoDb::seqlevels(genes_)[1] %>% grepl("chr", .)
-        if (seq_chr == TRUE) {
-            regions$seqnames <- paste0("chr", regions$seqnames)
+        seq_chr <- GenomeInfoDb::seqlevelsStyle(genes_)
+        if ("UCSC" %in% seq_chr) {
+            regions <- ..changeStyle(df=regions, style="UCSC")
         }
     } else if (grep("ensembl", genes)) {
         genes_ <- ..accessBiomart(species = genes, regions, version)
@@ -49,6 +49,11 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
         stop("Package \"biomaRt\" must be installed to use this function.",
             call. = FALSE
         )
+    }
+    regions <- data.frame(regions) %>% dplyr::mutate(seqnames = as.character(seqnames))
+    seq_chr <- unique(regions$seqnames) %>% as.character()
+    if(!"Ensembl" %in% GenomeInfoDb::seqlevelsStyle(seq_chr)) {
+        regions <- ..changeStyle(regions, "Ensembl")
     }
     ensembl <- biomaRt::useEnsembl(biomart = "genes", dataset = species, version = version)
     BM.info <- biomaRt::getBM(
@@ -70,6 +75,7 @@ collateGenes <- function(genes, regions, org.Db=NULL, version=NULL) {
     gene_features <- gene_features %>% .[order(.$chromosome_name, .$start_position), ]
     colnames(gene_features) <- c("ensembl_gene_id", "gene_name", "ensembl_transcript_id", "seqnames", "start", "end", "strand", "TSS")
     gene_features <- plyranges::as_granges(gene_features)
+    gene_features
 }
 
 ..annotateGeneGatc <- function(genes, regions) {
@@ -127,9 +133,10 @@ annotatePeaksGenes <- function(peaks, genes, regions, max_distance=5000) {
         !(inherits(peaks, "GRanges") | inherits(genes, "GRanges") | inherits(regions, "GRanges"))) {
         stop("Require data.frame of peaks, genes, and regions")
     }
-    regions <- data.frame(regions) %>%
-        dplyr::mutate(seqnames = paste0("chr", seqnames)) %>%
-        plyranges::as_granges()
+    regions <- ..changeStyle(regions, "UCSC")
+    genes <- ..changeStyle(genes, "UCSC")
+    peaks <- ..changeStyle(peaks, "UCSC")
+    regions <- plyranges::as_granges(regions)
     genes_gr <- plyranges::as_granges(genes)
     peaks_gr <- plyranges::as_granges(peaks)
 
@@ -141,7 +148,7 @@ annotatePeaksGenes <- function(peaks, genes, regions, max_distance=5000) {
     combo <- combo %>%
         dplyr::mutate(num = seq_len(dplyr::n()))
 
-    n_regions <- combo[, c("seqnames", "start", "end", "width", "num")]
+    n_regions <- combo[, c("seqnames", "start", "end", "width", "num"), drop = FALSE]
 
     n_regions <- plyranges::find_overlaps_within(
         regions, plyranges::as_granges(n_regions)
@@ -272,7 +279,7 @@ annotatePeaksGenes <- function(peaks, genes, regions, max_distance=5000) {
         "gene_position", "ensembl_gene_id", "gene_name", "midpoint_is",
         "position"
     )
-    df <- df[, col_order]
+    df <- df[, col_order, drop = FALSE]
     df
 }
 

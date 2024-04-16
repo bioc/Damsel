@@ -57,8 +57,7 @@ library("org.Dm.eg.db")
 set.seed(123)
 example_regions <- random_regions()
 gatc_sites <- dplyr::mutate(example_regions,
-    seqnames = paste0("chr", seqnames),
-    start = start - 3, end = start + 4
+    start = start - 3, end = start + 4, width = end - start + 1
 )
 counts.df <- random_counts()
 dm_results <- random_edgeR_results()

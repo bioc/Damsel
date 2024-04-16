@@ -18,7 +18,7 @@ random_regions <- function(size=50) {
     df$strand <- "*"
     row.names(df) <- NULL
     df$Position <- paste0("chr", df$seqnames, "-", df$start)
-    df[, c("Position", "seqnames", "start", "end", "width", "strand")]
+    df[, c("Position", "seqnames", "start", "end", "width", "strand"), drop = FALSE]
 }
 
 
@@ -82,4 +82,17 @@ random_edgeR_results <- function(size=50) {
         TRUE ~ "Not_included"
     )
     results
+}
+
+
+..changeStyle <- function(df, style, seq_names=NULL) {
+    df_ <- plyranges::as_granges(df)
+    if(is.null(seq_names)) {
+        seq_names <- GenomeInfoDb::seqlevels(df_)
+    }
+    newStyle <- GenomeInfoDb::mapSeqlevels(seqnames = seq_names, style = {{style}})
+    newStyle <- newStyle[stats::complete.cases(newStyle)]
+    df_ <- GenomeInfoDb::renameSeqlevels(x = df_, value = newStyle)
+    df_ <- data.frame(df_)
+    df_
 }
