@@ -18,7 +18,7 @@ A data.frame of peaks ranked by p-value.
 `identifyPeaks` aggregates neighbouring differentially methylated regions, identifying 'peaks' where the provided transcription factor is believed to have bound to the DNA. These locations can then be used to identify the potential target genes.
 }
 \details{
-Small unmethylated regions are able to be 'skipped' over and included into peaks through the gap_size paramter, whose default is 150bp. This was selected due to the common approach of 75bp sequencing of DamID from the edges of the fragments.
+Small unmethylated regions are able to be 'skipped' over and included into peaks through the gap_size parameter, whose default is 150bp. This was selected due to the common approach of 75bp sequencing of DamID from the edges of the fragments.
 The FDR and logFC for each peak is calculated via the theory of [csaw::getBestTest()] where the 'best' (smallest) p-value in the regions that make up the peak is selected as representative of the peak. The logFC is therefore the corresponding logFC from the FDR.
 }
 \examples{
