@@ -32,8 +32,11 @@ countBamInGATC <- function(path_to_bams, regions, nthreads=2, ...) {
     if (!is.data.frame(regions) && !inherits(regions, "GRanges")) {
         stop("GATC region file must be a GRanges object")
     }
+    if (Sys.info()["sysname"] == "Windows") {
+      nthreads <- 1
+    }
     regions <- data.frame(regions)
-    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(unique(regions$seqnames))) {
+    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(unfactor(unique(regions$seqnames)))) {
         regions <- ..changeStyle(regions, "NCBI")
     }
     if(!"Position" %in% colnames(regions)) {
