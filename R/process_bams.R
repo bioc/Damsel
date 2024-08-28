@@ -36,7 +36,7 @@ countBamInGATC <- function(path_to_bams, regions, nthreads=2, ...) {
       nthreads <- 1
     }
     regions <- data.frame(regions)
-    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(unfactor(unique(regions$seqnames)))) {
+    if(!"NCBI" %in% GenomeInfoDb::seqlevelsStyle(as.character(unique(regions$seqnames)))) {
         regions <- ..changeStyle(regions, "NCBI")
     }
     if(!"Position" %in% colnames(regions)) {
