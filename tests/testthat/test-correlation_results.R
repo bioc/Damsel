@@ -1,6 +1,6 @@
 # heatmap tests
 test_that("corr_heat: Output is a plot", {
-    expect_s3_class(plotCorrHeatmap(readRDS(test_path("fixtures", "test_counts_df.rds"))), "gg")
+    expect_s4_class(plotCorrHeatmap(readRDS(test_path("fixtures", "test_counts_df.rds"))), "Heatmap")
 })
 
 test_that("corr_heat: Output is error", {
