@@ -121,6 +121,11 @@ Two specific samples can also be compared using `ggscatter` which plots a scatte
 
 ## Visualisation of coverage
 
+The overall coverage of different samples can be compared
+```{r}
+plotCountsDistribution(counts.df, constant = 1)
+```
+
 A specific region can be selected to view the counts across samples.
 
 ```{r coverage3, fig.wide=TRUE}
@@ -261,6 +266,13 @@ plotCounts(counts.df,
     geom_gatc(gatc_sites)
 ```
 The default version will not plot the peak.label
+
+The distribution of counts per sample that have contributed to peaks can be compared.
+
+```{r}
+plotCountsInPeaks(counts.df, dm_results, peaks, position = "stack")
+```
+
 
 # Identifying genes associated with peaks
 
