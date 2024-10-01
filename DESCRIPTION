@@ -30,6 +30,7 @@ RoxygenNote: 7.3.1
 Imports: 
     AnnotationDbi,
     Biostrings,
+    ComplexHeatmap,
     dplyr,
     edgeR,
     GenomeInfoDb,
