@@ -4,7 +4,7 @@
 #' * cannot be plotted by itself, must be added to an existing ggplot object - see examples.
 #'
 #'
-#' @param peaks.df A data.frame of peaks as outputted from `aggregate_peaks()`.
+#' @param peaks.df A data.frame of peaks as outputted from `identifyPeaks()`.
 #' @param peak.label Specify whether peak_id labels should be added to the plot. Default is FALSE.
 #' @param peak.color Specify colour of peak. Default is black.
 #' @param peak.size Specify size of rectangle. Default is 5.
