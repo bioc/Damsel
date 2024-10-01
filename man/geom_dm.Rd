@@ -7,7 +7,7 @@
 geom_dm(dm_results.df, plot.space = 0.1, plot.height = 0.1)
 }
 \arguments{
-\item{dm_results.df}{A data.frame of differential testing results as outputted from `edgeR_results()`.}
+\item{dm_results.df}{A data.frame of differential testing results as outputted from `testDmRegions()`.}
 
 \item{plot.space}{Specify gap to next plot. Recommend leaving to the default: 0.1.}
 

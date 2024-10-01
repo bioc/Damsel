@@ -14,7 +14,7 @@ geom_peak(
 )
 }
 \arguments{
-\item{peaks.df}{A data.frame of peaks as outputted from `aggregate_peaks()`.}
+\item{peaks.df}{A data.frame of peaks as outputted from `identifyPeaks()`.}
 
 \item{peak.label}{Specify whether peak_id labels should be added to the plot. Default is FALSE.}
 

@@ -5,7 +5,7 @@
 #' * regions are coloured by dm result: 1, 0, NA (grey for NA)
 #' * cannot be plotted by itself, must be added to an existing plot - see examples.
 #'
-#' @param dm_results.df A data.frame of differential testing results as outputted from `edgeR_results()`.
+#' @param dm_results.df A data.frame of differential testing results as outputted from `testDmRegions()`.
 #' @param plot.space Specify gap to next plot. Recommend leaving to the default: 0.1.
 #' @param plot.height Specify overall height of plot. Recommend leaving to the default: 0.1.
 #'
