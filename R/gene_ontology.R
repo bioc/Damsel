@@ -114,7 +114,7 @@ plotGeneOntology <- function(signif_results, fdr_threshold=0.05) {
     max_fdr <- max(-log10(df$FDR)) + 5
     plot <- df %>%
         .[order(.$FDR, decreasing = FALSE), ] %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$FDR, y = factor(.data$term, levels = .data$term), colour = .data$ontology)) +
+        ggplot2::ggplot(ggplot2::aes(x = -log10(.data$FDR), y = factor(.data$term, levels = .data$term), colour = .data$ontology)) +
         ggplot2::geom_point(ggplot2::aes(size = .data$numInCat)) +
         ggplot2::geom_vline(xintercept = fdr_threshold, linetype = "dashed") +
         ggplot2::scale_x_continuous(limits = c(0, max_fdr))
