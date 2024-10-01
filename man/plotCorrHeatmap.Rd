@@ -7,13 +7,13 @@
 plotCorrHeatmap(df, method = "spearman")
 }
 \arguments{
-\item{df}{A data.frame of GATC region counts as outputted from [process_bams()].}
+\item{df}{A data.frame of GATC region counts as outputted from [countBamInGatc()].}
 
 \item{method}{The correlation method used. If not specified, will use default of non-parametric spearman's.
 * Non-parametric methods are recommended as data does not reliably meet the requirements for parametric analysis.}
 }
 \value{
-A `ggplot2` object. A heatmap style plot of the samples, coloured by correlation value.
+A heatmap style plot of the samples, coloured by correlation value.
 * Colour spectrum is determined from the minimum correlation as the lowest correlation, the median correlation as the midpoint colour, and 1 as the top colour.
 }
 \description{
