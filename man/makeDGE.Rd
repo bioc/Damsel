@@ -9,11 +9,14 @@ makeDGE(
   max.width = 10000,
   lib.size = NULL,
   min.cpm = 0.5,
-  min.samples = 3
+  min.samples = 3,
+  include_replicates = TRUE,
+  group = NULL,
+  design = NULL
 )
 }
 \arguments{
-\item{counts.df}{A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).}
+\item{counts.df}{A data.frame generated from [countBamInGATC]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).}
 
 \item{max.width}{Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.}
 
@@ -22,6 +25,12 @@ makeDGE(
 \item{min.cpm}{Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5.}
 
 \item{min.samples}{Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples).}
+
+\item{include_replicates}{Should replicates be incorporated into the design matrix? Assumes pattern of Dam_1, Fusion_2, Dam_2, Fusion_2. Default is `TRUE`.}
+
+\item{group}{Optional parameter to provide your own group definitions. Default is `NULL` and groups Dam and Fusion samples assuming pattern as Dam, Fusion etc.}
+
+\item{design}{Optional parameter to provide your own design matrix. See the `limma` documentation for advice on creating a design matrix.}
 }
 \value{
 An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
@@ -41,5 +50,5 @@ Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differenti
 Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
 }
 \seealso{
-[edgeR_results()] [process_bams()]
+[testDmRegions()] [countBamInGATC()]
 }

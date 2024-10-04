@@ -2,11 +2,15 @@
 #'
 #' `makeDGE()` sets up the edgeR analysis for visualisation of the samples [limma::plotMDS()], and then for identifying differentially methylated regions [edgeR_results()].
 #'
-#' @param counts.df A data.frame generated from [process_bams]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).
+#' @param counts.df A data.frame generated from [countBamInGATC]. Ensure that the samples are ordered by (Dam_1.bam, Fusion_1.bam, Dam_2.bam, Fusion_2.bam, ...).
 #' @param max.width Remove large regions, default is width of 10,000. We recommend this value as the Dam can methylate GATC sites up to 5kb away from the binding site, generating a total width of 10 kb.
 #' @param lib.size Library size for each sample is calculated as the sum across all rows for that sample unless otherwise specified.
 #' @param min.cpm Filtering parameter, minimum counts per million (cpm) of each sample. Recommend leaving at default of 0.5.
 #' @param min.samples Filtering parameter, minimum number of samples to meet the criteria of keep_a in order to retain the region in the downstream analysis. Default is 3 (assuming 6 samples).
+#' @param include_replicates Should replicates be incorporated into the design matrix? Assumes pattern of Dam_1, Fusion_2, Dam_2, Fusion_2. Default is `TRUE`.
+#' @param group Optional parameter to provide your own group definitions. Default is `NULL` and groups Dam and Fusion samples assuming pattern as Dam, Fusion etc.
+#' @param design Optional parameter to provide your own design matrix. See the `limma` documentation for advice on creating a design matrix.
+#'
 #'
 #' @return An object of class `DGEList`. Refer to [edgeR::?`DGEListClass`] for details
 #' @export
@@ -14,12 +18,13 @@
 #' McCarthy DJ, Chen Y, Smyth GK (2012). “Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation.” Nucleic Acids Research, 40(10), 4288-4297. doi:10.1093/nar/gks042.
 #' Chen Y, Lun ATL, Smyth GK (2016). “From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline.” F1000Research, 5, 1438. doi:10.12688/f1000research.8987.2.
 #' Chen Y, Chen L, Lun ATL, Baldoni P, Smyth GK (2024). “edgeR 4.0: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets.” bioRxiv. doi:10.1101/2024.01.21.576131.
-#' @seealso [edgeR_results()] [process_bams()]
+#' @seealso [testDmRegions()] [countBamInGATC()]
 #' @examples
 #' counts.df <- random_counts()
 #'
 #' makeDGE(counts.df)
-makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.samples=3) {
+makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.samples=3,
+                    include_replicates=TRUE, group=NULL, design=NULL) {
     if (!is.data.frame(counts.df)) {
         stop("Must have data.frame of counts")
     }
@@ -42,8 +47,11 @@ makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.
     rownames(matrix) <- counts.df$Position
 
     n_samples <- seq_len(ncol(matrix) / 2)
-
-    group <- rep(c("Dam", "Fusion"), times = length(n_samples))
+    if(is.null(group)) {
+        group <- rep(c("Dam", "Fusion"), times = length(n_samples))
+    } else {
+        group <- group
+    }
 
     dge <- edgeR::DGEList(matrix, lib.size = lib.size, group = group, gene = counts.df[, 2:5])
 
@@ -51,17 +59,25 @@ makeDGE <- function(counts.df, max.width=10000, lib.size=NULL, min.cpm=0.5, min.
     dge <- dge[keep, , keep.lib.sizes = FALSE]
 
     dge <- edgeR::calcNormFactors(dge)
-
-    design_df <- seq_len(ncol(matrix)) %>%
-        data.frame() %>%
-        stats::setNames("group")
-    zero_vec <- rep(0, times = length(n_samples))
-    for (i in n_samples) {
-        design <- replace(zero_vec, i, 1)
-        design <- rep(design, each = 2)
-        design_df[, ncol(design_df) + 1] <- design
+    if(is.null(design)) {
+        if(include_replicates == TRUE) {
+            design_df <- group %>%
+                data.frame() %>%
+                stats::setNames("group") %>%
+                dplyr::mutate(group = ifelse(group == "Dam", 0, 1))
+            zero_vec <- rep(0, times = length(n_samples))
+            for (i in n_samples) {
+                design <- replace(zero_vec, i, 1)
+                design <- rep(design, each = 2)
+                design_df[, ncol(design_df) + 1] <- design
+            }
+            design <- stats::model.matrix(~., data = design_df[, seq_len(ncol(design_df)) - 1])
+        } else {
+            design <- stats::model.matrix(~group)
+        }
+    } else {
+      design <- design
     }
-    design <- stats::model.matrix(~., data = design_df[, seq_len(ncol(design_df)) - 1])
 
     dge <- edgeR::estimateDisp(dge, robust = TRUE, design = design)
 
